@@ -6,21 +6,70 @@ tags = ['infosec','telegram']
 slug = "stealing-your-telegram-account-in-10-seconds-flat"
 +++
 
-If you handed me your phone, unlocked, what's the worst that I could do in 10 seconds?
-
-The other day I received this message on Telegram:
+If you handed me your phone, what's the worst I could do in 10 seconds?
 
 <div class="tgThread">
 	<!-- This is all handcrafted HTML & CSS :3 -->
 	<div class="tgMsg tgMsgSmBL"><a href="https://web.telegram.org/">Web.telegram.org</a><span class="tgMsgTs">edited 23:51</span></div>
-	<div class="tgMsg tgMsgSmTL tgMsgNoneBL">Click that link and your browser will be logged into telegram without passwords<span class="tgMsgTs">23:52</span></div><div class="tgMsgSpeech"><div></div></div>
+	<div class="tgMsg tgMsgSmTL tgMsgNoneBL"><span>Click that link and your browser will be logged into telegram without passwords</span><span class="tgMsgTs">23:52</span></div><div class="tgMsgSpeech"><div></div></div>
 </div>
 
-It was just a link to Telegram's web client, but to my surprise, it did in fact do exactly what was told.
+The other day I received an interesting message with a link to [Telegram's web client](https://web.telegram.org). Upon clicking on the link, I was greeted by the client, already logged in. Curious, I sent a message with the same link, clicked on it, and found myself logged in once again. There wasn't anything special about the link I had been sent, this is just Telegram's default behavior.
+
+I wanted to find out how this works. The first step was to figure out how the Telegram client was passing the session to the browser. As I clicked on the link, I noticed something flash on the URL bar for just a split second:
+
+<div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span style="color:#E3E3E3">web.telegram.org</span>/#tgWebAuthToken=dGhpcyB0b2tlbiBpcyByYW5kb20gYW5kIDEwMjQgYml0cyBsb25nLCBidXQgaW4gdGhlIGJsb2cgcG9zdCBpIHJlcGxhY2VkIGl0IHdpdGggdGhpcyBmdW4gZWFzdGVyIGVnZyBmb3IgdGhvc2Ugd2l0aCBhIGtlZW4gZXllIQ&tgWebAuthUserId=420493337&tgWebAuthDcId=4</span></div></div>
+
+It seems like Telegram just opens up an URL with your account's token in it.
 
 <!-- ![Sample Image](image.jpg) -->
 
 <style>
+	.urlBar {
+		background: #3C3C3C;
+		height: 34px;
+		width: 100%;
+		padding: 6px;
+		border-radius: 4px;
+		font-family: system-ui, sans-serif;
+		font-size: 14px;
+	}
+	.urlBarInner *::selection {
+		color: #000;
+		background-color: #A8C7FA;
+	}
+	.urlBarInner {
+		background: #282828;
+		color: #C7C7C7;
+		height: 34px;
+		border-radius: 34px;
+		width: 100%;
+		line-height: 22px;
+	}
+	.urlBarText {
+		text-overflow: ellipsis;
+		overflow:hidden;
+		white-space:nowrap;
+		display:inline-block;
+		margin-left:37px;
+		width: calc(100% - 36px - 16px);
+		margin-top: 6px;
+	}
+	.urlBarIcon {
+		width: 16px;
+		height: 16px;
+		margin: 5px;
+		color: #E3E3E3;
+		fill: #E3E3E3;
+		background: #3C3C3C;
+		padding: 4px;
+		position: absolute;
+		display:block;
+		border-radius: 24px;
+	}
+	.tgMsg *::selection {
+		background-color: #2E70A5;
+	}
 	.tgThread {
 		font-family: "Open Sans", system-ui, sans-serif;
 		font-size: 12.75px;
@@ -56,6 +105,7 @@ It was just a link to Telegram's web client, but to my surprise, it did in fact 
 		float: right;
 		margin-left: 12px;
 		color: #6D7F8F;
+		user-select: none;
 	}
 	.tgMsgSpeech {
 		background: #182533;
