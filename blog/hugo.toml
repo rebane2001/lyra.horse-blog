@@ -9,3 +9,6 @@ pluralizeListTitles = false
 [permalinks]
   [permalinks.page]
   	posts = '/:year/:month/:slug/'
+
+[markup.goldmark.renderer]
+  unsafe = true

@@ -6,8 +6,68 @@ tags = ['infosec','telegram']
 slug = "stealing-your-telegram-account-in-10-seconds-flat"
 +++
 
-Occaecat aliqua consequat laborum ut ex aute aliqua culpa quis irure esse magna dolore quis. Proident fugiat labore eu laboris officia Lorem enim. Ipsum occaecat cillum ut tempor id sint aliqua incididunt nisi incididunt reprehenderit. Voluptate ad minim sint est aute aliquip esse occaecat tempor officia qui sunt. Aute ex ipsum id ut in est velit est laborum incididunt. Aliqua qui id do esse sunt eiusmod id deserunt eu nostrud aute sit ipsum. Deserunt esse cillum Lorem non magna adipisicing mollit amet consequat.
+If you handed me your phone, unlocked, what's the worst that I could do in 10 seconds?
 
-![Bryce Canyon National Park](bryce-canyon.jpg)
+The other day I received this message on Telegram:
 
-Sit excepteur do velit veniam mollit in nostrud laboris incididunt ea. Amet eu cillum ut reprehenderit culpa aliquip labore laborum amet sit sit duis. Laborum id proident nostrud dolore laborum reprehenderit quis mollit nulla amet veniam officia id id. Aliquip in deserunt qui magna duis qui pariatur officia sunt deserunt.
+<div class="tgThread">
+	<!-- This is all handcrafted HTML & CSS :3 -->
+	<div class="tgMsg tgMsgSmBL"><a href="https://web.telegram.org/">Web.telegram.org</a><span class="tgMsgTs">edited 23:51</span></div>
+	<div class="tgMsg tgMsgSmTL tgMsgNoneBL">Click that link and your browser will be logged into telegram without passwords<span class="tgMsgTs">23:52</span></div><div class="tgMsgSpeech"><div></div></div>
+</div>
+
+It was just a link to Telegram's web client, but to my surprise, it did in fact do exactly what was told.
+
+<!-- ![Sample Image](image.jpg) -->
+
+<style>
+	.tgThread {
+		font-family: "Open Sans", system-ui, sans-serif;
+		font-size: 12.75px;
+		background: #0E1621;
+		padding: 8px;
+		border-radius: 4px;
+		width: fit-content;
+	}
+	.tgMsg {
+		background: #182533;
+		color: #F5F5F5;
+		border-radius: 16px;
+		max-width: 410px;
+		padding: 8px 8px 8px 11px;
+		margin: 2px;
+		width: fit-content;
+	}
+	.tgMsgSmTL {
+		border-top-left-radius: 6px;
+	}
+	.tgMsgSmBL {
+		border-bottom-left-radius: 6px;
+	}
+	.tgMsgNoneBL {
+		border-bottom-left-radius: 0;
+	}
+	.tgMsg a {
+		color: #70BAF5;
+		text-decoration: none;
+	}
+	.tgMsgTs {
+		margin-top: 5px;
+		float: right;
+		margin-left: 12px;
+		color: #6D7F8F;
+	}
+	.tgMsgSpeech {
+		background: #182533;
+		width: 8px;
+		height: 8px;
+		position: absolute;
+		transform: translate(-6px, -10px);
+	}
+	.tgMsgSpeech > div {
+		background: #0E1621;
+		width: 8px;
+		height: 8px;
+		border-bottom-right-radius: 8px;
+	}
+</style>
