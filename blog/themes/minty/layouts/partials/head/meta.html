@@ -1,0 +1,26 @@
+<meta property="og:url" content="{{ .Permalink }}">
+{{- with or site.Title site.Params.title | plainify }}
+  <meta property="og:site_name" content="{{ . }}">
+{{- end }}
+{{- with or .Title site.Title site.Params.title | plainify }}
+  <meta property="og:title" content="{{ . }}">
+{{- end }}
+{{- with or .Description .Summary site.Params.description | plainify | htmlUnescape | chomp }}
+  <meta property="og:description" content="{{ . }}">
+{{- end }}
+{{- with or .Params.locale site.Language.LanguageCode site.Language.Lang }}
+  <meta property="og:locale" content="{{ . }}">
+{{- end }}
+{{- if .IsPage }}
+  <meta property="og:type" content="article">
+{{- $ISO8601 := "2006-01-02T15:04:05Z07:00" }}
+{{- with .PublishDate }}
+  <meta property="article:published_time" {{ .Format $ISO8601 | printf "content=%q" | safeHTMLAttr }}>
+{{- end }}
+{{- with .PublishDate }}{{/* todo: make .Lastmod work and stuff */}}
+  <meta property="article:modified_time" {{ .Format $ISO8601 | printf "content=%q" | safeHTMLAttr }}>
+{{- end }}
+{{- else }}
+  <meta property="og:type" content="website">
+{{- end }}{{/* todo: og:image / og:video stuff */}}
+  <meta content="#8CFFDB" data-react-helmet="true" name="theme-color" />

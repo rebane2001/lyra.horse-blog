@@ -2,13 +2,45 @@ body {
   color: #222;
   font-family: sans-serif;
   line-height: 1.5;
-  margin: 1rem;
+  margin: 1rem auto;
+  padding: 0 1rem;
   max-width: 768px;
+  background: #8CFFDB;
 }
 
 header {
   border-bottom: 1px solid #222;
   margin-bottom: 1rem;
+}
+
+header > nav > ul {
+  font-family: Bahnschrift, 'DIN Alternate', 'Franklin Gothic Medium', 'Nimbus Sans Narrow', sans-serif-condensed, sans-serif;
+  color: #007A1B;
+  margin: 0;
+  padding: 0;
+  font-size: 2rem;
+  font-weight: bold;
+}
+
+header > nav > ul > li {
+  display: inline;
+}
+
+header > nav > ul > li > a {
+  color: #4f4f63;
+}
+
+#tags > ul {
+  margin: 0;
+  padding: 0;
+}
+
+#tags > ul > li {
+  display: inline;
+}
+
+a#title {
+  color: #007A1B;
 }
 
 footer {
@@ -17,6 +49,17 @@ footer {
 }
 
 a {
-  color: #00e;
+  color: #0078B1;
   text-decoration: none;
 }
+
+h1 {
+  line-height: normal;
+}
+
+h1, h2, h2 > a, h1 > a {
+  font-family: Didot, 'Bodoni MT', 'Noto Serif Display', 'URW Palladio L', P052, Sylfaen, serif;
+  color: #04593b;
+}
+
+.tag { }

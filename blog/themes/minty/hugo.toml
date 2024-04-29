@@ -1,19 +1,19 @@
 baseURL = 'https://example.org/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = 'My New Minty Site'
 
 [[menus.main]]
-name = 'Home'
+name = 'home'
 pageRef = '/'
 weight = 10
 
 [[menus.main]]
-name = 'Posts'
+name = 'posts'
 pageRef = '/posts'
 weight = 20
 
 [[menus.main]]
-name = 'Tags'
+name = 'tags'
 pageRef = '/tags'
 weight = 30
 
@@ -21,3 +21,4 @@ weight = 30
   [module.hugoVersion]
     extended = false
     min = "0.116.0"
+

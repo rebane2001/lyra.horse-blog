@@ -1,4 +1,7 @@
-baseURL = 'https://example.org/'
+baseURL = 'https://lyra.horse/blog/'
 languageCode = 'en-us'
-title = 'My New Hugo Site'
+title = "lyra's epic blog"
 theme = 'minty'
+disableHugoGeneratorInject = false
+capitalizeListTitles = false
+pluralizeListTitles = false
