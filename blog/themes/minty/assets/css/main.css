@@ -1,7 +1,7 @@
 body {
   color: #222;
   font-family: sans-serif;
-  line-height: 1.5;
+  line-height: normal;
   margin: 1rem auto;
   padding: 0 1rem;
   max-width: 768px;
@@ -35,11 +35,11 @@ header > nav > ul > li > a {
   padding: 0;
 }
 
-#tags > ul > li {
+#tags > ul, #tags > ul > li {
   display: inline;
 }
 
-a#title {
+a#blogTitle {
   color: #007A1B;
 }
 
@@ -53,13 +53,27 @@ a {
   text-decoration: none;
 }
 
-h1 {
-  line-height: normal;
+#subMeta {
+  width: 100%;
+  text-align: center;
+  font-family: serif;
+}
+
+#title {
+  margin: 0 0 0.5rem;
+  text-align: center;
+}
+
+h2 {
+  margin: 0;
 }
 
 h1, h2, h2 > a, h1 > a {
-  font-family: Didot, 'Bodoni MT', 'Noto Serif Display', 'URW Palladio L', P052, Sylfaen, serif;
   color: #04593b;
+}
+
+h1, h2, #subMeta {
+  font-family: Didot, 'Bodoni MT', 'Noto Serif Display', 'URW Palladio L', P052, Sylfaen, serif;
 }
 
 .tag { }

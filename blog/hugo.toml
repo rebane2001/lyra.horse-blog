@@ -5,3 +5,7 @@ theme = 'minty'
 disableHugoGeneratorInject = false
 capitalizeListTitles = false
 pluralizeListTitles = false
+
+[permalinks]
+  [permalinks.page]
+  	posts = '/:year/:month/:slug/'

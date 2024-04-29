@@ -1,4 +1,4 @@
 {{- $page := .page }}
 {{- $taxonomy := .taxonomy }}
 
-{{- with $page.GetTerms $taxonomy }}<div id="tags"><ul>{{- range . }}<li><a href="{{ .RelPermalink }}" class="tag">{{ .LinkTitle }}</a> </li>{{- end }}</ul></div>{{- end }}
+{{- with $page.GetTerms $taxonomy }}<span id="tags"><ul>{{- range . }}<li> ¦ <a href="{{ .RelPermalink }}" class="tag">{{ .LinkTitle }}</a></li>{{- end }}</ul></span>{{- end }}

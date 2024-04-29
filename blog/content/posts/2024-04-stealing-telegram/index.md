@@ -1,8 +1,9 @@
 +++
-title = 'Stealing your Telegram account in 10 seconds flat (and bypassing 2FA)'
-date = 2023-03-15T11:00:00Z
+title = 'Stealing your Telegram account in 10 seconds flat'
+date = 2024-04-29T16:00:00Z
 draft = false
-tags = ['red','green','blue']
+tags = ['infosec','telegram']
+slug = "stealing-your-telegram-account-in-10-seconds-flat"
 +++
 
 Occaecat aliqua consequat laborum ut ex aute aliqua culpa quis irure esse magna dolore quis. Proident fugiat labore eu laboris officia Lorem enim. Ipsum occaecat cillum ut tempor id sint aliqua incididunt nisi incididunt reprehenderit. Voluptate ad minim sint est aute aliquip esse occaecat tempor officia qui sunt. Aute ex ipsum id ut in est velit est laborum incididunt. Aliqua qui id do esse sunt eiusmod id deserunt eu nostrud aute sit ipsum. Deserunt esse cillum Lorem non magna adipisicing mollit amet consequat.
