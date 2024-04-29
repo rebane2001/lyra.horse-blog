@@ -2,10 +2,11 @@ body {
   color: #222;
   font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
   line-height: normal;
-  margin: 1rem auto;
-  padding: 0 1rem;
+  margin: 0.5rem auto;
+  padding: 0.5rem 1rem 1px;
   max-width: 768px;
   background: #8CFFDB;
+  border-radius: 4px;
 }
 
 header {

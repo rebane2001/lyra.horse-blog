@@ -10,5 +10,7 @@ pluralizeListTitles = false
   [permalinks.page]
   	posts = '/:year/:month/:slug/'
 
+[markup.goldmark.Extensions]
+  footnote = true
 [markup.goldmark.renderer]
   unsafe = true

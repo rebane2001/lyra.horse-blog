@@ -20,15 +20,35 @@ I wanted to find out how this works. The first step was to figure out how the Te
 
 <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span style="color:#E3E3E3">web.telegram.org</span>/#tgWebAuthToken=dGhpcyB0b2tlbiBpcyByYW5kb20gYW5kIDEwMjQgYml0cyBsb25nLCBidXQgaW4gdGhlIGJsb2cgcG9zdCBpIHJlcGxhY2VkIGl0IHdpdGggdGhpcyBmdW4gZWFzdGVyIGVnZyBmb3IgdGhvc2Ugd2l0aCBhIGtlZW4gZXllIQ&tgWebAuthUserId=420493337&tgWebAuthDcId=4</span></div></div>
 
-It seems like Telegram just opens up an URL with your account's token in it.
+It seems like Telegram just opens up a URL with your account's token appended to it. The token gets put in a hash fragment, and quickly disappears once the web client loads up and realizes there's a token there. Although very convenient, this feature is pretty concerning because it can be used to quickly gain access to your account even if you use 2FA and a locked-down device (eg *non-rooted/jailbroken* phone).
+
+So where does this URL and its session come from? I searched [tdesktop](https://github.com/telegramdesktop/tdesktop)'s[^1] code for various keywords such as "web.telegram.org" and "tgWebAuthToken", but weirdly enough I didn't get any results. After looking at the code for a bit, I could't find anything related to this feature, so I decided to build the app and attach a debugger to it.
+
+After a couple hours of setting up and compiling my very own build of tdesktop
+
+topics:
+
+- didn't find it in grep, compiled the client
+- go over the session token generation process
+- show domains list in visual studio (z.t.me share trick)
+- token expiration time (1 minute)
+- 10 second domain/demo
+- works on mobile
+- web.telegram.org/_ trick
+- failed attempt: web clients (foiled by the ampersand)
+- failed attempt: android protocol hijack
+- bonus: [web.telegram.org.](https://web.telegram.org.) to access old client
+
+Discuss this post on: twitter, mastodon, hackernews, cohost
 
 <!-- ![Sample Image](image.jpg) -->
+[^1]: tdesktop is the official cross-platform desktop client (Telegram Lite on macOS)
 
 <style>
 	.urlBar {
 		background: #3C3C3C;
 		height: 34px;
-		width: 100%;
+		width: calc(100% - 12px);
 		padding: 6px;
 		border-radius: 4px;
 		font-family: system-ui, sans-serif;
