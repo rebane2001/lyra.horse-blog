@@ -32,28 +32,29 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 		<div aria-hidden="true">
 		<span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C16FCC"><rect fill="#454545" stroke="#B9B9B9" x="1.5" y="2.5" width="13" height="11"/><line x1="5.5" x2="5.5" y1="4" y2="9"/><line x1="8" x2="3" y1="6.5" y2="6.5"/><line x1="10.5" x2="10.5" y1="7" y2="12"/><line x1="13" x2="8" y1="9.5" y2="9.5"/></svg>Telegram</span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#DEDEDE" stroke-linecap="square"><path d="m4.6 2.5c-0.7 0-1 0.4-1 1v3l-0.8 1v1l0.8 1v3c0 0.7 0.3 1 1 1"/><path d="m11.5 13.5c0.7 0 1-0.4 1-1v-3l0.8-1v-1l-0.8-1v-3c0-0.7-0.3-1-1-1"/></svg>Core::`anonymous-namespace'</span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="#474152" stroke="#9670C6" stroke-linejoin="round"><polyline class="st0" points="13.5 5 13.5 12.1 8 14.6 8 7.7 13.5 5 8 2 2.4 5 8 7.7 8 14.6 2.4 11.7 2.4 5"/></svg>BotAutoLogin(const QString & url, const QString & domain,</span>
 	</div>
-	<div style="height: calc(100% - 21px)"><span style="width: 17px;display:inline-block;background:#333;height:100%"></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%">   79
-   <font color="#8A8A8A">80</font>     [[nodiscard]] bool BotAutoLogin(
-   81             const QString &amp;url,
-   82             const QString &amp;domain,
-   83             QVariant context) {
-   84         auto &amp;account = Core::App().activeAccount();
-   85         const auto &amp;config = account.appConfig();
-   86         const auto domains = config.get&lt;std::vector&lt;QString&gt;&gt;(
-   87             &quot;url_auth_domains&quot;,
-   88             {});
-   89         if (!account.sessionExists()
-   90             || domain.isEmpty()
-   91             || !ranges::contains(domains, domain)) {
-   92             return false;
-   93         }
-   94         const auto good = url.startsWith(kBadPrefix, Qt::CaseInsensitive)
-   95             ? (kGoodPrefix + url.mid(kBadPrefix.size()))
-   96             : url;
-   97         UrlAuthBox::Activate(&amp;account.session(), good, context);
-   98         return true;
-   99     }
-  100</span></div>
+	<div style="height: calc(100% - 21px)"><span style="width: 17px;display:inline-block;background:#333;height:100%"></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%"><!-- This part (the syntax highlight) was really annoying to do manually, I wouldn't recommend doing it yourself. --><span class="vLn">   79     </span>
+<span class="vLn">   80     </span><span class="vC5">[[<span class="vCA">nodiscard</span>]] </span><span class="vC2">bool </span><span class="vC0">BotAutoLogin</span><span class="vC5">(</span>
+<span class="vLn">   81     </span>        <span class="vC2">const </span><span class="vC1">QString </span><span class="vC5">&amp;<span class="vC3">url</span>,</span>
+<span class="vLn">   82     </span>        <span class="vC2">const </span><span class="vC1">QString </span><span class="vC5">&amp;<span class="vC3">domain</span>,</span>
+<span class="vLn">   83     </span>        <span class="vC1">QVariant </span><span class="vC3">context</span><span class="vC5">) </span><span class="vC5">{</span>
+<span class="vLn">   84     </span>    <span class="vC2">auto </span><span class="vC5">&amp;<span class="vC4">account </span>= </span><span class="vC7">Core</span><span class="vC5">::<span class="vC0">App</span>().</span><span class="vC0">activeAccount</span><span class="vC5">();</span>
+<span class="vLn">   85     </span>    <span class="vC2">const auto </span><span class="vC5">&amp;<span class="vC4">config </span>= </span><span class="vC4">account</span><span class="vC5">.<span class="vC0">appConfig</span>();</span>
+<span class="vLn">   86     </span>    <span class="vC2">const auto </span><span class="vC4">domains <span class="vC5">= </span>config</span><span class="vC5">.<span class="vC0">get</span>&lt;</span><span class="vC7">std</span><span class="vC5">::<span class="vC1">vector</span>&lt;</span><span class="vC1">QString</span><span class="vC5">&gt;&gt;(</span>
+<span class="vLn">   87     </span>        <span class="vCB">&quot;<span class="vC8">url_auth_domains</span>&quot;</span><span class="vC5">,</span>
+<span class="vLn">   88     </span>        <span class="vC5">{});</span>
+<span class="vLn">   89     </span>    <span class="vC9">if </span><span class="vC5">(!<span class="vC4">account</span>.</span><span class="vC0">sessionExists</span><span class="vC5">()</span>
+<span class="vLn">   90     </span>        <span class="vC5">|| <span class="vC3">domain</span>.</span><span class="vC0">isEmpty</span><span class="vC5">()</span>
+<span class="vLn">   91     </span>        <span class="vC5">|| </span><span class="vC5">!<span class="vC7">ranges</span>::</span><span class="vC7">contains</span><span class="vC5">(<span class="vC4">domains</span>, </span><span class="vC3">domain</span><span class="vC5">)) {</span>
+<span class="vLn">   92     </span>        <span class="vC9">return </span><span class="vC2">false</span><span class="vC5">;</span>
+<span class="vLn">   93     </span>    <span class="vC5">}</span>
+<span class="vLn">   94     </span>    <span class="vC2">const auto </span><span class="vC4">good </span><span class="vC5">= <span class="vC3">url</span>.</span><span class="vC0">startsWith</span><span class="vC5">(<span class="vC7">kBadPrefix</span>, </span><span class="vC7">Qt</span><span class="vC5">::<span class="vC6">CaseInsensitive</span>)</span>
+<span class="vLn">   95     </span>        <span class="vC5">? </span><span class="vC5">(<span class="vC7">kGoodPrefix </span>+ </span><span class="vC3">url</span><span class="vC5">.<span class="vC0">mid</span>(</span><span class="vC7">kBadPrefix</span><span class="vC5">.<span class="vC0">size</span>()))</span>
+<span class="vLn">   96     </span>        <span class="vC5">: <span class="vC3">url</span>;</span>
+<span class="vLn">   97     </span>    <span class="vC1">UrlAuthBox</span><span class="vC5">::<span class="vC0">Activate</span>(&amp;</span><span class="vC4">account</span><span class="vC5">.<span class="vC0">session</span>(), </span><span class="vC4">good</span><span class="vC5">, <span class="vC3">context</span>);</span>
+<span class="vLn">   98     </span>    <span class="vC9">return </span><span class="vC2">true</span><span class="vC5">;</span>
+<span class="vLn">   99     </span><span class="vC5">}</span>
+<span class="vLn">  100     </span> <!----></span>
+</span></div>
 	</div>
 </div>
 
@@ -85,6 +86,36 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 [^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
 
 <style>
+	.vC1 { color: #4EC9B0 }
+	.vC2 { color: #569CD6 }
+	.vC3 { color: #9A9A9A }
+	.vC4 { color: #9CDCFE }
+	.vC5 { color: #B4B4B4 }
+	.vC6 { color: #B8D7A3 }
+	.vC7 { color: #C8C8C8 }
+	.vC8 { color: #D69D85 }
+	.vC9 { color: #D8A0DF }
+	.vC0 { color: #DCDCAA }
+	.vCA { color: #DCDCDC }
+	.vCB { color: #E8C9BB }
+	.vLn {
+		user-select: none;
+	}
+	.vsCodeArea::-webkit-scrollbar {
+	  width: 10px;
+	}
+	.vsCodeArea::-webkit-scrollbar-track {
+	  background: #2E2E2E;
+	}
+	.vsCodeArea::-webkit-scrollbar-thumb {
+	  background: #4D4D4D; 
+	}
+	.vsCodeArea::-webkit-scrollbar-thumb:hover {
+	  background: #999; 
+	}
+	.vsCodeArea::selection, .vsCodeArea *::selection  {
+		background: #264F78;
+	}
 	.vsCodeArea {
 		vertical-align: bottom;
 		font-family: "Cascadia Code", "Cascadia Mono", "Lucida Sans Typewriter", "Courier New", monospace;
@@ -92,6 +123,10 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 		font-size: 13px;
 		line-height: 17px;
     	display: inline-block;
+    	color: #8A8A8A;
+		text-wrap: nowrap;
+    	overflow: auto;
+    	overflow-y: hidden;
 	}
 	.vsContainer {
 		background: #1F1F1F;
