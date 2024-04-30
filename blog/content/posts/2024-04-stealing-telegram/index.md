@@ -4,6 +4,7 @@ date = 2024-04-29T16:00:00Z
 draft = false
 tags = ['infosec','telegram']
 slug = "stealing-your-telegram-account-in-10-seconds-flat"
+summary = "Say you handed me your phone, what’s the worst I could do in 10 seconds?"
 +++
 
 Say you handed me your phone, what's the worst I could do in 10 seconds?
@@ -26,13 +27,13 @@ So where does this URL and its session come from? I searched tdesktop[^1]'s code
 
 A couple hours of compiling later, I had my very own build of tdesktop up and running. I set up a few breakpoints, clicked on the link, and stepped through the code until I found the relevant bits. And eventually, I was here:
 
-<div class="vsContainer">
-	<div class="vsTabs"><span class="vsTab active">ui_integration.cpp<svg style="position:absolute;width:16px;height:16px;padding-left:27px" xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none"><polygon points="4 8 7 8 7 5 8 5 8 6 12 6 12 11 8 11 8 9 11 9 11 7 8 7 8 12 7 12 7 9 4 9"/></svg></span><span class="vsTab">base_integration.cpp</span><span class="vsTab">url_auth_box.cpp</span></div>
+<div class="vsContainer" draggable="false">
+	<div class="vsTabs"><span class="vsTab active">ui_integration.cpp<svg style="position:absolute;width:16px;height:16px;padding-left:27px" xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none"><polygon points="4 8 7 8 7 5 8 5 8 6 12 6 12 11 8 11 8 9 11 9 11 7 8 7 8 12 7 12 7 9 4 9"/></svg></span><span class="vsTab">base_integration.cpp</span><span class="vsTab">url_auth_box.cpp</span><span class="vsTab">scheme.h</span><span class="vsTab">local_url_handlers.cpp</span><span class="vsTab">basic_click_handlers.cpp</span></div>
 	<div class="vsBox" style="border-top: none; height: fit-content">
 		<div aria-hidden="true">
 		<span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C16FCC"><rect fill="#454545" stroke="#B9B9B9" x="1.5" y="2.5" width="13" height="11"/><line x1="5.5" x2="5.5" y1="4" y2="9"/><line x1="8" x2="3" y1="6.5" y2="6.5"/><line x1="10.5" x2="10.5" y1="7" y2="12"/><line x1="13" x2="8" y1="9.5" y2="9.5"/></svg>Telegram<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#DEDEDE" stroke-linecap="square"><path d="m4.6 2.5c-0.7 0-1 0.4-1 1v3l-0.8 1v1l0.8 1v3c0 0.7 0.3 1 1 1"/><path d="m11.5 13.5c0.7 0 1-0.4 1-1v-3l0.8-1v-1l-0.8-1v-3c0-0.7-0.3-1-1-1"/></svg>Core::`anonymous-namespace'<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="#474152" stroke="#9670C6" stroke-linejoin="round"><polyline class="st0" points="13.5 5 13.5 12.1 8 14.6 8 7.7 13.5 5 8 2 2.4 5 8 7.7 8 14.6 2.4 11.7 2.4 5"/></svg>BotAutoLogin(const QString & url, const QString & domain,<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span>
 	</div>
-	<div style="height: 374px"><span style="width: 17px;display:inline-block;background:#333;height:100%"><div style="height:1px"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint active"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%"><!-- This part (the syntax highlight) was really annoying to do manually, I wouldn't recommend doing it yourself. --><span class="vLn">   79     </span>
+	<div style="height: 374px"><span style="width: 17px;display:inline-block;background:#333;height:100%"><div style="height:1px"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint active" title="This is a breakpoint, code execution stops here, lets me see the cool info like the locals below, and also lets me step through the code line by line!"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%"><!-- This part (the syntax highlight) was really annoying to do manually, I wouldn't recommend doing it yourself. --><span class="vLn">   79     </span>
 <span class="vLn">   80     </span><span class="vC5">[[<span class="vCA">nodiscard</span>]] </span><span class="vC2">bool </span><span class="vC0">BotAutoLogin</span><span class="vC5">(</span>
 <span class="vLn">   81     </span>        <span class="vC2">const </span><span class="vC1">QString </span><span class="vC5">&amp;<span class="vC3">url</span>,</span>
 <span class="vLn">   82     </span>        <span class="vC2">const </span><span class="vC1">QString </span><span class="vC5">&amp;<span class="vC3">domain</span>,</span>
@@ -96,7 +97,7 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 </tr>
 <tr>
 	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#55AAFF"><rect fill="#323232" stroke="#E0E0E0" x="2.5" y="3.5" width="10" height="10"/><line x1="10" x2="5" y1="7.5" y2="7.5"/><line x1="10" x2="5" y1="9.5" y2="9.5"/></svg>domain</td>
-	<td>z.t.me</td>
+	<td>web.telegram.org</td>
 	<td>const QString &amp;</td>
 </tr>
 <tr>
@@ -151,7 +152,7 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 </tr>
 <tr>
 	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#55AAFF"><rect fill="#323232" stroke="#E0E0E0" x="2.5" y="3.5" width="10" height="10"/><line x1="10" x2="5" y1="7.5" y2="7.5"/><line x1="10" x2="5" y1="9.5" y2="9.5"/></svg>url</td>
-	<td>https://z.t.me</td>
+	<td>https://web.telegram.org</td>
 	<td>const QString &amp;</td>
 </tr>
 		</tbody>
@@ -160,7 +161,106 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 </div>
 </div>
 
-So that's why I couldn't find the keywords! The list of domains this trick works with is sent to you by the Telegram server and stored in the config under the `url_auth_domains`[^2] key.
+So that's why I couldn't find the keywords! The list of domains this trick works with is sent to you by the Telegram server and stored in the config under the `url_auth_domains`[^2] key. You can see the list of domains currently provided in the locals above.
+
+Once you click on a link with a matching domain your client sends the link to Telegram's servers and if everything looks alright your client will get a cute little URL back with the tokens and everything appended. For those playing along at home, we send a `messages_requestUrlAuth` with only the `url` set[^3] and hope to get back a `urlAuthResultAccepted` with the new `url` inside.
+
+Having figured out how the thing works, and armed with the list of domains, I began looking for ways to break it. It seems like the entire initial URL gets preserved, including the path, query parameters, and hash fragment, with the exception of the scheme being forced to https.
+
+For example:
+
+- `http://web.​telegram.org/` becomes `https://web.​telegram.org/​#tgWebAuthToken=...`
+- `https://z.t.me/​pony` becomes `https://z.t.me/pony​?tgWebAuth=1​#tgWebAuthToken=...`
+- `https://k.t.me/​#po=ny` becomes `https://k.t.me/​?tgWebAuth=1​#po=ny​&tgWebAuthToken=...`
+
+<details><summary>(a lot) more examples</summary>
+<table class="detailedUrlMapTable">
+  <thead>
+    <tr>
+      <th>Original URL</th>
+      <th>URL with token</th>
+    </tr>
+  </thead>
+  <tbody>
+<tr><td>https://z.t.me/</td><td>https://z.t.me/?tgWebAuth=1#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/pony</td><td>https://z.t.me/pony?tgWebAuth=1#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/#pony</td><td>https://z.t.me/?tgWebAuth=1#pony?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/#bon=bon</td><td>https://z.t.me/?tgWebAuth=1#bon=bon&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/#?bon</td><td>https://z.t.me/?tgWebAuth=1#?bon&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/?#bon</td><td>https://z.t.me/?tgWebAuth=1#bon?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/?bon=bon</td><td>https://z.t.me/?bon=bon&amp;tgWebAuth=1#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/?bon=bon#bon</td><td>https://z.t.me/?bon=bon&amp;tgWebAuth=1#bon?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/#=</td><td>https://z.t.me/?tgWebAuth=1#=&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/?tgWebAuth=🐴</td><td>https://z.t.me/?tgWebAuth=1#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset</td><td>https://z.t.me/?tgWebAuth=1#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://z.t.me/?tgWebAuth=🐴#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset</td><td>https://z.t.me/?tgWebAuth=1#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/pony</td><td>https://k.t.me/pony?tgWebAuth=1#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/#pony</td><td>https://k.t.me/?tgWebAuth=1#pony?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/#bon=bon</td><td>https://k.t.me/?tgWebAuth=1#bon=bon&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/#?bon</td><td>https://k.t.me/?tgWebAuth=1#?bon&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/?#bon</td><td>https://k.t.me/?tgWebAuth=1#bon?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/?bon=bon</td><td>https://k.t.me/?bon=bon&amp;tgWebAuth=1#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/?bon=bon#bon</td><td>https://k.t.me/?bon=bon&amp;tgWebAuth=1#bon?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/#=</td><td>https://k.t.me/?tgWebAuth=1#=&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/?tgWebAuth=🐴</td><td>https://k.t.me/?tgWebAuth=1#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset</td><td>https://k.t.me/?tgWebAuth=1#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://k.t.me/?tgWebAuth=🐴#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset</td><td>https://k.t.me/?tgWebAuth=1#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/pony</td><td>https://web.telegram.org/pony#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/#pony</td><td>https://web.telegram.org/#pony?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/#bon=bon</td><td>https://web.telegram.org/#bon=bon&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/#?bon</td><td>https://web.telegram.org/#?bon&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/?#bon</td><td>https://web.telegram.org/?#bon?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/?bon=bon</td><td>https://web.telegram.org/?bon=bon#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/?bon=bon#bon</td><td>https://web.telegram.org/?bon=bon#bon?tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/#=</td><td>https://web.telegram.org/#=&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/?tgWebAuth=🐴</td><td>https://web.telegram.org/?tgWebAuth=🐴#tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset</td><td>https://web.telegram.org/#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+<tr><td>https://web.telegram.org/?tgWebAuth=🐴#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset</td><td>https://web.telegram.org/?tgWebAuth=🐴#tgWebAuthToken=trixie&amp;tgWebAuthUserId=starlight&amp;tgWebAuthDcId=sunset&amp;tgWebAuthToken=...&amp;tgWebAuthUserId=420493337&amp;tgWebAuthDcId=4</td></tr>
+  </tbody>
+</table>
+</details>
+
+All of the domains apart from the web.telegram.org one are sort-of built for the [t.me deep links](https://core.telegram.org/api/links). Going on any of them without a path will just bring you to the telegram.org homepage. Going on one with a compatible path, such as [z.t.me/share?url=lyra.horse](https://z.t.me/share?url=lyra.horse), will open the respective client with a hash fragment, eg:  
+[https://web.telegram.org/a/#?​tgaddr=​tg%3A%2F%2Fmsg_url%3F​url%3Dlyra.horse](https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse)
+
+This is usually performed with a HTTP 301 redirect, but if the `tgWebAuth` parameter is set and the t.me deep link is valid, you'll get to run this javascript instead:
+
+```js
+<html>
+<head>
+<meta name="robots" content="noindex, nofollow">
+<noscript><meta http-equiv="refresh" content="0;url='https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse'"></noscript>
+<script>
+try {
+var url = "https:\/\/web.telegram.org\/a\/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse";
+var hash = location.hash.toString();
+if (hash.substr(0, 1) == '#') {
+  hash = hash.substr(1);
+}
+location.replace(hash ? urlAppendHashParams(url, hash) : url);
+} catch (e) { location.href=url; }
+
+function urlAppendHashParams(url, addHash) {
+  var ind = url.indexOf('#');
+  if (ind < 0) {
+    return url + '#' + addHash;
+  }
+  var curHash = url.substr(ind + 1);
+  if (curHash.indexOf('=') >= 0 || curHash.indexOf('?') >= 0) {
+    return url + '&' + addHash;
+  }
+  if (curHash.length > 0) {
+    return url + '?' + addHash;
+  }
+  return url + addHash;
+}
+</script>
+</head>
+</html>
+<!-- page generated in 4.76ms -->
+```
+
+I was a bit puzzled at first, but eventually realized it was just a simple hack to deal with URL hash fragments.
 
 topics:
 
@@ -188,9 +288,25 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 -->
 <!-- ![Sample Image](image.jpg) -->
 [^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
-[^2]: `url_auth_domains` is used for 
+[^2]: `url_auth_domains` is a list of domains used for logging into the web clients, but there is another list under the `autologin_domains` key, which is used for webapps such as [bugs.telegram.org](https://bugs.telegram.org) instead.
+[^3]: There are also `peer`, `msg_id`, and `button_id` fields, but if we set our `flag` to `f_url` (4) we skip them.
 
 <style>
+	.detailedUrlMapTable {
+		table-layout: fixed;
+		width: 100%;
+		word-break: break-all;
+		font-size: 12px;
+		font-family: monospace;
+		border-collapse: collapse;
+		color: #70BAF5;
+		background: #182533;
+		border-radius: 4px;
+	}
+	.detailedUrlMapTable td {
+		border: 1px solid #0E1621;
+		padding: 4px 4px;
+	}
 	.vsLocals svg {
 		width: 16px;
 		height: 16px;
