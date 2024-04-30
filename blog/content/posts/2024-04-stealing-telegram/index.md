@@ -56,6 +56,109 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 <span class="vLn">  100     </span> <!----></span>
 </span></div>
 	</div>
+<div style="height:6px"></div>
+<div class="vsBox" style="height: fit-content">
+<div>Locals</div>
+<div>Search (Ctrl+E)</div>
+<div class="vsLocals">
+	<table>
+    	<colgroup>
+    	   <col span="1" style="width: 35%">
+    	   <col span="1" style="width: 35%">
+    	   <col span="1" style="width: 20%">
+    	</colgroup>
+		<thead>
+			<tr>
+				<th>Name</th>
+				<th>Value</th>
+				<th>Type</th>
+			</tr>
+		</thead>
+		<tbody>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>Main::AppConfig::get&lt;std::vector&lt;QString,std::allocator&lt;QString&gt; &gt; &gt; returned</td>
+	<td>{ size=5 }</td>
+	<td>std::vector&lt;QString,std::allocator&lt;QString&gt;&gt; &amp;</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>account</td>
+	<td>{_domain={ptr_=0x000001b3822c5990 {_dataName={...} _local={...} _accounts={...} ...} } _local=unique_ptr {_owner={ptr_=0x000001b3887a6dd0 {_domain={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={ptr_=0x000001b3822c5990 {_dataName=data _local=unique_ptr {_owner={...} _dataName=data _localKey=shared_ptr  [2 strong refs] [] ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} ...} } ...} } ...} ...}</td>
+	<td>Main::Account &amp;</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#55AAFF"><rect fill="#323232" stroke="#E0E0E0" x="2.5" y="3.5" width="10" height="10"/><line x1="10" x2="5" y1="7.5" y2="7.5"/><line x1="10" x2="5" y1="9.5" y2="9.5"/></svg>config</td>
+	<td>{_account={ptr_=0x000001b3887a6dd0 {_domain={...} _local={...} _mtp={...} ...} } _api={_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr {_instance={ptr_=0x000001b3886a1b40 {_private=unique_ptr } } _mode=Normal (0) _config=unique_ptr {_dcOptions={...} _fields={...} _updates={...} } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} } } ...} ...}</td>
+	<td>const Main::AppConfig &amp;</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>context</td>
+	<td>{...}</td>
+	<td>QVariant</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#55AAFF"><rect fill="#323232" stroke="#E0E0E0" x="2.5" y="3.5" width="10" height="10"/><line x1="10" x2="5" y1="7.5" y2="7.5"/><line x1="10" x2="5" y1="9.5" y2="9.5"/></svg>domain</td>
+	<td>z.t.me</td>
+	<td>const QString &amp;</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="#E0E0E0" stroke="none"><path d="M11,9.5V5.2c0-0.4-0.5-0.7-0.9-0.4L5.9,9.1C5.5,9.5,5.8,10,6.2,10h4.3C10.8,10,11,9.8,11,9.5z"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>domains</td>
+	<td>{ size=5 }</td>
+	<td>std::vector&lt;QString,std::allocator&lt;QString&gt;&gt;</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0 0 0 17px" fill="none" stroke="#E0E0E0" stroke-linejoin="round"></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#3F3C44" stroke="#9670C6" stroke-linejoin="round"><polyline class="st0" points="13.5 5 13.5 12.1 8 14.6 8 7.7 13.5 5 8 2 2.4 5 8 7.7 8 14.6 2.4 11.7 2.4 5"/></svg>[capacity]</td>
+	<td>5</td>
+	<td>unsigned __int64</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0 0 0 17px" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>[allocator]</td>
+	<td>allocator</td>
+	<td>std::_Compressed_pair&lt;std::allocator&lt;QString&gt;,std::_Vector_val&lt;std::_Simple_types&lt;QString&gt;&gt;,1&gt;</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0 0 0 17px" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>[0]</td>
+	<td>web.telegram.org</td>
+	<td>QString</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0 0 0 17px" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>[1]</td>
+	<td>web.t.me</td>
+	<td>QString</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0 0 0 17px" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>[2]</td>
+	<td>k.t.me</td>
+	<td>QString</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0 0 0 17px" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>[3]</td>
+	<td>z.t.me</td>
+	<td>QString</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0 0 0 17px" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>[4]</td>
+	<td>a.t.me</td>
+	<td>QString</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0 0 0 17px" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>[Raw View]</td>
+	<td>{_Mypair=allocator }</td>
+	<td>std::vector&lt;QString,std::allocator&lt;QString&gt;&gt;</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="#293644" stroke="#54A6F9"><polygon class="st0" points="10.4 1.5 14.5 5.6 14.5 9.6 5.6 15 1.5 11.4 1.5 6.4"/><polyline fill="none" points="1.8 6.7 5.4 10.4 5.4 14.6 5.4 10.4 14.5 5.6"/></svg>good</td>
+	<td>???</td>
+	<td>QString</td>
+</tr>
+<tr>
+	<td><svg xmlns="http://www.w3.org/2000/svg" style="padding:0" fill="none" stroke="#E0E0E0" stroke-linejoin="round"><polygon points="9.5 8 6.5 5 6.5 11"/></svg><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#55AAFF"><rect fill="#323232" stroke="#E0E0E0" x="2.5" y="3.5" width="10" height="10"/><line x1="10" x2="5" y1="7.5" y2="7.5"/><line x1="10" x2="5" y1="9.5" y2="9.5"/></svg>url</td>
+	<td>https://z.t.me</td>
+	<td>const QString &amp;</td>
+</tr>
+		</tbody>
+	</table>
+</div>
+</div>
 </div>
 
 topics:
@@ -86,6 +189,42 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 [^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
 
 <style>
+	.vsLocals svg {
+		width: 16px;
+		height: 16px;
+		vertical-align: bottom;
+		padding-left: 2px;
+		padding-right: 4px;
+	}
+	.vsLocals th {
+		font-weight: normal;
+		text-align: left;
+  		border: 1px solid #3D3D3D;
+  		border-top: none;
+  		border-left: none;
+  		padding-left: 4px;
+  		user-select: none;
+	}
+	.vsLocals td {
+  		border: 1px solid #000;
+  		border-top: none;
+  		border-left: none;
+  		padding: 0 0 0 3px;
+		text-overflow: ellipsis;
+		overflow: hidden;
+		white-space: nowrap;
+		max-width: 0;
+	}
+	.vsLocals > table {
+		border-collapse: collapse;
+		box-model: border-box;
+		line-height: 16px;
+		width: 100%;
+		cursor: default;
+	}
+	.vsLocals > table *::selection {
+		background: #7160E8;
+	}
 	.vsBreakpoint {
 		width: 12px;
 		height: 12px;
@@ -154,7 +293,7 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 		background: #1F1F1F;
 		color: #FAFAFA;
 		width: calc(100% - 8px);
-		height: 600px;
+		height: 900px;
 		border-radius: 4px;
 		padding: 4px;
 		font-family: system-ui, sans-serif;
@@ -259,6 +398,10 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 		position: absolute;
 		display:block;
 		border-radius: 24px;
+	}
+	.urlBarIcon svg {
+		width: 16px;
+		height: 16px;
 	}
 	.tgMsg *::selection {
 		background-color: #2E70A5;
