@@ -28,11 +28,11 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 
 <div class="vsContainer">
 	<div class="vsTabs"><span class="vsTab active">ui_integration.cpp</span><span class="vsTab">base_integration.cpp</span><span class="vsTab">url_auth_box.cpp</span></div>
-	<div class="vsBox" style="border-top: none; height: 80%">
+	<div class="vsBox" style="border-top: none; height: fit-content">
 		<div aria-hidden="true">
 		<span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C16FCC"><rect fill="#454545" stroke="#B9B9B9" x="1.5" y="2.5" width="13" height="11"/><line x1="5.5" x2="5.5" y1="4" y2="9"/><line x1="8" x2="3" y1="6.5" y2="6.5"/><line x1="10.5" x2="10.5" y1="7" y2="12"/><line x1="13" x2="8" y1="9.5" y2="9.5"/></svg>Telegram</span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#DEDEDE" stroke-linecap="square"><path d="m4.6 2.5c-0.7 0-1 0.4-1 1v3l-0.8 1v1l0.8 1v3c0 0.7 0.3 1 1 1"/><path d="m11.5 13.5c0.7 0 1-0.4 1-1v-3l0.8-1v-1l-0.8-1v-3c0-0.7-0.3-1-1-1"/></svg>Core::`anonymous-namespace'</span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="#474152" stroke="#9670C6" stroke-linejoin="round"><polyline class="st0" points="13.5 5 13.5 12.1 8 14.6 8 7.7 13.5 5 8 2 2.4 5 8 7.7 8 14.6 2.4 11.7 2.4 5"/></svg>BotAutoLogin(const QString & url, const QString & domain,</span>
 	</div>
-	<div style="height: calc(100% - 21px)"><span style="width: 17px;display:inline-block;background:#333;height:100%"></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%"><!-- This part (the syntax highlight) was really annoying to do manually, I wouldn't recommend doing it yourself. --><span class="vLn">   79     </span>
+	<div style="height: 374px"><span style="width: 17px;display:inline-block;background:#333;height:100%"><div style="height:1px"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint active"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%"><!-- This part (the syntax highlight) was really annoying to do manually, I wouldn't recommend doing it yourself. --><span class="vLn">   79     </span>
 <span class="vLn">   80     </span><span class="vC5">[[<span class="vCA">nodiscard</span>]] </span><span class="vC2">bool </span><span class="vC0">BotAutoLogin</span><span class="vC5">(</span>
 <span class="vLn">   81     </span>        <span class="vC2">const </span><span class="vC1">QString </span><span class="vC5">&amp;<span class="vC3">url</span>,</span>
 <span class="vLn">   82     </span>        <span class="vC2">const </span><span class="vC1">QString </span><span class="vC5">&amp;<span class="vC3">domain</span>,</span>
@@ -86,6 +86,23 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 [^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
 
 <style>
+	.vsBreakpoint {
+		width: 12px;
+		height: 12px;
+		background: #B7B7B7;
+		border: 0.5px solid #DDD;
+		border-radius: 14px;
+		margin: 3px 0 2px 2px;
+		opacity: 0;
+	}
+	.vsBreakpoint:hover {
+		opacity: 1;
+	}
+	.vsBreakpoint.active {
+		background: #C55159;
+		border-color: #EF5B64;
+		opacity: 1;
+	}
 	.vC1 { color: #4EC9B0 }
 	.vC2 { color: #569CD6 }
 	.vC3 { color: #9A9A9A }
@@ -100,6 +117,10 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 	.vCB { color: #E8C9BB }
 	.vLn {
 		user-select: none;
+		cursor: default;
+	}
+	.vsCodeArea > span:hover {
+		background: #2e2237;
 	}
 	.vsCodeArea::-webkit-scrollbar {
 	  width: 10px;
@@ -127,6 +148,7 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 		text-wrap: nowrap;
     	overflow: auto;
     	overflow-y: hidden;
+    	cursor: text;
 	}
 	.vsContainer {
 		background: #1F1F1F;
