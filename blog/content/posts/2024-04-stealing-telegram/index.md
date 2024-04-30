@@ -6,25 +6,56 @@ tags = ['infosec','telegram']
 slug = "stealing-your-telegram-account-in-10-seconds-flat"
 +++
 
-If you handed me your phone, what's the worst I could do in 10 seconds?
+Say you handed me your phone, what's the worst I could do in 10 seconds?
 
 <div class="tgThread">
 	<!-- This is all handcrafted HTML & CSS :3 -->
-	<div class="tgMsg tgMsgSmBL"><a href="https://web.telegram.org/">Web.telegram.org</a><span class="tgMsgTs">edited 23:51</span></div>
-	<div class="tgMsg tgMsgSmTL tgMsgNoneBL"><span>Click that link and your browser will be logged into telegram without passwords</span><span class="tgMsgTs">23:52</span></div><div class="tgMsgSpeech"><div></div></div>
+	<div class="tgMsg tgMsgSmBL"><a href="https://web.telegram.org/">Web.telegram.org</a><span class="tgMsgTs" aria-hidden="true">edited 23:51</span></div>
+	<div class="tgMsg tgMsgSmTL tgMsgNoneBL"><span>Click that link and your browser will be logged into telegram without passwords</span><span class="tgMsgTs" aria-hidden="true">23:52</span></div><div class="tgMsgSpeech"><div></div></div>
 </div>
 
-The other day I received an interesting message with a link to [Telegram's web client](https://web.telegram.org). Upon clicking on the link, I was greeted by the client, already logged in. Curious, I sent a message with the same link, clicked on it, and found myself logged in once again. There wasn't anything special about the link I had been sent, this is just Telegram's default behavior.
+The other day I received an interesting message with a link to [Telegram's web client](https://web.telegram.org). Upon clicking on the link, I was greeted to the client, already logged in. Curious, I sent myself a message with the same link, clicked on it, and found myself logged in once again. There wasn't anything special about the link I had been sent, this is just Telegram's default behavior.
 
 I wanted to find out how this works. The first step was to figure out how the Telegram client was passing the session to the browser. As I clicked on the link, I noticed something flash on the URL bar for just a split second:
 
-<div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span style="color:#E3E3E3">web.telegram.org</span>/#tgWebAuthToken=dGhpcyB0b2tlbiBpcyByYW5kb20gYW5kIDEwMjQgYml0cyBsb25nLCBidXQgaW4gdGhlIGJsb2cgcG9zdCBpIHJlcGxhY2VkIGl0IHdpdGggdGhpcyBmdW4gZWFzdGVyIGVnZyBmb3IgdGhvc2Ugd2l0aCBhIGtlZW4gZXllIQ&tgWebAuthUserId=420493337&tgWebAuthDcId=4</span></div></div>
+<div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span style="color:#E3E3E3">web.telegram.org</span>/#tgWebAuthToken=dGhpcyB0b2tlbiBpcyByYW5kb20gYW5kIDEwMjQgYml0cyBsb25nLCBidXQgaW4gdGhlIGJsb2cgcG9zdCBpIHJlcGxhY2VkIGl0IHdpdGggdGhpcyBmdW4gZWFzdGVyIGVnZyBmb3IgdGhvc2Ugd2l0aCBhIGtlZW4gZXllIQ&tgWebAuthUserId=420493337&tgWebAuthDcId=4</span></div></div>
 
-It seems like Telegram just opens up a URL with your account's token appended to it. The token gets put in a hash fragment, and quickly disappears once the web client loads up and realizes there's a token there. Although very convenient, this feature is pretty concerning because it can be used to quickly gain access to your account even if you use 2FA and a locked-down device (eg *non-rooted/jailbroken* phone).
+It seems like Telegram just opens up a URL with your account's token appended to it. The token gets put in a hash fragment, and quickly disappears once the web client loads up and realizes there's a token there. Although very convenient, this feature is pretty concerning because it can be used to quickly gain access to your account even if you use 2FA and a locked-down device (eg a *non-rooted/jailbroken* phone).
 
-So where does this URL and its session come from? I searched [tdesktop](https://github.com/telegramdesktop/tdesktop)'s[^1] code for various keywords such as "web.telegram.org" and "tgWebAuthToken", but weirdly enough I didn't get any results. After looking at the code for a bit, I could't find anything related to this feature, so I decided to build the app and attach a debugger to it.
+So where does this URL and its session come from? I searched tdesktop[^1]'s code for various keywords such as "web.telegram.org" and "tgWebAuthToken", but oddly enough I didn't get any hits. After staring at the code and not finding anything related to this feature for a while, I decided to build the app for real and attach a debugger to it.
 
-After a couple hours of setting up and compiling my very own build of tdesktop
+A couple hours of compiling later, I had my very own build of tdesktop up and running. I set up a few breakpoints, clicked on the link, and stepped through the code until I found the relevant bits.
+
+<div class="vsContainer">
+	<div class="vsTabs"><span class="vsTab active">ui_integration.cpp</span><span class="vsTab">base_integration.cpp</span><span class="vsTab">url_auth_box.cpp</span></div>
+	<div class="vsBox" style="border-top: none; height: 80%">
+		<div aria-hidden="true">
+		<span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C16FCC"><rect fill="#454545" stroke="#B9B9B9" x="1.5" y="2.5" width="13" height="11"/><line x1="5.5" x2="5.5" y1="4" y2="9"/><line x1="8" x2="3" y1="6.5" y2="6.5"/><line x1="10.5" x2="10.5" y1="7" y2="12"/><line x1="13" x2="8" y1="9.5" y2="9.5"/></svg>Telegram</span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#DEDEDE" stroke-linecap="square"><path d="m4.6 2.5c-0.7 0-1 0.4-1 1v3l-0.8 1v1l0.8 1v3c0 0.7 0.3 1 1 1"/><path d="m11.5 13.5c0.7 0 1-0.4 1-1v-3l0.8-1v-1l-0.8-1v-3c0-0.7-0.3-1-1-1"/></svg>Core::`anonymous-namespace'</span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="#474152" stroke="#9670C6" stroke-linejoin="round"><polyline class="st0" points="13.5 5 13.5 12.1 8 14.6 8 7.7 13.5 5 8 2 2.4 5 8 7.7 8 14.6 2.4 11.7 2.4 5"/></svg>BotAutoLogin(const QString & url, const QString & domain,</span>
+	</div>
+	<div style="height: calc(100% - 21px)"><span style="width: 17px;display:inline-block;background:#333;height:100%"></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%">   79
+   <font color="#8A8A8A">80</font>     [[nodiscard]] bool BotAutoLogin(
+   81             const QString &amp;url,
+   82             const QString &amp;domain,
+   83             QVariant context) {
+   84         auto &amp;account = Core::App().activeAccount();
+   85         const auto &amp;config = account.appConfig();
+   86         const auto domains = config.get&lt;std::vector&lt;QString&gt;&gt;(
+   87             &quot;url_auth_domains&quot;,
+   88             {});
+   89         if (!account.sessionExists()
+   90             || domain.isEmpty()
+   91             || !ranges::contains(domains, domain)) {
+   92             return false;
+   93         }
+   94         const auto good = url.startsWith(kBadPrefix, Qt::CaseInsensitive)
+   95             ? (kGoodPrefix + url.mid(kBadPrefix.size()))
+   96             : url;
+   97         UrlAuthBox::Activate(&amp;account.session(), good, context);
+   98         return true;
+   99     }
+  100</span></div>
+	</div>
+</div>
 
 topics:
 
@@ -41,10 +72,95 @@ topics:
 
 Discuss this post on: twitter, mastodon, hackernews, cohost
 
+<!-- 
+messages.requestUrlAuth#198fb446 flags:# peer:flags.1?InputPeer msg_id:flags.1?int button_id:flags.1?int url:flags.2?string = UrlAuthResult;
+
+messages.acceptUrlAuth#b12c7125 flags:# write_allowed:flags.0?true peer:flags.1?InputPeer msg_id:flags.1?int button_id:flags.1?int url:flags.2?string = UrlAuthResult;
+
+urlAuthResultRequest#92d33a0e flags:# request_write_access:flags.0?true bot:User domain:string = UrlAuthResult;
+urlAuthResultAccepted#8f8c0e4e url:string = UrlAuthResult;
+urlAuthResultDefault#a9d6db1f = UrlAuthResult;
+-->
 <!-- ![Sample Image](image.jpg) -->
-[^1]: tdesktop is the official cross-platform desktop client (Telegram Lite on macOS)
+[^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
 
 <style>
+	.vsCodeArea {
+		vertical-align: bottom;
+		font-family: "Cascadia Code", "Cascadia Mono", "Lucida Sans Typewriter", "Courier New", monospace;
+		white-space: pre-wrap;
+		font-size: 13px;
+		line-height: 17px;
+    	display: inline-block;
+	}
+	.vsContainer {
+		background: #1F1F1F;
+		color: #FAFAFA;
+		width: calc(100% - 8px);
+		height: 600px;
+		border-radius: 4px;
+		padding: 4px;
+		font-family: system-ui, sans-serif;
+		font-size: 12px;
+		line-height: 16px;
+	}
+	.vsBox {
+		border: 1px solid #3D3D3D;
+		overflow: hidden;
+		white-space:nowrap;
+	}
+	.vsDropdown {
+		background: #383838;
+		height: 18px;
+		padding-top: 1px;
+		border: 1px solid #424242;
+		border-right: 4px solid #424242;
+		width: 352px;
+		display: inline-block;
+		user-select: none;
+	}
+	.vsDropdown > svg {
+		width: 16px;
+		height: 16px;
+		vertical-align: bottom;
+		padding-left: 2px;
+		padding-right: 3px;
+	}
+	.vsDropdown:hover {
+		background: #3D3D3D;
+	}
+	.vsTabs {
+		width: 100%;
+		height: 21px;
+		border-bottom: 2px #7160E8 solid;
+		user-select: none;
+		margin-left: 1px;
+		overflow: hidden;
+		white-space:nowrap;
+	}
+	.vsTab:hover {
+		background: #3D3D3D;
+		color: #FAFAFA;
+	}
+	.vsTab {
+		display: inline-block;
+		height: 16px;
+		background: #2E2E2E;
+		color: #B2B2B2;
+		padding: 0 43px 3px 4.5px;
+		margin: 1px 1px 0;
+	}
+	.vsTab.active {
+		border-top: 2px #7160E8 solid;
+		box-sizing: border-box;
+		height: 20px;
+		vertical-align: bottom;
+		color: #FAFAFA;
+		background: #3D3D3D;
+		font-weight: 600;
+		margin: 1px 0px 0;
+		padding: 0 45px 3px 4.5px;
+	}
 	.urlBar {
 		background: #3C3C3C;
 		height: 34px;
