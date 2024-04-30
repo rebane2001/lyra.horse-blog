@@ -82,3 +82,9 @@ h1, h2, #subMeta {
 ::selection {
   background: #FAD542;
 }
+
+code, pre {
+  font-family: 'Nimbus Mono PS', 'Courier New', monospace;
+  color: #04593b;
+  font-size: 90%;
+}

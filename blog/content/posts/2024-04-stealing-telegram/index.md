@@ -24,13 +24,13 @@ It seems like Telegram just opens up a URL with your account's token appended to
 
 So where does this URL and its session come from? I searched tdesktop[^1]'s code for various keywords such as "web.telegram.org" and "tgWebAuthToken", but oddly enough I didn't get any hits. After staring at the code and not finding anything related to this feature for a while, I decided to build the app for real and attach a debugger to it.
 
-A couple hours of compiling later, I had my very own build of tdesktop up and running. I set up a few breakpoints, clicked on the link, and stepped through the code until I found the relevant bits.
+A couple hours of compiling later, I had my very own build of tdesktop up and running. I set up a few breakpoints, clicked on the link, and stepped through the code until I found the relevant bits. And eventually, I was here:
 
 <div class="vsContainer">
-	<div class="vsTabs"><span class="vsTab active">ui_integration.cpp</span><span class="vsTab">base_integration.cpp</span><span class="vsTab">url_auth_box.cpp</span></div>
+	<div class="vsTabs"><span class="vsTab active">ui_integration.cpp<svg style="position:absolute;width:16px;height:16px;padding-left:27px" xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none"><polygon points="4 8 7 8 7 5 8 5 8 6 12 6 12 11 8 11 8 9 11 9 11 7 8 7 8 12 7 12 7 9 4 9"/></svg></span><span class="vsTab">base_integration.cpp</span><span class="vsTab">url_auth_box.cpp</span></div>
 	<div class="vsBox" style="border-top: none; height: fit-content">
 		<div aria-hidden="true">
-		<span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C16FCC"><rect fill="#454545" stroke="#B9B9B9" x="1.5" y="2.5" width="13" height="11"/><line x1="5.5" x2="5.5" y1="4" y2="9"/><line x1="8" x2="3" y1="6.5" y2="6.5"/><line x1="10.5" x2="10.5" y1="7" y2="12"/><line x1="13" x2="8" y1="9.5" y2="9.5"/></svg>Telegram</span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#DEDEDE" stroke-linecap="square"><path d="m4.6 2.5c-0.7 0-1 0.4-1 1v3l-0.8 1v1l0.8 1v3c0 0.7 0.3 1 1 1"/><path d="m11.5 13.5c0.7 0 1-0.4 1-1v-3l0.8-1v-1l-0.8-1v-3c0-0.7-0.3-1-1-1"/></svg>Core::`anonymous-namespace'</span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="#474152" stroke="#9670C6" stroke-linejoin="round"><polyline class="st0" points="13.5 5 13.5 12.1 8 14.6 8 7.7 13.5 5 8 2 2.4 5 8 7.7 8 14.6 2.4 11.7 2.4 5"/></svg>BotAutoLogin(const QString & url, const QString & domain,</span>
+		<span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C16FCC"><rect fill="#454545" stroke="#B9B9B9" x="1.5" y="2.5" width="13" height="11"/><line x1="5.5" x2="5.5" y1="4" y2="9"/><line x1="8" x2="3" y1="6.5" y2="6.5"/><line x1="10.5" x2="10.5" y1="7" y2="12"/><line x1="13" x2="8" y1="9.5" y2="9.5"/></svg>Telegram<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#DEDEDE" stroke-linecap="square"><path d="m4.6 2.5c-0.7 0-1 0.4-1 1v3l-0.8 1v1l0.8 1v3c0 0.7 0.3 1 1 1"/><path d="m11.5 13.5c0.7 0 1-0.4 1-1v-3l0.8-1v-1l-0.8-1v-3c0-0.7-0.3-1-1-1"/></svg>Core::`anonymous-namespace'<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="#474152" stroke="#9670C6" stroke-linejoin="round"><polyline class="st0" points="13.5 5 13.5 12.1 8 14.6 8 7.7 13.5 5 8 2 2.4 5 8 7.7 8 14.6 2.4 11.7 2.4 5"/></svg>BotAutoLogin(const QString & url, const QString & domain,<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span>
 	</div>
 	<div style="height: 374px"><span style="width: 17px;display:inline-block;background:#333;height:100%"><div style="height:1px"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint active"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%"><!-- This part (the syntax highlight) was really annoying to do manually, I wouldn't recommend doing it yourself. --><span class="vLn">   79     </span>
 <span class="vLn">   80     </span><span class="vC5">[[<span class="vCA">nodiscard</span>]] </span><span class="vC2">bool </span><span class="vC0">BotAutoLogin</span><span class="vC5">(</span>
@@ -47,7 +47,7 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 <span class="vLn">   91     </span>        <span class="vC5">|| </span><span class="vC5">!<span class="vC7">ranges</span>::</span><span class="vC7">contains</span><span class="vC5">(<span class="vC4">domains</span>, </span><span class="vC3">domain</span><span class="vC5">)) {</span>
 <span class="vLn">   92     </span>        <span class="vC9">return </span><span class="vC2">false</span><span class="vC5">;</span>
 <span class="vLn">   93     </span>    <span class="vC5">}</span>
-<span class="vLn">   94     </span>    <span class="vC2">const auto </span><span class="vC4">good </span><span class="vC5">= <span class="vC3">url</span>.</span><span class="vC0">startsWith</span><span class="vC5">(<span class="vC7">kBadPrefix</span>, </span><span class="vC7">Qt</span><span class="vC5">::<span class="vC6">CaseInsensitive</span>)</span>
+<span class="vLn">   94     </span>    <span class="vC2">const auto </span><span class="vC4">good </span><span class="vC5">= <span class="vC3">url</span>.</span><span class="vC0">startsWith</span><span class="vC5">(<span class="vC7">kBadPrefix</span>, </span><span class="vC7">Qt</span><span class="vC5">::<span class="vC6">CaseInsensitive</span>)</span> 
 <span class="vLn">   95     </span>        <span class="vC5">? </span><span class="vC5">(<span class="vC7">kGoodPrefix </span>+ </span><span class="vC3">url</span><span class="vC5">.<span class="vC0">mid</span>(</span><span class="vC7">kBadPrefix</span><span class="vC5">.<span class="vC0">size</span>()))</span>
 <span class="vLn">   96     </span>        <span class="vC5">: <span class="vC3">url</span>;</span>
 <span class="vLn">   97     </span>    <span class="vC1">UrlAuthBox</span><span class="vC5">::<span class="vC0">Activate</span>(&amp;</span><span class="vC4">account</span><span class="vC5">.<span class="vC0">session</span>(), </span><span class="vC4">good</span><span class="vC5">, <span class="vC3">context</span>);</span>
@@ -58,8 +58,7 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 	</div>
 <div style="height:6px"></div>
 <div class="vsBox" style="height: fit-content">
-<div>Locals</div>
-<div>Search (Ctrl+E)</div>
+<div style="padding:2px 0 0 4px;color:#B2B2B2;user-select:none">Locals</div>
 <div class="vsLocals">
 	<table>
     	<colgroup>
@@ -161,6 +160,8 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 </div>
 </div>
 
+So that's why I couldn't find the keywords! The list of domains this trick works with is sent to you by the Telegram server and stored in the config under the `url_auth_domains`[^2] key.
+
 topics:
 
 - didn't find it in grep, compiled the client
@@ -187,6 +188,7 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 -->
 <!-- ![Sample Image](image.jpg) -->
 [^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
+[^2]: `url_auth_domains` is used for 
 
 <style>
 	.vsLocals svg {
@@ -214,6 +216,7 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 		overflow: hidden;
 		white-space: nowrap;
 		max-width: 0;
+		user-select: all;
 	}
 	.vsLocals > table {
 		border-collapse: collapse;
@@ -293,7 +296,7 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 		background: #1F1F1F;
 		color: #FAFAFA;
 		width: calc(100% - 8px);
-		height: 900px;
+		height: fit-content;
 		border-radius: 4px;
 		padding: 4px;
 		font-family: system-ui, sans-serif;
