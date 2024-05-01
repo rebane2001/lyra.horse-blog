@@ -8,7 +8,7 @@ summary = "Say you handed me your phone, what’s the worst I could do in 10 sec
 +++
 
 Say you handed me your phone, what's the worst I could do in 10 seconds?
-low skill attack
+
 <div class="tgThread">
 	<!-- This is all handcrafted HTML & CSS :3 -->
 	<div class="tgMsg tgMsgSmBL"><a href="https://web.telegram.org/">Web.telegram.org</a><span class="tgMsgTs" aria-hidden="true">edited 23:51</span></div>
@@ -242,14 +242,27 @@ I also looked into the mobile apps. Both the [iOS](https://github.com/TelegramMe
 
 In my research I was unable to come up with a successful remote exploit - but that doesn't mean it was all in vain. Combining all the research so far and adding a little cherry on top we can create a scenario where we can steal someone's Telegram session in just a few seconds of physical access to their device, no matter if it's their computer, phone, or tablet.
 
-We start off by sending "[z.t.me](https://z.t.me/)" in their Telegram app and tapping on the link. This will open their browser to a link that will redirect to `telegram.org/​#tgWebAuthToken=...`. From here we edit the domain in the browser to `telegramz.org` - a domain I own - and hit/tap enter. The javascript on my domain will take it from here, logging one of *my* devices in with the token.
+We start off by sending "z.t.me" in their Telegram app and tapping on the link. This will open their browser to a link that will redirect to `telegram.org/​#tgWebAuthToken=...`. From here we edit the domain in the browser to `telegramz.org` - a domain I own - and hit/tap enter. The javascript on my domain will take it from here, logging one of *my* devices in with the token.
 
-todo: video demo
+**Here's a demo of me pulling off the entire attack in less than 10 seconds on an Android phone and a laptop:**
 
-You may be wondering if this attack is in any way different from just logging in using the QR code instead:
+<svg height="32px" style="display: inline-block;vertical-align: middle" viewBox="0 0 68 48"><path class="ytp-large-play-button-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path><path d="M 45,24 27,14 27,34" fill="#fff"></path></svg><a href="https://www.youtube.com/watch?v=">https://www.youtube.com/watch?v=</a>
+
+<div class="ytLink"><svg height="32px" style="display: inline-block;vertical-align: middle" viewBox="0 0 68 48"><path class="ytp-large-play-button-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path><path d="M 45,24 27,14 27,34" fill="#fff"></path></svg><span><a href="https://www.youtube.com/watch?v=">Stealing your Telegram account in 10 seconds flat</a></span></div>
+
+<div class="ytLink2">
+<div style="padding:13px;display: inline-block">
+<span style="width:40px;height:40px;display:inline-block;background: pink;border-radius:40px;vertical-align: middle;"></span><span style="text-shadow: 0 0 2px #0008;vertical-align: middle;padding-left:10px">Stealing your Telegram account in 10 seconds flat</span></div>
+<svg width="15%" style="margin:auto;display:block;position:absolute;top:0;left:0;bottom:0;right:0" viewBox="0 0 68 48"><path class="ytp-large-play-button-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path><path d="M 45,24 27,14 27,34" fill="#fff"></path></svg>
+<div style="position:absolute;bottom: 8px;background:#171717cc;width:fit-content;height:47px;font-size:16px;font-weight:500;display:flex;align-items: center"><span style="margin: 12px">Watch on YouTube</span></div>
+</div>
+
+This attack is incredibly easy to pull off even for a low-skill attacker. Assuming some higher forces have already set up a custom domain for you, all you need to know is how to tap on a link and add a letter onto the URL bar. You don't need any specialized tools, you don't need to know anything about the target, you don't even need a phone.
+
+So what should Telegram do about this?
 
 <div class="tgQr">
-<div style="margin: 0 auto;width:280px;height:280px;background:#FFF;border-radius:24px"><a href="https://lyra.horse/antonymph/"><svg fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+<div style="margin: 0 auto;width:280px;aspect-ratio:1/1;max-width:100%;background:#FFF;border-radius:24px"><a href="https://lyra.horse/antonymph/"><svg fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
 <!-- QR data -->
 <polyline points="92 28 100 28 100 36 108 36"/><polyline points="124 28 124 36 132 36 124 36 124 44 116 44 116 68 100 68 108 68 108 76 108 60 132 60 132 52 132 60 140 60 140 84 156 84 156 76"/><polyline points="148 68 117.2 68 124 68 124 84 116 84 116 92"/><polyline points="132 92 132 100 124 100"/><polyline points="84 116 108 116 108 100 84 100 84 92 76 92 100 92 100 84 100 108 100 116 100 108 116 108"/><polyline points="180 44 180 52 148 52 148 44 164 44 164 28 188 28 172 28 172 36 164 36 164 52 156 52 156 60"/><polyline points="172 76 172 68 188 68 188 76 188 60"/><polyline points="188 116 188 108 180 108 180 100 180 108 164 108 164 92 164 100 156 100"/><line x1="188" x2="196" y1="92" y2="92"/><polyline points="236 116 236 100 244 100 244 108 236 108"/><polyline points="212 100 220 100 220 116"/><polyline points="52 92 36 92 36 100"/><polyline points="252 148.9 252 132 244 132 252 132 252 124"/><polyline points="196 140 188 140 188 148"/><polyline points="68 100 68 108 76 108 68 108 68 116"/><polyline points="92 156 92 164 100 164 100 156 76 156 84 156 84 140 76 140"/><line x1="28" x2="28" y1="108" y2="116"/><polyline points="36 124 36 132 44 132 36 132 36 140"/><polyline points="28 148 28 156 36 156 36 164"/><polyline points="68 148 60 148 60 164 68 164 52 164 52 156 60 156 60 188"/><polyline points="76 172 84 172 84 180 100 180 84 180 84 188 76 188"/><line x1="92" x2="92" y1="196" y2="204"/><polyline points="116 228 116 220 100 220 108 220 108 204 132 204 132 220 132 212 124 212 124 204 148 204 140 204 140 188 124 188 124 180 132 180 132 188"/><polyline points="92 228 92 244 100 244 100 236 92 236"/><polyline points="124 252 132 252 132 244"/><polyline points="172 252 164 252 164 236 156 236 156 228 156 236 140 236 140 228"/><polyline points="148 180 172 180 172 164 172 172 180 172"/><polyline points="172 228 172 220 164 220 164 204 164 212 156 212"/><line x1="188" x2="188" y1="236" y2="252"/><polyline points="212 156 212 140 228 140 228 132 220 132 220 140 236 140 236 164 244 164 244 180 252 180 244 180 244 156 236 156 236 164 220 164 220 172 196 172 196 164 188 164"/><polyline points="228 164 228 196 220 196 220 172 204 172 204 180 204 188 204 180 220 180 220 188 180 188 180 204 188 204 188 188 188 220 204 220 204 236 204 228 196 228 196 220 220 220 220 196 220 228 244 228 244 236 252 236 236 236 236 244 228 244 228 228 236 228 236 236 236 220 244 220 244 228 236 228 236 204 252 204 252 196 252 212 252 204 236 204 236 212 220 212"/><line x1="204" x2="204" y1="204" y2="204"/><line x1="244" x2="244" y1="252" y2="252"/><line x1="148" x2="148" y1="252" y2="252"/><line x1="148" x2="148" y1="220" y2="220"/><line x1="108" x2="108" y1="188" y2="188"/><line x1="108" x2="108" y1="172" y2="172"/><line x1="44" x2="44" y1="188" y2="188"/><line x1="28" x2="28" y1="172" y2="172"/><line x1="44" x2="44" y1="148" y2="148"/><line x1="76" x2="76" y1="124" y2="124"/><line x1="52" x2="52" y1="108" y2="108"/><line x1="92" x2="92" y1="76" y2="76"/><path d="m148 108"/><line x1="180" x2="180" y1="132" y2="132"/><line x1="196" x2="196" y1="124" y2="124"/><line x1="212" x2="212" y1="124" y2="124"/><line x1="204" x2="204" y1="108" y2="108"/><line x1="252" x2="252" y1="92" y2="92"/><line x1="148" x2="148" y1="28" y2="28"/>
 <!-- QR position -->
@@ -260,6 +273,8 @@ You may be wondering if this attack is in any way different from just logging in
 <p>Log in to Telegram by QR Code</p>
 <ol><li><span>Open Telegram on your phone</span></li><li><span>Go to Settings &gt; Devices &gt; Link Desktop Device</span></li><li><span>Point your phone at this screen to confirm login</span></li></ol>
 </div>
+
+The same thing they did with the QR code logins!
 
 Discuss this post on: twitter, mastodon, hackernews, cohost
 
@@ -278,19 +293,41 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 [^3]: There are also `peer`, `msg_id`, and `button_id` fields, but if we set our `flag` to `f_url` (4) we skip them.
 
 <style>
-	.tgQr div, .tgQr svg *:hover {
+	.ytLink {
+		width: fit-content;
+		height: 32px;
+		padding: 4px;
+		background: #020;
+		border-radius: 4px;
+		font-family: "Roboto", "Arial", sans-serif;
+	}
+	.ytLink a {
+		color: #EEE;
+        font-size: 18px;
+        font-weight: 700;
+	}
+	.ytLink2 {
+		position: relative;
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		background: #FF0;
+		background: linear-gradient(90deg, rgba(174,238,184,1) 0%, rgba(223,233,148,1) 100%);
+		border-radius: 4px;
+		color:#eee;
+		font-size: 18px;
+		font-family: 'YouTube Noto', Roboto, Arial, Helvetica, sans-serif;
+	}
+	.tgQr div {
 		transform: scale(1);
 		cursor: pointer;
 		filter: none;
-		stroke: inherit;
-		transition: transform 0.2s, filter 0.2s, stroke 0.2s;
+		transition: transform 0.2s, filter 0.2s;
 	}
 	.tgQr div:hover {
 		transform: scale(1.05);
 		filter: drop-shadow(2px 4px 7px #000);
 	}
 	.tgQr svg *:hover {
-		transform: translate(-1px, -1px);
 		stroke: pink;
 	}
 	.tgQr {
