@@ -249,16 +249,15 @@ We start off by sending "z.t.me" in their Telegram app and tapping on the link. 
 
 <!-- I did not want to add a YouTube embed here because I want there to be no external resources in this blog unless absolutely necessary.
 Having the thumbnail be just a gradient looks a bit silly but otherwise I think it's a fairly decent replacement for the official embed. -->
-<!-- yt link https://www.youtube.com/watch?v=5DQrPEr1gGk -->
 <div class="ytLink">
-<a href="https://cdn.hobune.stream/tg_video_1080p.mp4" target="_blank"><div class="ytLinkOverlay"></div></a>
+<a href="https://vimeo.com/941755175" target="_blank"><div class="ytLinkOverlay"></div></a>
 <div style="padding:13px;display:flex;align-items:center;position:absolute;z-index:3;max-width: calc(100% - 26px);pointer-events:none">
 <a href="https://www.youtube.com/MLGaeming" target="_blank"><span class="ytChan"><span style="color:#F00">m</span><span style="color:#00F">l</span><span style="color:#0F0">g</span></span></a><span style="text-shadow: 0 0 2px #0008;vertical-align: middle;padding-left:10px;display:inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap">Stealing your Telegram account in 10 seconds flat</span></div>
 <svg height="13%" style="margin:auto;display:block;position:absolute;top:0;left:0;bottom:0;right:0" viewBox="0 0 68 48"><path class="ytp-large-play-button-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path><path d="M 45,24 27,14 27,34" fill="#fff"></path></svg>
 <div style="position:absolute;bottom: 8px;background:#171717cc;width:fit-content;height:47px;font-size:16px;font-weight:500;display:flex;align-items: center"><span style="margin: 12px">Watch on YouTube</span></div>
 </div>
 
-*Note: YouTube has removed [my video](https://www.youtube.com/watch?v=5DQrPEr1gGk) for a guidelines violation. I'm hoping this will be lifted soon (security research is allowed, "how to hack facebook by downloading our exe" isn't), but you can watch a [plain mp4](https://cdn.hobune.stream/tg_video_1080p.mp4) or [this twitter post](https://twitter.com/rebane2001/status/1785791628533195209) instead for now.*
+*Note: YouTube has removed [my video](https://www.youtube.com/watch?v=5DQrPEr1gGk) for a community guidelines violation. Educational content like this is allowed, but I believe their review team confused my video with a hacking tutorial (probably due to livesplit splits looking too much like a step-by-step instruction). They've also refused my appeal. You can watch a [plain mp4](https://cdn.hobune.stream/tg_video_1080p.mp4), [a Vimeo upload](https://vimeo.com/941755175), or [this twitter post](https://twitter.com/rebane2001/status/1785791628533195209) instead.*
 
 This attack is incredibly easy to pull off even for a low-skill attacker. Assuming some higher forces have already set up a custom domain for you, all you need to know is how to tap on a link and add a letter onto the URL bar. You don't need any specialized tools, you don't need to know anything about the target, you don't even need a phone.
 
