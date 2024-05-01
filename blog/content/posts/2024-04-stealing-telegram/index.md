@@ -225,42 +225,14 @@ All of the domains apart from the web.telegram.org one are sort-of built for the
 
 This is usually performed with a HTTP 301 redirect, but if the `tgWebAuth` parameter is set and the t.me deep link is valid, you'll get to run this javascript instead:
 
-```js
-<html>
-<head>
-<meta name="robots" content="noindex, nofollow">
-<noscript><meta http-equiv="refresh" content="0;url='https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse'"></noscript>
-<script>
-try {
-var url = "https:\/\/web.telegram.org\/a\/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse";
-var hash = location.hash.toString();
-if (hash.substr(0, 1) == '#') {
-  hash = hash.substr(1);
-}
-location.replace(hash ? urlAppendHashParams(url, hash) : url);
-} catch (e) { location.href=url; }
+<div class="chromeWindow"><!-- At this point I got a bit lazy, so instead of recreating it from scratch I just kinda copied chromium's view-source CSS :p -->
+<div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText">view-source:https://<span style="color:#E3E3E3">z.t.me</span>/share?url=lyra.horse&tgWebAuth=1</span></div></div>
+<table class="vs-main"><tbody><tr><td class="vs-ln" value="1"></td><td class="vs-lc"><span class="vs-tg">&lt;html&gt;</span></td></tr><tr><td class="vs-ln" value="2"></td><td class="vs-lc"><span class="vs-tg">&lt;head&gt;</span></td></tr><tr><td class="vs-ln" value="3"></td><td class="vs-lc"><span class="vs-tg">&lt;meta <span class="vs-at">name</span>="<span class="vs-av">robots</span>" <span class="vs-at">content</span>="<span class="vs-av">noindex, nofollow</span>"&gt;</span></td></tr><tr><td class="vs-ln" value="4"></td><td class="vs-lc"><span class="vs-tg">&lt;noscript&gt;</span>&lt;meta http-equiv="refresh" content="0;url='https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse'"&gt;<span class="vs-tg">&lt;/noscript&gt;</span></td></tr><tr><td class="vs-ln" value="5"></td><td class="vs-lc"><span class="vs-tg">&lt;script&gt;</span></td></tr><tr><td class="vs-ln" value="6"></td><td class="vs-lc">try {</td></tr><tr><td class="vs-ln" value="7"></td><td class="vs-lc">var url = "https:\/\/web.telegram.org\/a\/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse";</td></tr><tr><td class="vs-ln" value="8"></td><td class="vs-lc">var hash = location.hash.toString();</td></tr><tr><td class="vs-ln" value="9"></td><td class="vs-lc">if (hash.substr(0, 1) == '#') {</td></tr><tr><td class="vs-ln" value="10"></td><td class="vs-lc">  hash = hash.substr(1);</td></tr><tr><td class="vs-ln" value="11"></td><td class="vs-lc">}</td></tr><tr><td class="vs-ln" value="12"></td><td class="vs-lc">location.replace(hash ? urlAppendHashParams(url, hash) : url);</td></tr><tr><td class="vs-ln" value="13"></td><td class="vs-lc">} catch (e) { location.href=url; }</td></tr><tr><td class="vs-ln" value="14"></td><td class="vs-lc"><br></td></tr><tr><td class="vs-ln" value="15"></td><td class="vs-lc">function urlAppendHashParams(url, addHash) {</td></tr><tr><td class="vs-ln" value="16"></td><td class="vs-lc">  var ind = url.indexOf('#');</td></tr><tr><td class="vs-ln" value="17"></td><td class="vs-lc">  if (ind &lt; 0) {</td></tr><tr><td class="vs-ln" value="18"></td><td class="vs-lc">    return url + '#' + addHash;</td></tr><tr><td class="vs-ln" value="19"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="20"></td><td class="vs-lc">  var curHash = url.substr(ind + 1);</td></tr><tr><td class="vs-ln" value="21"></td><td class="vs-lc">  if (curHash.indexOf('=') &gt;= 0 || curHash.indexOf('?') &gt;= 0) {</td></tr><tr><td class="vs-ln" value="22"></td><td class="vs-lc">    return url + '&amp;' + addHash;</td></tr><tr><td class="vs-ln" value="23"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="24"></td><td class="vs-lc">  if (curHash.length &gt; 0) {</td></tr><tr><td class="vs-ln" value="25"></td><td class="vs-lc">    return url + '?' + addHash;</td></tr><tr><td class="vs-ln" value="26"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="27"></td><td class="vs-lc">  return url + addHash;</td></tr><tr><td class="vs-ln" value="28"></td><td class="vs-lc">}</td></tr><tr><td class="vs-ln" value="29"></td><td class="vs-lc"><span class="vs-tg">&lt;/script&gt;</span></td></tr><tr><td class="vs-ln" value="30"></td><td class="vs-lc"><span class="vs-tg">&lt;/head&gt;</span></td></tr><tr><td class="vs-ln" value="31"></td><td class="vs-lc"><span class="vs-tg">&lt;/html&gt;</span></td></tr><tr><td class="vs-ln" value="32"></td><td class="vs-lc"><span class="vs-cm">&lt;!-- page generated in 4.3ms --&gt;</span></td></tr><tr><td class="vs-ln" value="33"></td><td class="vs-lc"><span></span></td></tr></tbody></table>
+</div>
 
-function urlAppendHashParams(url, addHash) {
-  var ind = url.indexOf('#');
-  if (ind < 0) {
-    return url + '#' + addHash;
-  }
-  var curHash = url.substr(ind + 1);
-  if (curHash.indexOf('=') >= 0 || curHash.indexOf('?') >= 0) {
-    return url + '&' + addHash;
-  }
-  if (curHash.length > 0) {
-    return url + '?' + addHash;
-  }
-  return url + addHash;
-}
-</script>
-</head>
-</html>
-<!-- page generated in 4.76ms -->
-```
+I was a bit puzzled at first, but eventually realized it was just a simple hack to deal with URL hash fragments. The [hash fragment](https://en.wikipedia.org/wiki/URI_fragment) part of the URL never gets sent to the server, so the server cannot know *where* to redirect you *if* it wants to add its own hash fragment. In this specific case, we have `#tgWebAuthToken=...` in the URL already and want to add `#?tgaddr=...` to it as as we redirect to the web client (so in the end we get `#?tgaddr=...&tgWeb​AuthToken=...`).
 
-I was a bit puzzled at first, but eventually realized it was just a simple hack to deal with URL hash fragments.
+For the rest of the night I played around with Telegram's various web clients. A little-known fact is that the [original Telegram web client](https://github.com/zhukov/webogram) can still be accessed to this day by going to [web.telegram.org.](https://web.telegram.org./) with the period at the end. This is probably because they made web.telegram.org redirect to [](https://web.telegram.org/a/)
 
 topics:
 
@@ -292,6 +264,55 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 [^3]: There are also `peer`, `msg_id`, and `button_id` fields, but if we set our `flag` to `f_url` (4) we skip them.
 
 <style>
+	.vs-main {
+    	width: 100%;
+    	word-break: normal;
+    	overflow-wrap: anywhere;
+    	white-space: pre-wrap;
+    	color: white;
+    	font-family: monospace;
+    	border-spacing: 0px;
+    	background: #000;
+    	border-top: 1px solid #444746;
+	}
+	.vs-ln::before {
+    	content: attr(value);
+	}
+	.vs-ln {
+		box-sizing: border-box;
+    	width: 31px;
+    	background-color: rgb(60, 60, 60);
+    	user-select: none;
+    	text-align: right;
+    	color: rgb(128, 128, 128);
+    	font-size: 12px;
+    	padding: 0px 4px;
+    	border-right: 1px solid rgb(187, 187, 187);
+    	vertical-align: baseline;
+	}
+	.vs-lc {
+		padding: 0px 5px;
+		vertical-align: baseline;
+	}
+	.vs-tg {
+		color: rgb(93, 176, 215);
+	}
+	.vs-at {
+		color: rgb(155, 187, 220);
+	}
+	.vs-av {
+		color: rgb(242, 151, 102);
+	}
+	.vs-cm {
+		color: rgb(35, 110, 37);
+	}
+	.chromeWindow {
+		background: #3C3C3C;
+		height: fit-content;
+		width: 100%;
+		border-radius: 4px;
+		overflow: hidden;
+	}
 	.detailedUrlMapTable {
 		table-layout: fixed;
 		width: 100%;
