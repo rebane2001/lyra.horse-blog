@@ -163,7 +163,7 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 
 So that's why I couldn't find the keywords! The list of domains this trick works with is sent to you by the Telegram server and stored in the config under the `url_auth_domains`[^2] key. You can see the list of domains currently provided in the locals above.
 
-Once you click on a link with a matching domain your client sends the link to Telegram's servers and if everything looks alright your client will get a cute little URL back with the tokens and everything appended. For those playing along at home, we send a `messages_requestUrlAuth` with only the `url` set[^3] and hope to get back a `urlAuthResultAccepted` with the new `url` inside.
+Once you click on a link with a matching domain your client sends the link to Telegram's servers and if everything looks alright your client will get a cute little temporary URL with the tokens and everything appended. For those playing along at home, we send a `messages_requestUrlAuth` with only the `url` set[^3] and hope to get back a `urlAuthResultAccepted` with the new `url` inside.
 
 Having figured out how the thing works, and armed with the list of domains, I began looking for ways to break it. It seems like the entire initial URL gets preserved, including the path, query parameters, and hash fragment, with the exception of the scheme being forced to https.
 
@@ -232,20 +232,19 @@ This is usually performed with a HTTP 301 redirect, but if the `tgWebAuth` param
 
 I was a bit puzzled at first, but eventually realized it was just a simple hack to deal with URL hash fragments. The [hash fragment](https://en.wikipedia.org/wiki/URI_fragment) part of the URL never gets sent to the server, so the server cannot know *where* to redirect you *if* it wants to add its own hash fragment. In this specific case, we have `#tgWebAuthToken=...` in the URL already and want to add `#?tgaddr=...` to it as as we redirect to the web client (so in the end we get `#?tgaddr=...&tgWeb​AuthToken=...`).
 
-For the rest of the night I played around with Telegram's various web clients. A little-known fact is that the [original Telegram web client](https://github.com/zhukov/webogram) can still be accessed to this day by going to [web.telegram.org.](https://web.telegram.org./) with the period at the end. This is probably because they made web.telegram.org redirect to [](https://web.telegram.org/a/)
+For the rest of the night I played around with Telegram's various web clients. A little-known fact is that the [legacy Telegram web client](https://github.com/zhukov/webogram) can still be accessed to this day by going to [web.telegram.org?legacy=1](https://web.telegram.org/?legacy=1). What's more, the session is shared between the web clients, so an exploit in the old web client might still be useful even if the target uses a different web client.
 
-topics:
+I couldn't find anything too interesting in [WebK](https://github.com/morethanwords/tweb), but both [WebZ](https://github.com/Ajaxy/telegram-tt) and the legacy client provided some promising leads in messing with the `tgaddr` in the URL. It ended up being a dead end for my research though, as I couldn't figure out a way to get rid of or bypass the ampersand in the `&tgWebAuthToken=...` part of the URL.
 
-- didn't find it in grep, compiled the client
-- go over the session token generation process
-- show domains list in visual studio (z.t.me share trick)
-- token expiration time (1 minute)
-- 10 second domain/demo
-- works on mobile
-- web.telegram.org/_ trick
-- failed attempt: web clients (foiled by the ampersand)
-- failed attempt: android protocol hijack
-- bonus: [web.telegram.org.](https://web.telegram.org.) to access old client
+I also looked into the mobile apps. Both the [iOS](https://github.com/TelegramMessenger/Telegram-iOS) and [Android](https://github.com/DrKLO/Telegram) clients support the link authentication thing, which makes the whole situation a bit more worrying considering it's generally a lot harder to just copy a session token off a mobile device. On Android I messed around with intents, but ended up at another dead end as intents for web links have been [locked down since Android 12](https://developer.android.com/about/versions/12/behavior-changes-12#android-app-links-verification-changes) and require verification to work. I also messed around with protocol intents, but the way the app has been built prevents the token from being appended in those cases.
+
+*So, no exploit?*
+
+In my research I was unable to come up with a successful remote exploit - but that doesn't mean it was all in vain. Combining all the research so far and adding a little cherry on top we can create a scenario where we can steal someone's Telegram session in just a few seconds of physical access to their device, no matter if it's their computer, phone, or tablet.
+
+We start off by sending "[z.t.me](https://z.t.me/)" in their Telegram app and tapping on the link. This will open their browser to a link that will redirect to `telegram.org/​#tgWebAuthToken=...`. From here we edit the domain in the browser to `telegramz.org` - a domain I own - and hit/tap enter. The javascript on my domain will take it from here, logging one of *my* devices in with the token.
+
+todo: video demo
 
 Discuss this post on: twitter, mastodon, hackernews, cohost
 
