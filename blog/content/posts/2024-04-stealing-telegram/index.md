@@ -1,6 +1,6 @@
 +++
 title = 'Stealing your Telegram account in 10 seconds flat'
-date = 2024-04-29T16:00:00Z
+date = 2024-05-01T16:00:00Z
 draft = false
 tags = ['infosec','telegram']
 slug = "stealing-your-telegram-account-in-10-seconds-flat"
@@ -8,7 +8,7 @@ summary = "Say you handed me your phone, what’s the worst I could do in 10 sec
 +++
 
 Say you handed me your phone, what's the worst I could do in 10 seconds?
-
+low skill attack
 <div class="tgThread">
 	<!-- This is all handcrafted HTML & CSS :3 -->
 	<div class="tgMsg tgMsgSmBL"><a href="https://web.telegram.org/">Web.telegram.org</a><span class="tgMsgTs" aria-hidden="true">edited 23:51</span></div>
@@ -246,6 +246,21 @@ We start off by sending "[z.t.me](https://z.t.me/)" in their Telegram app and ta
 
 todo: video demo
 
+You may be wondering if this attack is in any way different from just logging in using the QR code instead:
+
+<div class="tgQr">
+<div style="margin: 0 auto;width:280px;height:280px;background:#FFF;border-radius:24px"><a href="https://lyra.horse/antonymph/"><svg fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+<!-- QR data -->
+<polyline points="92 28 100 28 100 36 108 36"/><polyline points="124 28 124 36 132 36 124 36 124 44 116 44 116 68 100 68 108 68 108 76 108 60 132 60 132 52 132 60 140 60 140 84 156 84 156 76"/><polyline points="148 68 117.2 68 124 68 124 84 116 84 116 92"/><polyline points="132 92 132 100 124 100"/><polyline points="84 116 108 116 108 100 84 100 84 92 76 92 100 92 100 84 100 108 100 116 100 108 116 108"/><polyline points="180 44 180 52 148 52 148 44 164 44 164 28 188 28 172 28 172 36 164 36 164 52 156 52 156 60"/><polyline points="172 76 172 68 188 68 188 76 188 60"/><polyline points="188 116 188 108 180 108 180 100 180 108 164 108 164 92 164 100 156 100"/><line x1="188" x2="196" y1="92" y2="92"/><polyline points="236 116 236 100 244 100 244 108 236 108"/><polyline points="212 100 220 100 220 116"/><polyline points="52 92 36 92 36 100"/><polyline points="252 148.9 252 132 244 132 252 132 252 124"/><polyline points="196 140 188 140 188 148"/><polyline points="68 100 68 108 76 108 68 108 68 116"/><polyline points="92 156 92 164 100 164 100 156 76 156 84 156 84 140 76 140"/><line x1="28" x2="28" y1="108" y2="116"/><polyline points="36 124 36 132 44 132 36 132 36 140"/><polyline points="28 148 28 156 36 156 36 164"/><polyline points="68 148 60 148 60 164 68 164 52 164 52 156 60 156 60 188"/><polyline points="76 172 84 172 84 180 100 180 84 180 84 188 76 188"/><line x1="92" x2="92" y1="196" y2="204"/><polyline points="116 228 116 220 100 220 108 220 108 204 132 204 132 220 132 212 124 212 124 204 148 204 140 204 140 188 124 188 124 180 132 180 132 188"/><polyline points="92 228 92 244 100 244 100 236 92 236"/><polyline points="124 252 132 252 132 244"/><polyline points="172 252 164 252 164 236 156 236 156 228 156 236 140 236 140 228"/><polyline points="148 180 172 180 172 164 172 172 180 172"/><polyline points="172 228 172 220 164 220 164 204 164 212 156 212"/><line x1="188" x2="188" y1="236" y2="252"/><polyline points="212 156 212 140 228 140 228 132 220 132 220 140 236 140 236 164 244 164 244 180 252 180 244 180 244 156 236 156 236 164 220 164 220 172 196 172 196 164 188 164"/><polyline points="228 164 228 196 220 196 220 172 204 172 204 180 204 188 204 180 220 180 220 188 180 188 180 204 188 204 188 188 188 220 204 220 204 236 204 228 196 228 196 220 220 220 220 196 220 228 244 228 244 236 252 236 236 236 236 244 228 244 228 228 236 228 236 236 236 220 244 220 244 228 236 228 236 204 252 204 252 196 252 212 252 204 236 204 236 212 220 212"/><line x1="204" x2="204" y1="204" y2="204"/><line x1="244" x2="244" y1="252" y2="252"/><line x1="148" x2="148" y1="252" y2="252"/><line x1="148" x2="148" y1="220" y2="220"/><line x1="108" x2="108" y1="188" y2="188"/><line x1="108" x2="108" y1="172" y2="172"/><line x1="44" x2="44" y1="188" y2="188"/><line x1="28" x2="28" y1="172" y2="172"/><line x1="44" x2="44" y1="148" y2="148"/><line x1="76" x2="76" y1="124" y2="124"/><line x1="52" x2="52" y1="108" y2="108"/><line x1="92" x2="92" y1="76" y2="76"/><path d="m148 108"/><line x1="180" x2="180" y1="132" y2="132"/><line x1="196" x2="196" y1="124" y2="124"/><line x1="212" x2="212" y1="124" y2="124"/><line x1="204" x2="204" y1="108" y2="108"/><line x1="252" x2="252" y1="92" y2="92"/><line x1="148" x2="148" y1="28" y2="28"/>
+<!-- QR position -->
+<polyline points="52 44 52 60 60 60 60 44 44 44 44 60 52 60"/><path d="m44 28h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/><polyline points="52 220 52 236 60 236 60 220 44 220 44 236 52 236"/><path d="m44 204h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/><polyline points="228 44 228 60 236 60 236 44 220 44 220 60 228 60"/><path d="m220 28h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/>
+<!-- TG logo -->
+<circle fill="#3390EC" stroke="none" cx="140" cy="140" r="32"/><path fill="#FFF" stroke="none" d="m131 143.6c5.7-3.8 11.4-7.5 14.8-9.2 0.7-0.5 1.5 0.5 0.9 1.1-2.6 3.3-6.5 6.6-10.8 10.8-0.8 0.8-0.6 2 0.3 2.6 3.5 2.6 7.7 5.2 12.2 7.8 1.8 1.1 4.2 0.1 4.5-2 1.7-9.1 3-17.7 3.9-25.8 0.3-1.9-1.6-3.5-3.5-2.7-10.4 4-21.8 8.8-34.3 14.1-1 0.5-1.6 1.5-0.1 2.3l4.5 1.6c2.6 0.9 5.3 0.8 7.6-0.6z"/>
+</svg></a></div>
+<p>Log in to Telegram by QR Code</p>
+<ol><li><span>Open Telegram on your phone</span></li><li><span>Go to Settings &gt; Devices &gt; Link Desktop Device</span></li><li><span>Point your phone at this screen to confirm login</span></li></ol>
+</div>
+
 Discuss this post on: twitter, mastodon, hackernews, cohost
 
 <!-- 
@@ -263,6 +278,57 @@ urlAuthResultDefault#a9d6db1f = UrlAuthResult;
 [^3]: There are also `peer`, `msg_id`, and `button_id` fields, but if we set our `flag` to `f_url` (4) we skip them.
 
 <style>
+	.tgQr div, .tgQr svg *:hover {
+		transform: scale(1);
+		cursor: pointer;
+		filter: none;
+		stroke: inherit;
+		transition: transform 0.2s, filter 0.2s, stroke 0.2s;
+	}
+	.tgQr div:hover {
+		transform: scale(1.05);
+		filter: drop-shadow(2px 4px 7px #000);
+	}
+	.tgQr svg *:hover {
+		transform: translate(-1px, -1px);
+		stroke: pink;
+	}
+	.tgQr {
+		font-family: "Roboto", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
+		background: #212121;
+		border-radius: 4px;
+		color: #FFF;
+		padding: 32px calc(50% - 180px) 16px;
+		font-size: 16px;
+	}
+	.tgQr p {
+		margin: 1.5rem 0 1rem 0;
+    	font-size: 1.25rem;
+		line-height: 1.5;
+		font-weight: 500;
+		text-align: center;
+	}
+	.tgQr ol {
+		padding: 0 1.75rem;
+		margin: 0 0 1rem;
+	}
+	.tgQr li {
+		margin: .75rem 0;
+		display: flex;
+		counter-increment: item;
+	}
+	.tgQr ol li::before {
+    	content: counter(item);
+    	display: flex;
+    	justify-content: center;
+    	align-items: center;
+    	min-width: 1.375rem;
+    	height: 1.375rem;
+    	margin: 0 .75rem 0 0;
+    	background: rgb(135,116,225);
+    	border-radius: 50%;
+    	font-size: smaller;
+	}
 	.vs-main {
     	width: 100%;
     	word-break: normal;
