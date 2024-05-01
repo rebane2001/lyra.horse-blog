@@ -1,6 +1,6 @@
 +++
 title = 'Stealing your Telegram account in 10 seconds flat'
-date = 2024-05-01T16:00:00Z
+date = 2024-05-01T21:00:00Z
 draft = false
 tags = ['infosec','telegram']
 slug = "stealing-your-telegram-account-in-10-seconds-flat"
@@ -9,15 +9,15 @@ summary = "Say you handed me your phone, what’s the worst I could do in 10 sec
 
 Say you handed me your phone, what's the worst I could do in 10 seconds?
 
+<!-- This is all handcrafted HTML & CSS :3 -->
 <div class="tgThread">
-	<!-- This is all handcrafted HTML & CSS :3 -->
 	<div class="tgMsg tgMsgSmBL"><a href="https://web.telegram.org/">Web.telegram.org</a><span class="tgMsgTs" aria-hidden="true">edited 23:51</span></div>
 	<div class="tgMsg tgMsgSmTL tgMsgNoneBL"><span>Click that link and your browser will be logged into telegram without passwords</span><span class="tgMsgTs" aria-hidden="true">23:52</span></div><div class="tgMsgSpeech"><div></div></div>
 </div>
 
-The other day I received an interesting message with a link to [Telegram's web client](https://web.telegram.org). Upon clicking on the link, I was greeted to the client, already logged in. Curious, I sent myself a message with the same link, clicked on it, and found myself logged in once again. There wasn't anything special about the link I had been sent, this is just Telegram's default behavior.
+The other day I received an interesting message with a link to [Telegram's web client](https://web.telegram.org). Upon clicking on the link, I found myself already logged in. Curious, I logged out, sent myself a message with the same link, clicked, and was logged in once again. There wasn't anything special about the link I had been sent, this is just Telegram's default behavior.
 
-I wanted to find out how this works. The first step was to figure out how the Telegram client was passing the session to the browser. As I clicked on the link, I noticed something flash on the URL bar for just a split second:
+I wanted to look into how this works. The first step was to figure out how the Telegram client was passing the session to the browser. As I clicked on the link, I noticed something flash on the URL bar for just a split second:
 
 <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span style="color:#E3E3E3">web.telegram.org</span>/#tgWebAuthToken=dGhpcyB0b2tlbiBpcyByYW5kb20gYW5kIDEwMjQgYml0cyBsb25nLCBidXQgaW4gdGhlIGJsb2cgcG9zdCBpIHJlcGxhY2VkIGl0IHdpdGggdGhpcyBmdW4gZWFzdGVyIGVnZyBmb3IgdGhvc2Ugd2l0aCBhIGtlZW4gZXllIQ&tgWebAuthUserId=420493337&tgWebAuthDcId=4</span></div></div>
 
@@ -25,15 +25,17 @@ It seems like Telegram just opens up a URL with your account's token appended to
 
 So where does this URL and its session come from? I searched tdesktop[^1]'s code for various keywords such as "web.telegram.org" and "tgWebAuthToken", but oddly enough I didn't get any hits. After staring at the code and not finding anything related to this feature for a while, I decided to build the app for real and attach a debugger to it.
 
-A couple hours of compiling later, I had my very own build of tdesktop up and running. I set up a few breakpoints, clicked on the link, and stepped through the code until I found the relevant bits. And eventually, I was here:
+A couple hours of compiling later, I had my very own build of tdesktop up and running. I set up a few breakpoints, clicked on some test links, and stepped through the code looking for the relevant bits. And eventually, I got here:
 
+<!-- This was fun to make! It took me a long time to recreate all the icons in SVG though. -->
 <div class="vsContainer" draggable="false">
 	<div class="vsTabs"><span class="vsTab active">ui_integration.cpp<svg style="position:absolute;width:16px;height:16px;padding-left:27px" xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none"><polygon points="4 8 7 8 7 5 8 5 8 6 12 6 12 11 8 11 8 9 11 9 11 7 8 7 8 12 7 12 7 9 4 9"/></svg></span><span class="vsTab">base_integration.cpp</span><span class="vsTab">url_auth_box.cpp</span><span class="vsTab">scheme.h</span><span class="vsTab">local_url_handlers.cpp</span><span class="vsTab">basic_click_handlers.cpp</span></div>
 	<div class="vsBox" style="border-top: none; height: fit-content">
 		<div aria-hidden="true">
 		<span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#C16FCC"><rect fill="#454545" stroke="#B9B9B9" x="1.5" y="2.5" width="13" height="11"/><line x1="5.5" x2="5.5" y1="4" y2="9"/><line x1="8" x2="3" y1="6.5" y2="6.5"/><line x1="10.5" x2="10.5" y1="7" y2="12"/><line x1="13" x2="8" y1="9.5" y2="9.5"/></svg>Telegram<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="none" stroke="#DEDEDE" stroke-linecap="square"><path d="m4.6 2.5c-0.7 0-1 0.4-1 1v3l-0.8 1v1l0.8 1v3c0 0.7 0.3 1 1 1"/><path d="m11.5 13.5c0.7 0 1-0.4 1-1v-3l0.8-1v-1l-0.8-1v-3c0-0.7-0.3-1-1-1"/></svg>Core::`anonymous-namespace'<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span><span class="vsDropdown"><svg xmlns="http://www.w3.org/2000/svg" fill="#474152" stroke="#9670C6" stroke-linejoin="round"><polyline class="st0" points="13.5 5 13.5 12.1 8 14.6 8 7.7 13.5 5 8 2 2.4 5 8 7.7 8 14.6 2.4 11.7 2.4 5"/></svg>BotAutoLogin(const QString & url, const QString & domain,<svg xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none" style="float: right; padding-right: 2px"><polygon points="13 11 16 8 10 8"/></svg></span>
 	</div>
-	<div style="height: 374px"><span style="width: 17px;display:inline-block;background:#333;height:100%"><div style="height:1px"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint active" title="This is a breakpoint, code execution stops here, lets me see the cool info like the locals below, and also lets me step through the code line by line!"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%"><!-- This part (the syntax highlight) was really annoying to do manually, I wouldn't recommend doing it yourself. --><span class="vLn">   79     </span>
+	<div style="height: 374px"><span style="width: 17px;display:inline-block;background:#333;height:100%"><div style="height:1px"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint active" title="This is a breakpoint, code execution stops here, lets me see the cool info like the locals below, and also lets me step through the code line by line!"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div><div class="vsBreakpoint"></div></span><span class="vsCodeArea" style="width: calc(100% - 17px);display:inline-block;background:#1E1E1E;height:100%"><!--
+ This part (the syntax highlight) was really annoying to do manually, I wouldn't recommend doing it yourself. --><span class="vLn">   79     </span>
 <span class="vLn">   80     </span><span class="vC5">[[<span class="vCA">nodiscard</span>]] </span><span class="vC2">bool </span><span class="vC0">BotAutoLogin</span><span class="vC5">(</span>
 <span class="vLn">   81     </span>        <span class="vC2">const </span><span class="vC1">QString </span><span class="vC5">&amp;<span class="vC3">url</span>,</span>
 <span class="vLn">   82     </span>        <span class="vC2">const </span><span class="vC1">QString </span><span class="vC5">&amp;<span class="vC3">domain</span>,</span>
@@ -161,14 +163,13 @@ A couple hours of compiling later, I had my very own build of tdesktop up and ru
 </div>
 </div>
 
-So that's why I couldn't find the keywords! The list of domains this trick works with is sent to you by the Telegram server and stored in the config under the `url_auth_domains`[^2] key. You can see the list of domains currently provided in the locals above.
+So that's why I couldn't find the keywords earlier! The list of domains this trick works with is sent to you by the Telegram server and stored in the config under the `url_auth_domains`[^2] key. You can see the list of domains currently provided in the locals above.
 
-Once you click on a link with a matching domain your client sends the link to Telegram's servers and if everything looks alright your client will get a cute little temporary URL with the tokens and everything appended. For those playing along at home, we send a `messages_requestUrlAuth` with only the `url` set[^3] and hope to get back a `urlAuthResultAccepted` with the new `url` inside.
+Once you click on a link with a matching domain, your client will send it to Telegram's servers and if everything looks alright you'll get back a cute little temporary URL with the tokens and everything appended. For those playing along at home, we send a `messages_requestUrlAuth` with just the `url` set[^3], and hope to get back a `urlAuthResultAccepted` with the new `url` inside.
 
-Having figured out how the thing works, and armed with the list of domains, I began looking for ways to break it. It seems like the entire initial URL gets preserved, including the path, query parameters, and hash fragment, with the exception of the scheme being forced to https.
+Having figured out how the thing works, and armed with a list of domains, I began looking for a way to break it. It seems like the entire initial URL gets preserved, including the path, query parameters, and the hash fragment, with the exception of the scheme being forced to https.
 
 For example:
-
 - `http://web.​telegram.org/` becomes `https://web.​telegram.org/​#tgWebAuthToken=...`
 - `https://z.t.me/​pony` becomes `https://z.t.me/pony​?tgWebAuth=1​#tgWebAuthToken=...`
 - `https://k.t.me/​#po=ny` becomes `https://k.t.me/​?tgWebAuth=1​#po=ny​&tgWebAuthToken=...`
@@ -220,37 +221,39 @@ For example:
 </table>
 </details>
 
-All of the domains apart from the web.telegram.org one are sort-of built for the [t.me deep links](https://core.telegram.org/api/links). Going on any of them without a path will just bring you to the telegram.org homepage. Going on one with a compatible path, such as [z.t.me/share?url=lyra.horse](https://z.t.me/share?url=lyra.horse), will open the respective client with a hash fragment, eg:  
+All of the domains apart from the web.telegram.org one are sort-of built for the [t.me deep links](https://core.telegram.org/api/links). Going on any of them without a path will just bring you to the telegram.org homepage. Going on one with a compatible path, such as [z.t.me/share?url=lyra.horse](https://z.t.me/share?url=lyra.horse), will open up the respective client with a hash fragment, eg:  
 [https://web.telegram.org/a/#?​tgaddr=​tg%3A%2F%2Fmsg_url%3F​url%3Dlyra.horse](https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse)
 
-This is usually performed with a HTTP 301 redirect, but if the `tgWebAuth` parameter is set and the t.me deep link is valid, you'll get to run this javascript instead:
+This is usually performed with a HTTP 301 redirect, but if the `tgWebAuth` parameter is set and the deep link is valid, you'll get to run this fun javascript instead:
 
 <div class="chromeWindow"><!-- At this point I got a bit lazy, so instead of recreating it from scratch I just kinda copied chromium's view-source CSS :p -->
 <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText">view-source:https://<span style="color:#E3E3E3">z.t.me</span>/share?url=lyra.horse&tgWebAuth=1</span></div></div>
 <table class="vs-main"><tbody><tr><td class="vs-ln" value="1"></td><td class="vs-lc"><span class="vs-tg">&lt;html&gt;</span></td></tr><tr><td class="vs-ln" value="2"></td><td class="vs-lc"><span class="vs-tg">&lt;head&gt;</span></td></tr><tr><td class="vs-ln" value="3"></td><td class="vs-lc"><span class="vs-tg">&lt;meta <span class="vs-at">name</span>="<span class="vs-av">robots</span>" <span class="vs-at">content</span>="<span class="vs-av">noindex, nofollow</span>"&gt;</span></td></tr><tr><td class="vs-ln" value="4"></td><td class="vs-lc"><span class="vs-tg">&lt;noscript&gt;</span>&lt;meta http-equiv="refresh" content="0;url='https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse'"&gt;<span class="vs-tg">&lt;/noscript&gt;</span></td></tr><tr><td class="vs-ln" value="5"></td><td class="vs-lc"><span class="vs-tg">&lt;script&gt;</span></td></tr><tr><td class="vs-ln" value="6"></td><td class="vs-lc">try {</td></tr><tr><td class="vs-ln" value="7"></td><td class="vs-lc">var url = "https:\/\/web.telegram.org\/a\/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse";</td></tr><tr><td class="vs-ln" value="8"></td><td class="vs-lc">var hash = location.hash.toString();</td></tr><tr><td class="vs-ln" value="9"></td><td class="vs-lc">if (hash.substr(0, 1) == '#') {</td></tr><tr><td class="vs-ln" value="10"></td><td class="vs-lc">  hash = hash.substr(1);</td></tr><tr><td class="vs-ln" value="11"></td><td class="vs-lc">}</td></tr><tr><td class="vs-ln" value="12"></td><td class="vs-lc">location.replace(hash ? urlAppendHashParams(url, hash) : url);</td></tr><tr><td class="vs-ln" value="13"></td><td class="vs-lc">} catch (e) { location.href=url; }</td></tr><tr><td class="vs-ln" value="14"></td><td class="vs-lc"><br></td></tr><tr><td class="vs-ln" value="15"></td><td class="vs-lc">function urlAppendHashParams(url, addHash) {</td></tr><tr><td class="vs-ln" value="16"></td><td class="vs-lc">  var ind = url.indexOf('#');</td></tr><tr><td class="vs-ln" value="17"></td><td class="vs-lc">  if (ind &lt; 0) {</td></tr><tr><td class="vs-ln" value="18"></td><td class="vs-lc">    return url + '#' + addHash;</td></tr><tr><td class="vs-ln" value="19"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="20"></td><td class="vs-lc">  var curHash = url.substr(ind + 1);</td></tr><tr><td class="vs-ln" value="21"></td><td class="vs-lc">  if (curHash.indexOf('=') &gt;= 0 || curHash.indexOf('?') &gt;= 0) {</td></tr><tr><td class="vs-ln" value="22"></td><td class="vs-lc">    return url + '&amp;' + addHash;</td></tr><tr><td class="vs-ln" value="23"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="24"></td><td class="vs-lc">  if (curHash.length &gt; 0) {</td></tr><tr><td class="vs-ln" value="25"></td><td class="vs-lc">    return url + '?' + addHash;</td></tr><tr><td class="vs-ln" value="26"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="27"></td><td class="vs-lc">  return url + addHash;</td></tr><tr><td class="vs-ln" value="28"></td><td class="vs-lc">}</td></tr><tr><td class="vs-ln" value="29"></td><td class="vs-lc"><span class="vs-tg">&lt;/script&gt;</span></td></tr><tr><td class="vs-ln" value="30"></td><td class="vs-lc"><span class="vs-tg">&lt;/head&gt;</span></td></tr><tr><td class="vs-ln" value="31"></td><td class="vs-lc"><span class="vs-tg">&lt;/html&gt;</span></td></tr><tr><td class="vs-ln" value="32"></td><td class="vs-lc"><span class="vs-cm">&lt;!-- page generated in 4.3ms --&gt;</span></td></tr><tr><td class="vs-ln" value="33"></td><td class="vs-lc"><span></span></td></tr></tbody></table>
 </div>
 
-I was a bit puzzled at first, but eventually realized it was just a simple hack to deal with URL hash fragments. The [hash fragment](https://en.wikipedia.org/wiki/URI_fragment) part of the URL never gets sent to the server, so the server cannot know *where* to redirect you *if* it wants to add its own hash fragment. In this specific case, we have `#tgWebAuthToken=...` in the URL already and want to add `#?tgaddr=...` to it as as we redirect to the web client (so in the end we get `#?tgaddr=...&tgWeb​AuthToken=...`).
+I was a bit puzzled at first, but eventually realized that this is all just a simple hack to deal with URL hash fragments. The [hash fragment](https://en.wikipedia.org/wiki/URI_fragment) part of the URL never gets sent to the server, so the server cannot know *where* to redirect you *if* it also wants to add its own hash fragment. In this specific case, we have `#tgWebAuthToken=...` in the URL already, and we want to combine it with `#?tgaddr=...` as we redirect to the web client (so in the end we get `#?tgaddr=...&tgWeb​AuthToken=...`).
 
-For the rest of the night I played around with Telegram's various web clients. A little-known fact is that the [legacy Telegram web client](https://github.com/zhukov/webogram) can still be accessed to this day by going to [web.telegram.org?legacy=1](https://web.telegram.org/?legacy=1). What's more, the session is shared between the web clients, so an exploit in the old web client might still be useful even if the target uses a different web client.
+For the rest of the night I played around with Telegram's various web clients. A little-known fact is that the [legacy Telegram web client](https://github.com/zhukov/webogram) can still be accessed to this day by going to [web.telegram.org/?legacy=1](https://web.telegram.org/?legacy=1). What's more, the session is shared between the web clients, so an exploit in the old web client might still be useful even if the target uses a modern web client.
 
-I couldn't find anything too interesting in [WebK](https://github.com/morethanwords/tweb), but both [WebZ](https://github.com/Ajaxy/telegram-tt) and the legacy client provided some promising leads in messing with the `tgaddr` in the URL. It ended up being a dead end for my research though, as I couldn't figure out a way to get rid of or bypass the ampersand in the `&tgWebAuthToken=...` part of the URL.
+I couldn't find anything too interesting in [WebK](https://github.com/morethanwords/tweb), but both [WebZ](https://github.com/Ajaxy/telegram-tt) and the legacy client provided some promising leads in messing with the `tgaddr` in the URL. It ended up being a dead end for my research though, as I couldn't figure out a way to get rid of or bypass the ampersand in the `&tgWebAuthToken=...` part of the URL. I even messed around with unicode to see if that'd somehow let me "erase" the ampersand, but it seems like UTF-8 has been designed to withstand this.
 
-I also looked into the mobile apps. Both the [iOS](https://github.com/TelegramMessenger/Telegram-iOS) and [Android](https://github.com/DrKLO/Telegram) clients support the link authentication thing, which makes the whole situation a bit more worrying considering it's generally a lot harder to just copy a session token off a mobile device. On Android I messed around with intents, but ended up at another dead end as intents for web links have been [locked down since Android 12](https://developer.android.com/about/versions/12/behavior-changes-12#android-app-links-verification-changes) and require verification to work. I also messed around with protocol intents, but the way the app has been built prevents the token from being appended in those cases.
+I then looked into the mobile apps. Both the [iOS](https://github.com/TelegramMessenger/Telegram-iOS) and [Android](https://github.com/DrKLO/Telegram) clients support the link authentication thing, which makes the whole situation a tad more worrying considering it's generally a lot harder to just copy a session token off a mobile device. On Android I messed around with intents, but ended up at another dead end as intents for web links have been [locked down since Android 12](https://developer.android.com/about/versions/12/behavior-changes-12#android-app-links-verification-changes) and require domain verification to work. I also messed around with protocol intents, but the way the app has been written prevents the token from being appended in those cases.
 
 *So, no exploit?*
 
-In my research I was unable to come up with a successful remote exploit - but that doesn't mean it was all in vain. Combining all the research so far and adding a little cherry on top we can create a scenario where we can steal someone's Telegram session in just a few seconds of physical access to their device, no matter if it's their computer, phone, or tablet.
+In my research I was unable to come up with a successful remote exploit. I won't be getting a bug bounty, but that doesn't mean it was all in vain. Combining all the research so far, and adding a little cherry on top, we can create a scenario where we can steal someone's Telegram session in just a few seconds of physical access to their device, no matter if it's their computer, phone, or tablet.
 
-We start off by sending "z.t.me" in their Telegram app and tapping on the link. This will open their browser to a link that will redirect to `telegram.org/​#tgWebAuthToken=...`. From here we edit the domain in the browser to `telegramz.org` - a domain I own - and hit/tap enter. The javascript on my domain will take it from here, logging one of *my* devices in with the token.
+We start off by sending "z.t.me" in their Telegram app and tapping on the link. This will redirect their browser to `telegram.org/​#tgWebAuthToken=...`. From here we edit the domain in the browser to `telegramz.org` - a domain I own - and hit/tap enter. The javascript on my domain will take it from here, logging one of *my own* devices in with the token.
 
 **Here's a demo of me pulling off the entire attack in less than 10 seconds on an Android phone and a laptop:**
 
+<!-- I did not want to add a YouTube embed here because I want there to be no external resources in this blog unless absolutely necessary.
+Having the thumbnail be just a gradient looks a bit silly but otherwise I think it's a fairly decent replacement for the official embed. -->
 <div class="ytLink">
-<a href="https://www.youtube.com/watch?v=" target="_blank"><div class="ytLinkOverlay"></div></a>
+<a href="https://www.youtube.com/watch?v=5DQrPEr1gGk" target="_blank"><div class="ytLinkOverlay"></div></a>
 <div style="padding:13px;display:flex;align-items:center;position:absolute;z-index:3;max-width: calc(100% - 26px);pointer-events:none">
 <a href="https://www.youtube.com/MLGaeming" target="_blank"><span class="ytChan"><span style="color:#F00">m</span><span style="color:#00F">l</span><span style="color:#0F0">g</span></span></a><span style="text-shadow: 0 0 2px #0008;vertical-align: middle;padding-left:10px;display:inline-block;text-overflow: ellipsis;overflow: hidden;white-space: nowrap">Stealing your Telegram account in 10 seconds flat</span></div>
-<svg height="15%" style="margin:auto;display:block;position:absolute;top:0;left:0;bottom:0;right:0" viewBox="0 0 68 48"><path class="ytp-large-play-button-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path><path d="M 45,24 27,14 27,34" fill="#fff"></path></svg>
+<svg height="13%" style="margin:auto;display:block;position:absolute;top:0;left:0;bottom:0;right:0" viewBox="0 0 68 48"><path class="ytp-large-play-button-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path><path d="M 45,24 27,14 27,34" fill="#fff"></path></svg>
 <div style="position:absolute;bottom: 8px;background:#171717cc;width:fit-content;height:47px;font-size:16px;font-weight:500;display:flex;align-items: center"><span style="margin: 12px">Watch on YouTube</span></div>
 </div>
 
@@ -259,7 +262,8 @@ This attack is incredibly easy to pull off even for a low-skill attacker. Assumi
 So what should Telegram do about this?
 
 <div class="tgQr">
-<div style="margin: 0 auto;width:280px;aspect-ratio:1/1;max-width:100%;background:#FFF;border-radius:24px"><a href="https://lyra.horse/antonymph/" target="_blank"><!-- I recreated the QR code SVG from scratch because the one auto-generated by Telegram is very inefficient as a static asset! --><svg fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+<div style="margin: 0 auto;width:280px;aspect-ratio:1/1;max-width:100%;background:#FFF;border-radius:24px"><a href="https://lyra.horse/antonymph/" target="_blank"><!--
+I recreated the QR code SVG from scratch because the one auto-generated by Telegram is very inefficient as a static asset for the blog :c --><svg fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
 <!-- QR data -->
 <polyline points="92 28 100 28 100 36 108 36"/><polyline points="124 28 124 36 132 36 124 36 124 44 116 44 116 68 100 68 108 68 108 76 108 60 132 60 132 52 132 60 140 60 140 84 156 84 156 76"/><polyline points="148 68 117.2 68 124 68 124 84 116 84 116 92"/><polyline points="132 92 132 100 124 100"/><polyline points="84 116 108 116 108 100 84 100 84 92 76 92 100 92 100 84 100 108 100 116 100 108 116 108"/><polyline points="180 44 180 52 148 52 148 44 164 44 164 28 188 28 172 28 172 36 164 36 164 52 156 52 156 60"/><polyline points="172 76 172 68 188 68 188 76 188 60"/><polyline points="188 116 188 108 180 108 180 100 180 108 164 108 164 92 164 100 156 100"/><line x1="188" x2="196" y1="92" y2="92"/><polyline points="236 116 236 100 244 100 244 108 236 108"/><polyline points="212 100 220 100 220 116"/><polyline points="52 92 36 92 36 100"/><polyline points="252 148.9 252 132 244 132 252 132 252 124"/><polyline points="196 140 188 140 188 148"/><polyline points="68 100 68 108 76 108 68 108 68 116"/><polyline points="92 156 92 164 100 164 100 156 76 156 84 156 84 140 76 140"/><line x1="28" x2="28" y1="108" y2="116"/><polyline points="36 124 36 132 44 132 36 132 36 140"/><polyline points="28 148 28 156 36 156 36 164"/><polyline points="68 148 60 148 60 164 68 164 52 164 52 156 60 156 60 188"/><polyline points="76 172 84 172 84 180 100 180 84 180 84 188 76 188"/><line x1="92" x2="92" y1="196" y2="204"/><polyline points="116 228 116 220 100 220 108 220 108 204 132 204 132 220 132 212 124 212 124 204 148 204 140 204 140 188 124 188 124 180 132 180 132 188"/><polyline points="92 228 92 244 100 244 100 236 92 236"/><polyline points="124 252 132 252 132 244"/><polyline points="172 252 164 252 164 236 156 236 156 228 156 236 140 236 140 228"/><polyline points="148 180 172 180 172 164 172 172 180 172"/><polyline points="172 228 172 220 164 220 164 204 164 212 156 212"/><line x1="188" x2="188" y1="236" y2="252"/><polyline points="212 156 212 140 228 140 228 132 220 132 220 140 236 140 236 164 244 164 244 180 252 180 244 180 244 156 236 156 236 164 220 164 220 172 196 172 196 164 188 164"/><polyline points="228 164 228 196 220 196 220 172 204 172 204 180 204 188 204 180 220 180 220 188 180 188 180 204 188 204 188 188 188 220 204 220 204 236 204 228 196 228 196 220 220 220 220 196 220 228 244 228 244 236 252 236 236 236 236 244 228 244 228 228 236 228 236 236 236 220 244 220 244 228 236 228 236 204 252 204 252 196 252 212 252 204 236 204 236 212 220 212"/><line x1="204" x2="204" y1="204" y2="204"/><line x1="244" x2="244" y1="252" y2="252"/><line x1="148" x2="148" y1="252" y2="252"/><line x1="148" x2="148" y1="220" y2="220"/><line x1="108" x2="108" y1="188" y2="188"/><line x1="108" x2="108" y1="172" y2="172"/><line x1="44" x2="44" y1="188" y2="188"/><line x1="28" x2="28" y1="172" y2="172"/><line x1="44" x2="44" y1="148" y2="148"/><line x1="76" x2="76" y1="124" y2="124"/><line x1="52" x2="52" y1="108" y2="108"/><line x1="92" x2="92" y1="76" y2="76"/><path d="m148 108"/><line x1="180" x2="180" y1="132" y2="132"/><line x1="196" x2="196" y1="124" y2="124"/><line x1="212" x2="212" y1="124" y2="124"/><line x1="204" x2="204" y1="108" y2="108"/><line x1="252" x2="252" y1="92" y2="92"/><line x1="148" x2="148" y1="28" y2="28"/>
 <!-- QR position -->
@@ -271,17 +275,34 @@ So what should Telegram do about this?
 <ol><li><span>Open Telegram on your phone</span></li><li><span>Go to Settings &gt; Devices &gt; Link Desktop Device</span></li><li><span>Point your phone at this screen to confirm login</span></li></ol>
 </div>
 
-The same thing they did with the QR code logins!
+The same thing they did with the QR code logins! If you attempt to log onto a new device by scanning a login QR code, you'll still have to enter your 2FA password - and I think the same mitigation could be implemented for these instant login web client URLs.
 
-blabla something something QRs require 2FA
+**Discuss this post on:** twitter, mastodon, hackernews, cohost
 
-Discuss this post on: twitter, mastodon, hackernews, cohost
+---
+
+thank you for reading my first blog post!! 
+
+i decided to take on the challenge of using no images on the page, and no javascript either. i don't think this'll be a sustainable way of doing things going forward, but it does mean you get fast load times (everything here is ~20kB gzipped!), pretty vector graphics on hidpi screens (try zooming in!), and responsive "screenshots" for mobile devices (try resizing the window and see how neatly things change to accommodate!). also if you're someone using assistive technologies, please let me know how this post felt to read and if there's anything to be improved or done differently in the future.
+
+note: the graphics in this blog post are not fully compatible with [netscape navigator](https://en.wikipedia.org/wiki/Netscape_Navigator), please switch to a modern alternative such as [ladybird](https://ladybird.dev/)
+
+
 
 [^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
-[^2]: `url_auth_domains` is a list of domains used for logging into the web clients, but there is another list under the `autologin_domains` key, which is used for webapps such as [bugs.telegram.org](https://bugs.telegram.org) instead.
+[^2]: `url_auth_domains` is a list of domains used for logging into the web clients, but there is another list under the `autologin_domains` key, which is used for webapps such as [bugs.telegram.org](https://bugs.telegram.org).
 [^3]: There are also `peer`, `msg_id`, and `button_id` fields, but if we set our `flag` to `f_url` (4) we skip them.
 
 <style>
+	.ytLink svg {
+		filter: saturate(0.5) brightness(1.5);
+		transform: scale(1.0);
+		transition: transform 0.3s, filter 0.3s;
+	}
+	.ytLink:hover svg {
+		filter: saturate(1) brightness(1);
+		transform: scale(1.05);
+	}
 	.ytLinkOverlay {
 		position:absolute;
 		width:100%;
@@ -306,6 +327,7 @@ Discuss this post on: twitter, mastodon, hackernews, cohost
 		pointer-events:auto;	
 	}
 	.ytLink {
+		user-select: none;
 		position: relative;
 		width: 100%;
 		min-height: 240px;
@@ -318,18 +340,18 @@ Discuss this post on: twitter, mastodon, hackernews, cohost
 		font-family: 'YouTube Noto', Roboto, Arial, Helvetica, sans-serif;
 		overflow:hidden;
 	}
-	.tgQr div {
+	.tgQr div, .tgQr div circle {
 		transform: scale(1);
 		cursor: pointer;
 		filter: none;
-		transition: transform 0.2s, filter 0.2s;
+		transition: transform 0.2s, filter 0.2s, fill 0.3s;
 	}
 	.tgQr div:hover {
 		transform: scale(1.05);
 		filter: drop-shadow(2px 4px 7px #000);
 	}
-	.tgQr svg *:hover {
-		stroke: pink;
+	.tgQr div circle:hover {
+		fill: pink;
 	}
 	.tgQr {
 		font-family: "Roboto", "Segoe UI", "Helvetica Neue", system-ui, sans-serif;
