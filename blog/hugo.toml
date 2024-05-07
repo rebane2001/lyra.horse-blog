@@ -6,6 +6,12 @@ disableHugoGeneratorInject = false
 capitalizeListTitles = false
 pluralizeListTitles = false
 
+[security]
+  enableInlineShortcodes = true
+
+[services.rss]
+  limit = 1000
+
 [permalinks]
   [permalinks.page]
   	posts = '/:year/:month/:slug/'
