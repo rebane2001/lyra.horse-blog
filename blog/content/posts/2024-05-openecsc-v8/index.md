@@ -9,7 +9,7 @@ summary = "todo: fill this and also the date"
 
 Despite having 7 Chrome CVEs, I've never actually exploited a memory corruption in it's [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024)<!-- TODO: link -->, a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
 
-Most V8 exploits tend to have two parts to them - figuring out a unique way to trigger some sort of a memory corruption of a single byte, and then following a common pattern of building upon that corruption to read arbitrary addresses, create fake objects, and eventually reach arbitrary code execution. This challenge was no different.
+Most V8 exploits tend to have two parts to them - figuring out a unique way to trigger some sort of a memory corruption of a single byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
 
 <div class="challDetails">
 	<div class="challTitle challHr">Baby Array.xor</div>
@@ -130,7 +130,62 @@ BUILTIN(ArrayXor) {
 }
 ```
 
-This patch adds a
+The patch adds a new `Array.xor()` prototype that can be used to xor all values within an array of doubles, let's try it:
+
+```js
+> arr = [0.1, 0.2, 0.3]
+> arr.xor(1337)
+> arr
+<  (3) [0.10000000000001079, 0.20000000000002158, 0.30000000000004035]
+```
+
+Seems to work as expected! It may be a little unintuitive at first if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes a lot more sense once we look at the binary representations of the values:
+<!-- todo: highlight XOR bits in red -->
+```js
+(double) 0.1 ^ (uint64) 5 = (double) 0.10000000000001079
+  11111110111001100110011001100110011001100110011001100110011010
+^ 00000000000000000000000000000000000000000000000000010100111001
+= 11111110111001100110011001100110011001100110011001110010100011
+```
+
+Quite the peculiar feature. XORing doubles in an array isn't going to get us anywhere though as they are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`) as just themselves. All we can do is change some numbers around in an array we can already just modify to our will.
+
+Alright, let's see if we can break it somehow. To achieve memory corruption, we must somehow use this xor functionality on an array that has other kinds of elements in it (`PACKED_ELEMENTS`). We'll see later why that is, but for now let's just try to find a way to do it.
+
+So let's try a simple array with an object in it:
+
+```js
+> arr = [0.1, 0.2, {}]
+> arr.xor(1337)
+< TypeError: Array.xor needs array of double numbers
+```
+
+Hmm, seems like there's a check in-place to prevent us from doing this:
+
+```c
+  if (kind != PACKED_DOUBLE_ELEMENTS) {
+    THROW_NEW_ERROR_RETURN_FAILURE(isolate, NewTypeError(MessageTemplate::kPlaceholderOnly,
+      factory->NewStringFromAsciiChecked("Array.xor needs array of double numbers")));
+  }
+```
+
+But what if we try to create an object that *pretends* to be a double array?
+
+```c
+> evil = { valueOf: () => [1.1] }
+```
+
+
+<!--
+
+args.gn has v8_enable_sandbox = false
+
+other solutions:
+ - rdjgr: change length
+ - popax21: flip obj/ptr bit
+
+-->
+
 
 <style>
 	.challDetails {
