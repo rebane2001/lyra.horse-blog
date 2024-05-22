@@ -243,11 +243,108 @@ We're cooking!
 
 ## Part 2: Cooking up some primitives
 
-Now that we've found a way to mess with the pointers in an array, we must figure out a way to turn them into the `addrof` and `fakeobj` primitives. There are a few different ways to accomplish this from here. I'm going to go with the path I took originally, but see if you can figure out any other ones - I'll share a couple at the end of the post.
+Now that we've found a way to mess with the pointers in an array, we must figure out a way to turn them into the `addrof` and `fakeobj` primitives. There are a few different ways to accomplish this from here. I'm going to go with the path I took originally, but see if you can figure out any other ones - I'll share a couple (arguably better ones) at the end of the post.
 
-So what are these exploit primitives? `addrof` lets us see the memory address of any object, and `fakeobj` lets us - they're kind of like memory read and write functions, but not quite.
+So far we've just blindly done stuff without looking at the memory layout itself, but it's going to get pretty hard to understand without doing that, so how could we do that? **d8 natives syntax** and **a debugger**! If we launch d8 (the v8 shell) with the `--allow-natives-syntax` flag, we can use various debug functions such as `%DebugPrint(obj)` to examine what's going on, and if we also use a debugger ([gdb](https://gnu.org/software/gdb/) in this case) we can then look at the memory to understand it better:
+
+```js
+> gdb --args ./d8 --allow-natives-syntax //<-- use d8 with the natives syntax in gdb
+GNU gdb (GDB) 14.2
+...                      
+(gdb) run // <-- start d8
+Starting program: /home/lyra/Desktop/array.xor/dist/d8 --allow-natives-syntax
+V8 version 12.7.0 (candidate)
+d8> arr = [1.1, 2.2, 3.3] // <-- create an array
+[1.1, 2.2, 3.3]
+d8> %DebugPrint(arr) // <-- debugprint the array
+DebugPrint: 0xa3800042be9: [JSArray] // <-- we get the address here
+ - map: 0x0a38001cb7c5 <Map[16](PACKED_DOUBLE_ELEMENTS)> [FastProperties]
+ - prototype: 0x0a38001cb11d <JSArray[0]>
+ - elements: 0x0a3800042bc9 <FixedDoubleArray[3]> [PACKED_DOUBLE_ELEMENTS]
+ - length: 3
+ - properties: 0x0a3800000725 <FixedArray[0]>
+ - All own properties (excluding elements): {
+    0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 <AccessorInfo name= 0x0a3800000d99 <String[6]: #length>, data= 0x0a3800000069 <undefined>> (const accessor descriptor, attrs: [W__]), location: descriptor
+ }
+ - elements: 0x0a3800042bc9 <FixedDoubleArray[3]> {
+           0: 1.1
+           1: 2.2
+           2: 3.3
+ }
+0xa38001cb7c5: [Map] in OldSpace
+ - map: 0x0a38001c01b5 <MetaMap (0x0a38001c0205 <NativeContext[295]>)>
+ - type: JS_ARRAY_TYPE
+ - instance size: 16
+ - inobject properties: 0
+ - unused property fields: 0
+ - elements kind: PACKED_DOUBLE_ELEMENTS
+ - enum length: invalid
+ - back pointer: 0x0a38001cb785 <Map[16](HOLEY_SMI_ELEMENTS)>
+ - prototype_validity cell: 0x0a3800000a89 <Cell value= 1>
+ - instance descriptors #1: 0x0a38001cb751 <DescriptorArray[1]>
+ - transitions #1: 0x0a38001cb7ed <TransitionArray[4]>
+   Transition array #1:
+     0x0a3800000e5d <Symbol: (elements_transition_symbol)>: (transition to HOLEY_DOUBLE_ELEMENTS) -> 0x0a38001cb805 <Map[16](HOLEY_DOUBLE_ELEMENTS)>
+ - prototype: 0x0a38001cb11d <JSArray[0]>
+ - constructor: 0x0a38001cae09 <JSFunction Array (sfi = 0xa380002b2f9)>
+ - dependent code: 0x0a3800000735 <Other heap object (WEAK_ARRAY_LIST_TYPE)>
+ - construction counter: 0
+
+[1.1, 2.2, 3.3]
+d8> ^Z  // <-- suspend d8 (ctrl+z) to get to gdb
+Thread 1 "d8" received signal SIGTSTP, Stopped (user).
+0x00007ffff7da000a in read () from /usr/lib/libc.so.6
+(gdb) x/8xg 0xa3800042be9-1 // <-- examine the array's address
+0xa3800042be8:	0x00000725001cb7c5	0x0000000600042bc9
+0xa3800042bf8:	0x00bab9320000010d	0x7566280a00000adc
+0xa3800042c08:	0x29286e6f6974636e	0x20657375220a7b20
+0xa3800042c18:	0x3b22746369727473	0x6d2041202f2f0a0a
+(gdb) 
+```
+
+In this example I made an array, used DebugPrint to see it's address, and then used gdb's `x/32xg`[^4] command to see the memory around that address. Going forward I'll be cleaning up the examples shown in the blog post, but this is essentially how you can follow along at home.
+
+You'll notice I subtracted 1 from the memory address before viewing it, that's because of the tagged pointers I mentioned in [footnote 1](#fn:1). In a `PACKED_ELEMENTS` array, floats that end with a 0 bit (even) are stored as-is, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
+
+Anyways, what are those exploit primitives? `addrof` lets us see the memory address of any object, and `fakeobj` lets us create a "fake" JavaScript object - they're almost like memory read and write functions, but not quite.
+
+Let's first try to understand what's going on with our arrays, I'll use the example from above.
+
+<div class="jsMem">
+	<div class="jsMemDbg">
+		<span style="background:var(--jsMemVar1)">sample</span> <span style="background:var(--jsMemVar2)">text</span>
+	</div>
+	<div class="jsMemHex">
+		<span class="jsMemVar1">0xSAMPLE</span> <span class="jsMemVar2">0xTEXT</span>
+	</div>
+</div>
+
+<style>
+:root {
+	--jsMemVar1: white;
+	--jsMemVar2: white;
+}
+
+.jsMemVar1:hover {
+	color: red;
+}
+.jsMemVar2:hover {
+	color: red;
+}
+.jsMem:has(.jsMemHex .jsMemVar1:hover) {
+    --jsMemVar1: red;
+}
+
+.jsMem:has(.jsMemHex .jsMemVar2:hover) {
+    --jsMemVar2: red;
+}
+</style>
+
+
 
 <!--
+
+## Part x: There's better ways
 
 args.gn has v8_enable_sandbox = false
 
@@ -264,6 +361,8 @@ other solutions:
 [^2]: `PACKED_DOUBLE_ELEMENTS` means that the array consists of doubles only, and it also doesn't have any empty "holes". A double array with holes would be `HOLEY_DOUBLE_ELEMENTS` instead.
 
 [^3]: [HasOnlySimpleReceiverElements](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/builtins-array.cc;l=42;drc=fe67713b2ff62f8ba290607bf7482a8efd0ca6cc) makes sure that there are no accessors on any of the elements, and that the array's prototype hasn't been modified.
+
+[^4]: `x/32xg` stands for: e(**x**)amine (**32**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
 
 <style>
 	.challDetails {
