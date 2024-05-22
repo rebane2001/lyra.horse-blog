@@ -308,36 +308,104 @@ You'll notice I subtracted 1 from the memory address before viewing it, that's b
 
 Anyways, what are those exploit primitives? `addrof` lets us see the memory address of any object, and `fakeobj` lets us create a "fake" JavaScript object - they're almost like memory read and write functions, but not quite.
 
-Let's first try to understand what's going on with our arrays, I'll use the example from above.
+Let's first try to actually understand what's going on with our arrays in the memory, I'll explain the example from above:
+
+
 
 <div class="jsMem">
 	<div class="jsMemDbg">
-		<span style="background:var(--jsMemVar1)">sample</span> <span style="background:var(--jsMemVar2)">text</span>
+DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
+- map: 0x<span class="jsMemVar7">0a38001cb7c5</span> &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
+- prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
+- elements: 0x0a3800042bc9 &lt;FixedDoubleArray[3]&gt; [PACKED_DOUBLE_ELEMENTS]
+- length: 3
+- properties: 0x<span class="jsMemVar6">0a3800000725</span> &lt;FixedArray[0]&gt;
+- All own properties (excluding elements): {
+   0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 &lt;AccessorInfo name= 0x0a3800000d99 &lt;String[6]: #length&gt;, data= 0x0a3800000069 &lt;undefined&gt&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
+}
+- elements: 0x0a3800042bc9 &lt;FixedDoubleArray[3]&gt; {
+          0: <span class="jsMemVar3">1.1</span>
+          1: <span class="jsMemVar4">2.2</span>
+          2: <span class="jsMemVar5">3.3</span>
+}
 	</div>
 	<div class="jsMemHex">
-		<span class="jsMemVar1">0xSAMPLE</span> <span class="jsMemVar2">0xTEXT</span>
-	</div>
+0xa3800042bb8: 0x00000004000005e5 0x001d3377020801a4
+0xa3800042bc8: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
+0xa3800042bd8: 0x<span class="jsMemVar4">400199999999999a</span> 0x<span class="jsMemVar5">400a666666666666</span>
+<span class="jsMemVar10">0xa3800042be8</span>: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span> 0x<span class="jsMemVar8">00000006</span><span class="jsMemVar9">00042bc9</span>
+0xa3800042bf8: 0x00bab9320000010d 0x7566280a00000adc
+</div>
+<div class="jsMemLegend">
+Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class="jsMemVar6">properties list</span> is empty, it uses <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> with a <span class="jsMemVar8">length of 6</span> (1 double counts as 2 length) at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">???</span> with a <span class="jsMemVar1">length (again) of 6</span> and the floats <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
+</div>
 </div>
 
 <style>
 :root {
-	--jsMemVar1: white;
-	--jsMemVar2: white;
+	--jsMemVar1: #0007;
+	--jsMemVar2: #1097;
+	--jsMemVar3: #2087;
+	--jsMemVar4: #3077;
+	--jsMemVar5: #4067;
+	--jsMemVar6: #5057;
+	--jsMemVar7: #6047;
+	--jsMemVar8: #7037;
+	--jsMemVar9: #8027;
+	--jsMemVar10: #9017;
+	--lyreGold: #FAD542;
 }
 
-.jsMemVar1:hover {
-	color: red;
-}
-.jsMemVar2:hover {
-	color: red;
-}
-.jsMem:has(.jsMemHex .jsMemVar1:hover) {
-    --jsMemVar1: red;
+.jsMem *::selection {
+	background: #00F;
+	color: #FFF;
 }
 
-.jsMem:has(.jsMemHex .jsMemVar2:hover) {
-    --jsMemVar2: red;
+.jsMemDbg {
+	white-space: pre-wrap;
+	font-family: 'Nimbus Mono PS', 'Courier New', monospace;
 }
+
+.jsMemHex {
+	white-space: pre-wrap;
+	font-family: 'Nimbus Mono PS', 'Courier New', monospace;
+	cursor: crosshair;
+}
+
+.jsMemLegend span {
+	text-decoration: underline wavy;
+}
+
+.jsMemVar1 { background: var(--jsMemVar1) }
+.jsMemVar1:hover { color: #000 }
+.jsMemVar2 { background: var(--jsMemVar2) }
+.jsMemVar2:hover { color: #000 }
+.jsMemVar3 { background: var(--jsMemVar3) }
+.jsMemVar3:hover { color: #000 }
+.jsMemVar4 { background: var(--jsMemVar4) }
+.jsMemVar4:hover { color: #000 }
+.jsMemVar5 { background: var(--jsMemVar5) }
+.jsMemVar5:hover { color: #000 }
+.jsMemVar6 { background: var(--jsMemVar6) }
+.jsMemVar6:hover { color: #000 }
+.jsMemVar7 { background: var(--jsMemVar7) }
+.jsMemVar7:hover { color: #000 }
+.jsMemVar8 { background: var(--jsMemVar8) }
+.jsMemVar8:hover { color: #000 }
+.jsMemVar9 { background: var(--jsMemVar9) }
+.jsMemVar9:hover { color: #000 }
+.jsMemVar10 { background: var(--jsMemVar10) }
+.jsMemVar10:hover { color: #000 }
+.jsMem:has(.jsMemVar1:hover) { --jsMemVar1: var(--lyreGold) }
+.jsMem:has(.jsMemVar2:hover) { --jsMemVar2: var(--lyreGold) }
+.jsMem:has(.jsMemVar3:hover) { --jsMemVar3: var(--lyreGold) }
+.jsMem:has(.jsMemVar4:hover) { --jsMemVar4: var(--lyreGold) }
+.jsMem:has(.jsMemVar5:hover) { --jsMemVar5: var(--lyreGold) }
+.jsMem:has(.jsMemVar6:hover) { --jsMemVar6: var(--lyreGold) }
+.jsMem:has(.jsMemVar7:hover) { --jsMemVar7: var(--lyreGold) }
+.jsMem:has(.jsMemVar8:hover) { --jsMemVar8: var(--lyreGold) }
+.jsMem:has(.jsMemVar9:hover) { --jsMemVar9: var(--lyreGold) }
+.jsMem:has(.jsMemVar10:hover) { --jsMemVar10: var(--lyreGold) }
 </style>
 
 
@@ -353,6 +421,9 @@ other solutions:
  - popax21: flip obj/ptr bit
 
 --allow-natives-syntax
+
+todo:
+32bit pointer/memory compression
 
 -->
 
