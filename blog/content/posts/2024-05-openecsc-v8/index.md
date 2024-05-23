@@ -249,8 +249,13 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 	padding-right: 4px;
 }
 
-@media (max-width: 480px) {
-	.js480 {
+@media (width >= 400px) {
+	.under400 {
+		display: none;
+	}
+}
+@media (width < 400px) {
+	.over400 {
 		display: none;
 	}
 }
@@ -499,17 +504,19 @@ But let's try to understand what the gdb output above means:
           2: <span class="jsMemVar5">3.3</span>
 }</div>
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
-	<div class="jsMemHex">0xa3800042bb8: 0x00000004000005e5 0x001d3377020801a4
-<span class="jsMemVar9">0xa3800042bc8</span>: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
-0xa3800042bd8: 0x<span class="jsMemVar4">400199999999999a</span> 0x<span class="jsMemVar5">400a666666666666</span>
-<span class="jsMemVar10">0xa3800042be8</span>: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span> 0x<span class="jsMemVar8">00000006</span><span class="jsMemVar9">00042bc9</span>
-0xa3800042bf8: 0x00bab9320000010d 0x7566280a00000adc
+	<div class="jsMemHex">0xa3800042bb8: 0x00000004000005e5<span class="under400"><br>0xa3800042bc0:</span> 0x001d3377020801a4
+<span class="jsMemVar9">0xa3800042bc8</span>: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span><span class="under400"><br>0xa3800042bd0:</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
+0xa3800042bd8: 0x<span class="jsMemVar4">400199999999999a</span><span class="under400"><br>0xa3800042be0:</span> 0x<span class="jsMemVar5">400a666666666666</span>
+<span class="jsMemVar10">0xa3800042be8</span>: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span><span class="under400"><br>0xa3800042bf0:</span> 0x<span class="jsMemVar8">00000006</span><span class="jsMemVar9">00042bc9</span>
+0xa3800042bf8: 0x00bab9320000010d<span class="under400"><br>0xa3800042c00:</span> 0x7566280a00000adc
 </div>
 <div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
 <div class="jsMemLegend">
-Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class="jsMemVar6">properties list</span> is empty, it uses <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> with a <span class="jsMemVar8">length of 3</span> (1 double counts as 2 length in the hex) at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the doubles <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
+Our array is at <span class="jsMemVar10">0xa3800042be8</span>, its <span class="jsMemVar6">properties list</span> is empty, it's a <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> array with a <span class="jsMemVar8">length of 3</span><sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref" style="color:#95dcff">4</a></sup> at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the doubles <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
 </div>
 </div>
+
+Try <span class="fineText">hovering over</span><span class="coarseText">tapping on</span> the text and stuff above. You'll see what the memory values mean and how they're represented in the %DebugPrint output.
 
 <style>
 .jsMem {
@@ -517,6 +524,31 @@ Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class=
 	background: #282C34;
 	border-radius: 4px;
 	padding:8px;
+	cursor: default;
+}
+
+.coarseText {
+	display: none;
+}
+.fineText {
+	display: inline;
+}
+
+/*
+ *	Disable text selection on touchscreens because you can't
+ *  hover over the interactive elements and tapping them will
+ *  try to select the text if we don't disable selections.
+ */
+@media (pointer: coarse) {
+	.jsMem {
+		user-select: none;
+	}
+	.coarseText {
+		display: inline;
+	}
+	.fineText {
+		display: none;
+	}
 }
 
 .jsMemTitle {
@@ -553,7 +585,6 @@ Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class=
 	font-size: 12px;
 	white-space: pre-wrap;
 	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	cursor: crosshair;
 }
 
 .jsMemLegend span {
@@ -612,8 +643,6 @@ Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class=
 .jsMem:has(.jsMemVar10:hover) { --jsMemVarB10: var(--jsMemVarB); --jsMemVarF10: var(--jsMemVarF) }
 </style>
 
-
-
 <!--
 
 ## Part x: There's better ways
@@ -630,6 +659,7 @@ todo:
 32bit pointer/memory compression
 
 -->
+[^5]
 
 [^1]: If we could modify a boxed double - a special double that can also be tagged as a pointer - we could already use xor to corrupt memory, but `PACKED_DOUBLE_ELEMENTS` in V8 uses unboxed doubles.
 
@@ -638,6 +668,8 @@ todo:
 [^3]: [HasOnlySimpleReceiverElements](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/builtins-array.cc;l=42;drc=fe67713b2ff62f8ba290607bf7482a8efd0ca6cc) makes sure that there are no accessors on any of the elements, and that the array's prototype hasn't been modified.
 
 [^4]: `x/32xg` stands for: e(**x**)amine (**32**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
+
+[^5]: In the memory, the length of the array is doubled (6 instead of 3) because each double value takes up two 32-bit "slots". TODO: factcheck this
 
 <style>
 	.challDetails {
