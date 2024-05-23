@@ -248,6 +248,12 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 .jsConErr > .jsConIcon {
 	padding-right: 4px;
 }
+
+@media (max-width: 480px) {
+	.js480 {
+		display: none;
+	}
+}
 </style>
 
 Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the hex representations of the values:
@@ -288,12 +294,12 @@ But what if we do create a double array, but then wrap it in an evil [proxy](htt
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, <span class="jsConValIn">0.3</span>]</div>
 	<div class="jsConBorder"></div>
-	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">evilHandler</span> = <span style="white-space: pre">{
-         <span class="jsConFun">get</span>(<span class="jsConIdx">target</span>, <span class="jsConIdx">prop</span>, <span class="jsConIdx">receiver</span>) {
-             <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">`Got </span>${<span class="jsConVar">prop</span>}<span class="jsConStr">!`</span>);
-             <span class="jsConKw">return</span> <span class="jsConVar">Reflect</span>.<span class="jsConFun">get</span>(...<span class="jsConVar">arguments</span>);
-         }
-     }</span></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">evilHandler</span> = <span style="white-space: pre-wrap">{
+<span class="js480">    </span>     <span class="jsConFun">get</span>(<span class="jsConIdx">target</span>, <span class="jsConIdx">prop</span>, <span class="jsConIdx">receiver</span>) {
+<span class="js480">      </span>       <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">`Got </span>${<span class="jsConVar">prop</span>}<span class="jsConStr">!`</span>);
+<span class="js480">      </span>       <span class="jsConKw">return</span> <span class="jsConVar">Reflect</span>.<span class="jsConFun">get</span>(...<span class="jsConVar">arguments</span>);
+<span class="js480">    </span>     }
+<span class="js480">  </span>   }</span></div>
 	<div class="jsConBorder"></div>
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">evil</span> = <span class="jsConKw">new</span> <span class="jsConVar">Proxy</span>(<span class="jsConVar">arr</span>, <span class="jsConVar">evilHandler</span>)</div>
 	<div class="jsConBorder"></div>
@@ -347,33 +353,51 @@ Hmmph, this seems pretty well coded so far. There is no way for us to get anythi
 
 The length of the array gets stored in a `uint32_t`, and I thought that perhaps we could overflow this value, but it turns out you can't make an array that big:
 
-```js
-> arr = new Array(2**32)
-< RangeError: Invalid array length
-```
+<div class="jsConsole">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = <span class="jsConKw">new</span> <span class="jsConVar">Array</span>(<span class="jsConValIn">2</span>**<span class="jsConValIn">32</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><div class="jsConErr"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><circle fill="#E46962" cx="8" cy="7" r="6.5"/><polygon fill="#4E3534" points="4.8,4.6 5.6,3.8 8,6.2 10.4,3.8 11.2,4.6 8.8,7 11.2,9.4 10.4,10.2 8,7.8 5.6,10.2 4.8,9.4 7.2,7"/></svg>RangeError: Invalid array length</div></div>
+</div>
 
 I also tried messing with the length value, but v8 doesn't allow us to do that in a way that could be of use here:
 
-```js
-> arr = [1.1, 2.2, 3.3]
-> arr.length = "evil"
-< RangeError: Invalid array length
-> arr.__defineGetter__("length", () => 1337);
-< TypeError: Cannot redefine property: length
-> arr.length = 1337 // our array is now a HOLEY_DOUBLE_ELEMENTS
-> arr.xor(1337)
-< TypeError: Array.xor needs array of double numbers
-```
+<div class="jsConsole">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>, <span class="jsConValIn">3.3</span>]</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConFun">length</span> = <span class="jsConStr">"evil"</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><div class="jsConErr"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><circle fill="#E46962" cx="8" cy="7" r="6.5"/><polygon fill="#4E3534" points="4.8,4.6 5.6,3.8 8,6.2 10.4,3.8 11.2,4.6 8.8,7 11.2,9.4 10.4,10.2 8,7.8 5.6,10.2 4.8,9.4 7.2,7"/></svg>RangeError: Invalid array length</div></div>
+  <div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConFun">__defineGetter__</span>(<span class="jsConStr">"length"</span>, () => <span class="jsConValIn">1337</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><div class="jsConErr"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><circle fill="#E46962" cx="8" cy="7" r="6.5"/><polygon fill="#4E3534" points="4.8,4.6 5.6,3.8 8,6.2 10.4,3.8 11.2,4.6 8.8,7 11.2,9.4 10.4,10.2 8,7.8 5.6,10.2 4.8,9.4 7.2,7"/></svg>TypeError: Cannot redefine property: length</div></div>
+  <div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConFun">length</span> = <span class="jsConValIn">1337</span> <span class="jsConNull">// uh oh, our array is now a HOLEY_DOUBLE_ELEMENTS</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>(<span class="jsConValIn">1337</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><div class="jsConErr"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><circle fill="#E46962" cx="8" cy="7" r="6.5"/><polygon fill="#4E3534" points="4.8,4.6 5.6,3.8 8,6.2 10.4,3.8 11.2,4.6 8.8,7 11.2,9.4 10.4,10.2 8,7.8 5.6,10.2 4.8,9.4 7.2,7"/></svg>TypeError: Array.xor needs array of double numbers</div></div>
+</div>
 
 And then it hit me - we're only doing all these checks on the array itself, not the argument! We get the argument to xor with (`Object::ToNumber(isolate, args.at(1))`) *after* we're already past all the previous checks, so perhaps we could take our double array and change it so something more interesting here? Let's give it a shot:
 
-```js
-> arr = [1.1, 2.2, 3.3]
-> evil = { valueOf: () => { arr[0] = {}; return 1337 } }
-> arr.xor(evil)
-> arr
-< [139350, 2.2, 139390] 
-```
+<div class="jsConsole">
+		<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>, <span class="jsConValIn">3.3</span>]</div>
+	<div class="jsConBorder"></div>
+		<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">evil</span> = { <span class="jsConFun">valueOf</span>: () => { <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConKw">return</span> <span class="jsConValIn">1337</span> } }</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>(<span class="jsConVar">evil</span>) <span class="jsConNull">// our array turns into PACKED_ELEMENTS here!</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,10 4,6 8,2 8.85,2.85 5.7,6 8.85,9.15 Z"/><circle cx="10" cy="6" r="1"/></svg><details><summary><i>(3) [<span class="jsConValOut">140508</span>, <span class="jsConValOut">2.2</span>, <span class="jsConValOut">140484</span>]</i></summary>
+<div style="padding-left: 24px">
+	<span class="jsConIdx jsConB">0</span>: <span class="jsConValOut">0x000449b8</span> (<span class="jsConType">SMI</span>)<br/>
+	<span class="jsConIdx jsConB">1</span>: <span class="jsConValOut">0x00044cbd</span> (<span class="jsConType">pointer to double</span>)<br/>
+	<span class="jsConIdx jsConB">2</span>: <span class="jsConValOut">0x00044988</span> (<span class="jsConType">SMI</span>)<br/>
+</div>
+	</details></div>
+</div>
 
 We're cooking!
 
@@ -440,7 +464,7 @@ Thread 1 "d8" received signal SIGTSTP, Stopped (user).
 
 In this example I made an array, used DebugPrint to see it's address, and then used gdb's `x/32xg`[^4] command to see the memory around that address. Going forward I'll be cleaning up the examples shown in the blog post, but this is essentially how you can follow along at home.
 
-You'll notice I subtracted 1 from the memory address before viewing it, that's because of the tagged pointers I mentioned in [footnote 1](#fn:1). In a `PACKED_ELEMENTS` array, floats that end with a 0 bit (even) are stored as-is, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
+You'll notice I subtracted 1 from the memory address before viewing it, that's because of the tagged pointers I mentioned in [footnote 1](#fn:1). In a `PACKED_ELEMENTS` array, doubles that end with a 0 bit (even) are stored as-is, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
 
 Anyways, what are those exploit primitives? `addrof` lets us see the memory address of any object, and `fakeobj` lets us create a "fake" JavaScript object - they're almost like memory read and write functions, but not quite.
 
@@ -473,7 +497,7 @@ DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
 0xa3800042bf8: 0x00bab9320000010d 0x7566280a00000adc
 </div>
 <div class="jsMemLegend">
-Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class="jsMemVar6">properties list</span> is empty, it uses <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> with a <span class="jsMemVar8">length of 3</span> (1 double counts as 2 length in the hex) at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the floats <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
+Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class="jsMemVar6">properties list</span> is empty, it uses <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> with a <span class="jsMemVar8">length of 3</span> (1 double counts as 2 length in the hex) at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the doubles <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
 </div>
 </div>
 
