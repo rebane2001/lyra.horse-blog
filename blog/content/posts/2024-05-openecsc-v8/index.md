@@ -189,6 +189,9 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 .jsConLine:hover {
 	background: #3D3D3D;
 }
+.jsConLine:has(.jsConErr):hover {
+	background: #E46962;
+}
 .jsConLine > details {
 	padding-left: 4px;
 	display: inline-block;
@@ -228,6 +231,15 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 	vertical-align: top;
 	padding-right: 2px;
 }
+.jsConErr {
+	background: #4E3534;
+	color: #F9DEDC;
+	padding: 4px;
+	border-radius: 4px;
+}
+.jsConErr > .jsConIcon {
+	padding-right: 4px;
+}
 </style>
 
 Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the hex representations of the values:
@@ -246,11 +258,13 @@ Hmm, XORing doubles isn't going to get us anywhere[^1] though as the values are 
 
 So let's try a simple array with an object in it:
 
-```js
-> arr = [0.1, 0.2, {}]
-> arr.xor(1337)
-< TypeError: Array.xor needs array of double numbers
-```
+<div class="jsConsole">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, {}] <span class="jsConNull">// PACKED_ELEMENTS array</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>(<span class="jsConValIn">1337</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><div class="jsConErr"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><circle fill="#E46962" cx="8" cy="7" r="6.5"/><polygon fill="#4E3534" points="4.8,4.6 5.6,3.8 8,6.2 10.4,3.8 11.2,4.6 8.8,7 11.2,9.4 10.4,10.2 8,7.8 5.6,10.2 4.8,9.4 7.2,7"/></svg>TypeError: Array.xor needs array of double numbers</div></div>
+</div>
 
 Hmm, seems like there's a check in-place to prevent us from doing this:
 
