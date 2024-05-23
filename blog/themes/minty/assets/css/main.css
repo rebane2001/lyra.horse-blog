@@ -88,3 +88,7 @@ code, pre {
   color: #04593b;
   font-size: 90%;
 }
+
+sup {
+  line-height: 0;
+}

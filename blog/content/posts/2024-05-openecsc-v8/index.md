@@ -249,13 +249,13 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 	padding-right: 4px;
 }
 
-@media (width >= 400px) {
-	.under400 {
+@media (width >= 430px) {
+	.under430 {
 		display: none;
 	}
 }
-@media (width < 400px) {
-	.over400 {
+@media (width < 430px) {
+	.over430 {
 		display: none;
 	}
 }
@@ -504,19 +504,21 @@ But let's try to understand what the gdb output above means:
           2: <span class="jsMemVar5">3.3</span>
 }</div>
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
-	<div class="jsMemHex">0xa3800042bb8: 0x00000004000005e5<span class="under400"><br>0xa3800042bc0:</span> 0x001d3377020801a4
-<span class="jsMemVar9">0xa3800042bc8</span>: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span><span class="under400"><br>0xa3800042bd0:</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
-0xa3800042bd8: 0x<span class="jsMemVar4">400199999999999a</span><span class="under400"><br>0xa3800042be0:</span> 0x<span class="jsMemVar5">400a666666666666</span>
-<span class="jsMemVar10">0xa3800042be8</span>: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span><span class="under400"><br>0xa3800042bf0:</span> 0x<span class="jsMemVar8">00000006</span><span class="jsMemVar9">00042bc9</span>
-0xa3800042bf8: 0x00bab9320000010d<span class="under400"><br>0xa3800042c00:</span> 0x7566280a00000adc
+	<div class="jsMemHex">0xa3800042bb8: 0x00000004000005e5<span class="under430"><br>0xa3800042bc0:</span> 0x001d3377020801a4
+<span class="jsMemVar9">0xa3800042bc8</span>: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span><span class="under430"><br>0xa3800042bd0:</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
+0xa3800042bd8: 0x<span class="jsMemVar4">400199999999999a</span><span class="under430"><br>0xa3800042be0:</span> 0x<span class="jsMemVar5">400a666666666666</span>
+<span class="jsMemVar10">0xa3800042be8</span>: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span><span class="under430"><br>0xa3800042bf0:</span> 0x<span class="jsMemVar8">00000006</span><span class="jsMemVar9">00042bc9</span>
+0xa3800042bf8: 0x00bab9320000010d<span class="under430"><br>0xa3800042c00:</span> 0x7566280a00000adc
 </div>
 <div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
 <div class="jsMemLegend">
-Our array is at <span class="jsMemVar10">0xa3800042be8</span>, its <span class="jsMemVar6">properties list</span> is empty, it's a <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> array with a <span class="jsMemVar8">length of 3</span><sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref" style="color:#95dcff">4</a></sup> at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the doubles <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
+The array is at <span class="jsMemVar10">0xa3800042be8</span>, its <span class="jsMemVar6">properties list</span> is empty, it's a <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> array with a <span class="jsMemVar8">length of 3</span><sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref" style="color:#95dcff">4</a></sup> at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the doubles <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
 </div>
 </div>
 
 Try <span class="fineText">hovering over</span><span class="coarseText">tapping on</span> the text and stuff above. You'll see what the memory values mean and how they're represented in the %DebugPrint output.
+
+You may be wondering why the memory only contains half the address - `0xa3800042bc8` is stored as `0x00042bc9` for example. This is [V8's pointer compression](https://v8.dev/blog/pointer-compression) and it makes pointers only store the lower 32 bits of an address.
 
 <style>
 .jsMem {
@@ -669,7 +671,7 @@ todo:
 
 [^4]: `x/32xg` stands for: e(**x**)amine (**32**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
 
-[^5]: In the memory, the length of the array is doubled (6 instead of 3) because each double value takes up two 32-bit "slots". TODO: factcheck this
+[^5]: In memory the length of the array is doubled (6 instead of 3) because each double value takes up two 32-bit "slots". TODO: factcheck this
 
 <style>
 	.challDetails {
