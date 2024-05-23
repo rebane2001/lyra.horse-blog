@@ -162,7 +162,7 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 	border-radius: 4px;
 	width: 100%;
 	color: #E3E3E3;
-	font-family: monospace;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
 	font-size: 12px;
 	border: 1px solid #5E5E5E;
 	cursor: default;
@@ -381,7 +381,7 @@ I also tried messing with the length value, but v8 doesn't allow us to do that i
 	<div class="jsConLine"><div class="jsConErr"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><circle fill="#E46962" cx="8" cy="7" r="6.5"/><polygon fill="#4E3534" points="4.8,4.6 5.6,3.8 8,6.2 10.4,3.8 11.2,4.6 8.8,7 11.2,9.4 10.4,10.2 8,7.8 5.6,10.2 4.8,9.4 7.2,7"/></svg>TypeError: Array.xor needs array of double numbers</div></div>
 </div>
 
-And then it hit me - we're only doing all these fancy checks on the array itself, but not the argument! We get our xor argument (`Object::ToNumber(isolate, args.at(1))`) *after* we're already past all the previous checks, so perhaps we could turn the xor argument evil instead and put an object in the double array once we're already past the checks? Let's give it a shot:
+And then it hit me - we're only doing all those fancy checks on the array itself, but not the argument! We get the xor argument (`Object::ToNumber(isolate, args.at(1))`) *after* we're already past all the previous array checks, so perhaps we could turn the xor argument evil and put an object in the double array once we're already past the initial checks? Let's give it a shot:
 
 <div class="jsConsole">
 		<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>, <span class="jsConValIn">3.3</span>]</div>
@@ -410,9 +410,11 @@ We're cooking!
 
 ## Part 2: Cooking up some primitives
 
-Now that we've found a way to mess with the pointers in an array, we must figure out a way to turn them into the `addrof` and `fakeobj` primitives. There are a few different ways to accomplish this from here. I'm going to go with the path I took originally, but see if you can figure out any other ones - I'll share a couple (arguably better ones) at the end of the post.
+Now that we've found a way to put some objects in an array and mess with them, we must figure out a way to turn that into the `addrof` and `fakeobj` primitives. There are a few different ways to accomplish this from here. I'll go with the path I took originally, but see if you can figure out any other ways to get there - I'll share a couple (arguably better ones) at the end of the post.
 
-So far we've just blindly done stuff without looking at the memory layout itself, but it's going to get pretty hard to understand without doing that, so how could we do that? **d8 natives syntax** and **a debugger**! If we launch d8 (the v8 shell) with the `--allow-natives-syntax` flag, we can use various debug functions such as `%DebugPrint(obj)` to examine what's going on, and if we also use a debugger ([gdb](https://gnu.org/software/gdb/) in this case) we can then look at the memory to understand it better:
+But first, we should look at how v8 stores stuff in the memory so that we can figure out what our memory corruption looks like and what we can do with it. How could we do that?
+
+With the **d8 natives syntax** and a **debugger**! If we launch d8 (the v8 shell) with the `--allow-natives-syntax` flag, we can use various debug functions such as `%DebugPrint(obj)` to examine what's going on with objects, and if we combine that with a debugger ([gdb](https://gnu.org/software/gdb/) in this case) we can even check out the entire memory to understand it better. Let's try it:
 
 ```js
 > gdb --args ./d8 --allow-natives-syntax //<-- use d8 with the natives syntax in gdb
@@ -471,17 +473,18 @@ Thread 1 "d8" received signal SIGTSTP, Stopped (user).
 
 In this example I made an array, used DebugPrint to see it's address, and then used gdb's `x/32xg`[^4] command to see the memory around that address. Going forward I'll be cleaning up the examples shown in the blog post, but this is essentially how you can follow along at home.
 
-You'll notice I subtracted 1 from the memory address before viewing it, that's because of the tagged pointers I mentioned in [footnote 1](#fn:1). In a `PACKED_ELEMENTS` array, doubles that end with a 0 bit (even) are stored as-is, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
+<!-- todo: i don't think that's quite true -->
+You'll notice I subtracted 1 from the memory address before viewing it - that's because of tagged pointers! ~~In a `PACKED_ELEMENTS` array, doubles that~~ end with a 0 bit (even) are stored as-is, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
 
-Anyways, what are those exploit primitives? `addrof` lets us see the memory address of any object, and `fakeobj` lets us create a "fake" JavaScript object - they're almost like memory read and write functions, but not quite.
+<!-- Anyways, what are those exploit primitives? `addrof` lets us see the memory address of any object, and `fakeobj` lets us create a "fake" JavaScript object - they're almost like memory read and write functions, but not quite. -->
 
-Let's first try to actually understand what's going on with our arrays in the memory, I'll explain the example from above:
+But let's try to understand what the gdb output above means:
 
 
 
 <div class="jsMem">
-	<div class="jsMemDbg">
-DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
+	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
+	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
 - map: <span class="jsMemVar7">0x0a38001cb7c5</span> &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
 - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
 - elements: 0x0a3800042bc9 &lt;<span class="jsMemVar2">FixedDoubleArray</span>[<span class="jsMemVar1">3</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
@@ -494,33 +497,45 @@ DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
           0: <span class="jsMemVar3">1.1</span>
           1: <span class="jsMemVar4">2.2</span>
           2: <span class="jsMemVar5">3.3</span>
-}
-	</div>
-	<div class="jsMemHex">
-0xa3800042bb8: 0x00000004000005e5 0x001d3377020801a4
+}</div>
+<div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
+	<div class="jsMemHex">0xa3800042bb8: 0x00000004000005e5 0x001d3377020801a4
 <span class="jsMemVar9">0xa3800042bc8</span>: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
 0xa3800042bd8: 0x<span class="jsMemVar4">400199999999999a</span> 0x<span class="jsMemVar5">400a666666666666</span>
 <span class="jsMemVar10">0xa3800042be8</span>: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span> 0x<span class="jsMemVar8">00000006</span><span class="jsMemVar9">00042bc9</span>
 0xa3800042bf8: 0x00bab9320000010d 0x7566280a00000adc
 </div>
+<div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
 <div class="jsMemLegend">
 Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class="jsMemVar6">properties list</span> is empty, it uses <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> with a <span class="jsMemVar8">length of 3</span> (1 double counts as 2 length in the hex) at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the doubles <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
 </div>
 </div>
 
 <style>
-:root {
-	--jsMemVar1: #0007;
-	--jsMemVar2: #1097;
-	--jsMemVar3: #2087;
-	--jsMemVar4: #3077;
-	--jsMemVar5: #4067;
-	--jsMemVar6: #5057;
-	--jsMemVar7: #6047;
-	--jsMemVar8: #7037;
-	--jsMemVar9: #8027;
-	--jsMemVar10: #9017;
-	--lyreGold: #FAD542;
+.jsMem {
+	color: #DCDFE4;
+	background: #282C34;
+	border-radius: 4px;
+	padding:8px;
+}
+
+.jsMemTitle {
+	pointer-events: none;
+	user-select: none;
+	color: var(--lyreGold);
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 14px;
+	display: flex;
+	margin: 4px 4px 4px;
+}
+.jsMemSep {
+	margin-left: 5px;
+	margin-top: 1px;
+	flex-grow: 1;
+	align-self: center;
+	display: inline-block;
+	height: 2px;
+	background: var(--lyreGold);
 }
 
 .jsMem *::selection {
@@ -529,50 +544,72 @@ Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class=
 }
 
 .jsMemDbg {
+	font-size: 12px;
 	white-space: pre-wrap;
-	font-family: 'Nimbus Mono PS', 'Courier New', monospace;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
 }
 
 .jsMemHex {
+	font-size: 12px;
 	white-space: pre-wrap;
-	font-family: 'Nimbus Mono PS', 'Courier New', monospace;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
 	cursor: crosshair;
 }
 
 .jsMemLegend span {
-	text-decoration: underline wavy;
+	/* text-decoration: underline wavy; */
 }
 
-.jsMemVar1 { background: var(--jsMemVar1) }
-.jsMemVar1:hover { color: #000 }
-.jsMemVar2 { background: var(--jsMemVar2) }
-.jsMemVar2:hover { color: #000 }
-.jsMemVar3 { background: var(--jsMemVar3) }
-.jsMemVar3:hover { color: #000 }
-.jsMemVar4 { background: var(--jsMemVar4) }
-.jsMemVar4:hover { color: #000 }
-.jsMemVar5 { background: var(--jsMemVar5) }
-.jsMemVar5:hover { color: #000 }
-.jsMemVar6 { background: var(--jsMemVar6) }
-.jsMemVar6:hover { color: #000 }
-.jsMemVar7 { background: var(--jsMemVar7) }
-.jsMemVar7:hover { color: #000 }
-.jsMemVar8 { background: var(--jsMemVar8) }
-.jsMemVar8:hover { color: #000 }
-.jsMemVar9 { background: var(--jsMemVar9) }
-.jsMemVar9:hover { color: #000 }
-.jsMemVar10 { background: var(--jsMemVar10) }
-.jsMemVar10:hover { color: #000 }
-.jsMem:has(.jsMemVar1:hover) { --jsMemVar1: var(--lyreGold) }
-.jsMem:has(.jsMemVar2:hover) { --jsMemVar2: var(--lyreGold) }
-.jsMem:has(.jsMemVar3:hover) { --jsMemVar3: var(--lyreGold) }
-.jsMem:has(.jsMemVar4:hover) { --jsMemVar4: var(--lyreGold) }
-.jsMem:has(.jsMemVar5:hover) { --jsMemVar5: var(--lyreGold) }
-.jsMem:has(.jsMemVar6:hover) { --jsMemVar6: var(--lyreGold) }
-.jsMem:has(.jsMemVar7:hover) { --jsMemVar7: var(--lyreGold) }
-.jsMem:has(.jsMemVar8:hover) { --jsMemVar8: var(--lyreGold) }
-.jsMem:has(.jsMemVar9:hover) { --jsMemVar9: var(--lyreGold) }
-.jsMem:has(.jsMemVar10:hover) { --jsMemVar10: var(--lyreGold) }
+:root {
+	--lyreGold: #FAD542;
+	--jsMemVarB0:  #0000;
+	--jsMemVarB1:  #0000;
+	--jsMemVarB2:  #0000;
+	--jsMemVarB3:  #0000;
+	--jsMemVarB4:  #0000;
+	--jsMemVarB5:  #0000;
+	--jsMemVarB6:  #0000;
+	--jsMemVarB7:  #0000;
+	--jsMemVarB8:  #0000;
+	--jsMemVarB9:  #0000;
+	--jsMemVarB10:  #0000;
+	--jsMemVarF0:  #ff9999;
+	--jsMemVarF1:  #99ffc1;
+	--jsMemVarF2:  #99ffea;
+	--jsMemVarF3:  #99eaff;
+	--jsMemVarF4:  #99c1ff;
+	--jsMemVarF5:  #9999ff;
+	--jsMemVarF6:  #ffea99;
+	--jsMemVarF7:  #eaff99;
+	--jsMemVarF8:  #c1ff99;
+	--jsMemVarF9:  #99ff99;
+	--jsMemVarF10:  #ffc199;
+	--jsMemVarB: var(--lyreGold);
+	--jsMemVarF: #000;
+}
+
+.jsMemVar0 { color: var(--jsMemVarF0); background: var(--jsMemVarB0) }
+.jsMemVar1 { color: var(--jsMemVarF1); background: var(--jsMemVarB1) }
+.jsMemVar2 { color: var(--jsMemVarF2); background: var(--jsMemVarB2) }
+.jsMemVar3 { color: var(--jsMemVarF3); background: var(--jsMemVarB3) }
+.jsMemVar4 { color: var(--jsMemVarF4); background: var(--jsMemVarB4) }
+.jsMemVar5 { color: var(--jsMemVarF5); background: var(--jsMemVarB5) }
+.jsMemVar6 { color: var(--jsMemVarF6); background: var(--jsMemVarB6) }
+.jsMemVar7 { color: var(--jsMemVarF7); background: var(--jsMemVarB7) }
+.jsMemVar8 { color: var(--jsMemVarF8); background: var(--jsMemVarB8) }
+.jsMemVar9 { color: var(--jsMemVarF9); background: var(--jsMemVarB9) }
+.jsMemVar10 { color: var(--jsMemVarF10); background: var(--jsMemVarB10) }
+.jsMem:has(.jsMemVar0:hover) { --jsMemVarB0: var(--jsMemVarB); --jsMemVarF0: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar1:hover) { --jsMemVarB1: var(--jsMemVarB); --jsMemVarF1: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar2:hover) { --jsMemVarB2: var(--jsMemVarB); --jsMemVarF2: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar3:hover) { --jsMemVarB3: var(--jsMemVarB); --jsMemVarF3: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar4:hover) { --jsMemVarB4: var(--jsMemVarB); --jsMemVarF4: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar5:hover) { --jsMemVarB5: var(--jsMemVarB); --jsMemVarF5: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar6:hover) { --jsMemVarB6: var(--jsMemVarB); --jsMemVarF6: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar7:hover) { --jsMemVarB7: var(--jsMemVarB); --jsMemVarF7: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar9:hover) { --jsMemVarB9: var(--jsMemVarB); --jsMemVarF9: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar10:hover) { --jsMemVarB10: var(--jsMemVarB); --jsMemVarF10: var(--jsMemVarF) }
 </style>
 
 
