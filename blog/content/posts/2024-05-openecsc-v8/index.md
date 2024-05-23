@@ -132,13 +132,6 @@ BUILTIN(ArrayXor) {
 
 The patch adds a new `Array.xor()` prototype that can be used to xor all values within an array of doubles, let's try it:
 
-```js
-> arr = [0.1, 0.2, 0.3]
-> arr.xor(1337)
-> arr
-<  (3) [0.10000000000001079, 0.20000000000002158, 0.30000000000004035]
-```
-
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, <span class="jsConValIn">0.3</span>]</div>
 	<!-- <div class="jsConBorder"></div> 🢒 ► ⋖ ≻
@@ -172,6 +165,10 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 	font-family: monospace;
 	font-size: 12px;
 	border: 1px solid #5E5E5E;
+	cursor: default;
+}
+.jsConsole *::selection {
+	background: #004A77;
 }
 .jsConLine {
 	min-height: 14px;
@@ -220,6 +217,9 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 .jsConKw {
 	color: #BF67FF;
 }
+.jsConType {
+	color: #7CACF8;
+}
 .jsConIcon {
 	fill: #C7C7C7;
 	display: inline-block;
@@ -230,14 +230,15 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 }
 </style>
 
-Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the binary representations of the values:
-<!-- todo: highlight XOR bits in red -->
-```js
-(double) 0.1 ^ (uint64) 5 = (double) 0.10000000000001079
-  11111110111001100110011001100110011001100110011001100110011010
-^ 00000000000000000000000000000000000000000000000000010100111001
-= 11111110111001100110011001100110011001100110011001110010100011
-```
+Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the hex representations of the values:
+
+<div class="jsConsole" style="text-align:center; width: fit-content; margin: 0 auto">
+	<div class="jsConLine">(<span class="jsConType">double</span>)&nbsp;<span class="jsConValIn">0.1</span> ^ (<span class="jsConType">uint64</span>)&nbsp;<span class="jsConValIn">1337</span> = (<span class="jsConType">double</span>)&nbsp;<span class="jsConValIn">0.10000000000001079</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine" style="white-space: pre">  <span class="jsConValIn">0x3fb9999999999<span class="jsConFun">99a</span></span></div>
+	<div class="jsConLine">^ <span class="jsConValIn">0x0000000000000<span class="jsConFun">539</span></span></div>
+	<div class="jsConLine">= <span class="jsConValIn">0x3fb9999999999<span class="jsConFun">ca3</span></span></div>
+</div>
 
 Hmm, XORing doubles isn't going to get us anywhere[^1] though as the values are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`[^2]) as just raw doubles. All we can do is change some numbers around in an array, but that's something we can already do without xor. It'd be a lot more interesting if we could run this xor thing on a mixed array (`PACKED_ELEMENTS`) consisting of memory pointers to other objects, since we could point the pointers to places in memory we're not supposed to.
 
