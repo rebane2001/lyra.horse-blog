@@ -139,6 +139,97 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 <  (3) [0.10000000000001079, 0.20000000000002158, 0.30000000000004035]
 ```
 
+<div class="jsConsole">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, <span class="jsConValIn">0.3</span>]</div>
+	<!-- <div class="jsConBorder"></div> 🢒 ► ⋖ ≻
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,10 4,6 8,2 8.85,2.85 5.7,6 8.85,9.15 Z"/><circle cx="10" cy="6" r="1"/></svg><details><summary><i>(3) [<span class="jsConValOut">0.1</span>, <span class="jsConValOut">0.2</span>, <span class="jsConValOut">0.3</span>]</i></summary>
+<div style="padding-left: 24px">
+	<span class="jsConIdx">0</span>: <span class="jsConValOut">3fb999999999999a</span><br/>
+	<span class="jsConIdx">1</span>: <span class="jsConValOut">3fc999999999999a</span><br/>
+	<span class="jsConIdx">2</span>: <span class="jsConValOut">3fd3333333333333</span><br/>
+</div>
+	</details></div> -->
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>(<span class="jsConValIn">1337</span>) <span class="jsConNull">// 0x539</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,10 4,6 8,2 8.85,2.85 5.7,6 8.85,9.15 Z"/><circle cx="10" cy="6" r="1"/></svg><details><summary><i>(3) [<span class="jsConValOut">0.10000000000001079</span>, <span class="jsConValOut">0.20000000000002158</span>, <span class="jsConValOut">0.30000000000004035</span>]</i></summary>
+<div style="padding-left: 24px">
+	<span class="jsConIdx">0</span>: <span class="jsConValOut">0x3fb9999999999<span class="jsConKw">ca3</span></span><br/>
+	<span class="jsConIdx">1</span>: <span class="jsConValOut">0x3fc9999999999<span class="jsConKw">ca3</span></span><br/>
+	<span class="jsConIdx">2</span>: <span class="jsConValOut">0x3fd3333333333<span class="jsConKw">60a</span></span><br/>
+</div>
+	</details></div>
+</div>
+
+<style>
+.jsConsole {
+	background: #282828;
+	border-radius: 4px;
+	width: 100%;
+	color: #E3E3E3;
+	font-family: monospace;
+	font-size: 12px;
+	border: 1px solid #5E5E5E;
+}
+.jsConLine {
+	min-height: 14px;
+	margin: 3px;
+	padding: 1px;
+	width: calc(100% - 8px);
+	border-radius: 4px;
+	/* border-bottom: 1px solid #5E5E5E; */
+}
+.jsConLine:has(details) {
+	text-wrap: nowrap;
+}
+.jsConBorder {
+	background: #5E5E5E;
+	width: 100%;
+	height: 1px;
+}
+.jsConLine:hover {
+	background: #3D3D3D;
+}
+.jsConLine > details {
+	padding-left: 4px;
+	display: inline-block;
+	text-wrap: wrap;
+	max-width: calc(100% - 4px - 18px);
+}
+.jsConVar {
+	color: #C7C7C7;
+}
+.jsConValIn {
+	color: #C4EED0;
+}
+.jsConValOut {
+	color: #9980FF;
+}
+.jsConFun {
+	color: #FACC15;
+}
+.jsConIdx {
+	color: #7CACF8;
+	font-weight: bold;
+}
+.jsConNull {
+	color: #6F6F6F;
+}
+.jsConKw {
+	color: #BF67FF;
+}
+.jsConIcon {
+	fill: #C7C7C7;
+	display: inline-block;
+	width: 16px;
+	height: 14px;
+	vertical-align: top;
+	padding-right: 2px;
+}
+</style>
+
 Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the binary representations of the values:
 <!-- todo: highlight XOR bits in red -->
 ```js
@@ -315,15 +406,15 @@ Let's first try to actually understand what's going on with our arrays in the me
 <div class="jsMem">
 	<div class="jsMemDbg">
 DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
-- map: 0x<span class="jsMemVar7">0a38001cb7c5</span> &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
+- map: <span class="jsMemVar7">0x0a38001cb7c5</span> &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
 - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
-- elements: 0x0a3800042bc9 &lt;FixedDoubleArray[3]&gt; [PACKED_DOUBLE_ELEMENTS]
-- length: 3
-- properties: 0x<span class="jsMemVar6">0a3800000725</span> &lt;FixedArray[0]&gt;
+- elements: 0x0a3800042bc9 &lt;<span class="jsMemVar2">FixedDoubleArray</span>[<span class="jsMemVar1">3</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
+- length: <span class="jsMemVar8">3</span>
+- properties: <span class="jsMemVar6">0x0a3800000725</span> &lt;FixedArray[0]&gt;
 - All own properties (excluding elements): {
    0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 &lt;AccessorInfo name= 0x0a3800000d99 &lt;String[6]: #length&gt;, data= 0x0a3800000069 &lt;undefined&gt&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
 }
-- elements: 0x0a3800042bc9 &lt;FixedDoubleArray[3]&gt; {
+- elements: <span class="jsMemVar9">0x0a3800042bc9</span> &lt;FixedDoubleArray[<span class="jsMemVar1">3</span>]&gt; {
           0: <span class="jsMemVar3">1.1</span>
           1: <span class="jsMemVar4">2.2</span>
           2: <span class="jsMemVar5">3.3</span>
@@ -331,13 +422,13 @@ DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
 	</div>
 	<div class="jsMemHex">
 0xa3800042bb8: 0x00000004000005e5 0x001d3377020801a4
-0xa3800042bc8: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
+<span class="jsMemVar9">0xa3800042bc8</span>: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
 0xa3800042bd8: 0x<span class="jsMemVar4">400199999999999a</span> 0x<span class="jsMemVar5">400a666666666666</span>
 <span class="jsMemVar10">0xa3800042be8</span>: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span> 0x<span class="jsMemVar8">00000006</span><span class="jsMemVar9">00042bc9</span>
 0xa3800042bf8: 0x00bab9320000010d 0x7566280a00000adc
 </div>
 <div class="jsMemLegend">
-Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class="jsMemVar6">properties list</span> is empty, it uses <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> with a <span class="jsMemVar8">length of 6</span> (1 double counts as 2 length) at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">???</span> with a <span class="jsMemVar1">length (again) of 6</span> and the floats <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
+Our array is at <span class="jsMemVar10">0xa3800042be8</span>, it's <span class="jsMemVar6">properties list</span> is empty, it uses <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> with a <span class="jsMemVar8">length of 3</span> (1 double counts as 2 length in the hex) at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the floats <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
 </div>
 </div>
 
@@ -447,6 +538,13 @@ todo:
 		max-width: 500px;
 		margin: 16px auto;
 	}
+	.challDetails *::selection {
+		background: #073BA6;
+	}
+	.challFiles *::selection {
+		background: #0F0;
+		color: #000;
+	}
 	.challTitle {
 		font-size: 24px;
 		font-weight: 500;
@@ -468,6 +566,9 @@ todo:
 	}
 	.challSection {
 		padding: 0 16px 16px 16px;
+	}
+	.challSection code {
+		overflow-wrap: break-word;
 	}
 	.challTag {
 		border-radius: 6px;
@@ -509,7 +610,8 @@ todo:
 	}
 	.challScores tr > * {
 		border: solid 1px rgb(73, 80, 87);
-		padding: 8px;
+		padding: 4px 8px;
+		line-height: 20px;
 		text-align: left;
 	}
 	.challScores tr > :first-child {
@@ -521,5 +623,12 @@ todo:
 	}
 	.challScores tbody tr:hover {
   		background: #2b3a4d;
+	}
+</style>
+<style>
+	/* temporary */
+	.highlight > pre {
+		white-space: pre-wrap;
+		overflow-wrap: anywhere;
 	}
 </style>
