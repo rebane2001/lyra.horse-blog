@@ -198,6 +198,9 @@ The patch adds a new `Array.xor()` prototype that can be used to xor all values 
 	text-wrap: wrap;
 	max-width: calc(100% - 4px - 18px);
 }
+.jsConLine > details > summary::marker {
+	line-height: 0;
+}
 .jsConVar {
 	color: #C7C7C7;
 }
