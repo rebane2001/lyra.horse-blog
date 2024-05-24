@@ -489,30 +489,30 @@ But let's try to understand what the gdb output above means:
 
 <div class="jsMem">
 	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
-	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar10">0xa3800042be9</span>: [JSArray]
-- map: <span class="jsMemVar7">0x0a38001cb7c5</span> &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
+	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar1">0xa3800042be9</span>: [JSArray]
+- map: <span class="jsMemVar3">0x0a38001cb7c5</span> &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
 - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
-- elements: <span class="jsMemVar9">0x0a3800042bc9</span> &lt;<span class="jsMemVar2">FixedDoubleArray</span>[<span class="jsMemVar1">3</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
-- length: <span class="jsMemVar8">3</span>
-- properties: <span class="jsMemVar6">0x0a3800000725</span> &lt;FixedArray[0]&gt;
+- elements: <span class="jsMemVar5">0x0a3800042bc9</span> &lt;<span class="jsMemVar7">FixedDoubleArray</span>[<span class="jsMemVar6">3</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
+- length: <span class="jsMemVar4">3</span>
+- properties: <span class="jsMemVar2">0x0a3800000725</span> &lt;FixedArray[0]&gt;
 - All own properties (excluding elements): {
    0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 &lt;AccessorInfo name= 0x0a3800000d99 &lt;String[6]: #length&gt;, data= 0x0a3800000069 &lt;undefined&gt&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
 }
-- elements: <span class="jsMemVar9">0x0a3800042bc9</span> &lt;FixedDoubleArray[<span class="jsMemVar1">3</span>]&gt; {
-          0: <span class="jsMemVar3">1.1</span>
-          1: <span class="jsMemVar4">2.2</span>
-          2: <span class="jsMemVar5">3.3</span>
+- elements: <span class="jsMemVar5">0x0a3800042bc9</span> &lt;FixedDoubleArray[<span class="jsMemVar6">3</span>]&gt; {
+          0: <span class="jsMemVar8">1.1</span>
+          1: <span class="jsMemVar9">2.2</span>
+          2: <span class="jsMemVar10">3.3</span>
 }</div>
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
 	<div class="jsMemHex">0xa3800042bb8: 0x00000004000005e5<span class="under430"><br>0xa3800042bc0:</span> 0x001d3377020801a4
-<span class="jsMemVar9">0xa3800042bc8</span>: 0x<span class="jsMemVar1">00000006</span><span class="jsMemVar2">000008a9</span><span class="under430"><br>0xa3800042bd0:</span> 0x<span class="jsMemVar3">3ff199999999999a</span>
-0xa3800042bd8: 0x<span class="jsMemVar4">400199999999999a</span><span class="under430"><br>0xa3800042be0:</span> 0x<span class="jsMemVar5">400a666666666666</span>
-<span class="jsMemVar10">0xa3800042be8</span>: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span><span class="under430"><br>0xa3800042bf0:</span> 0x<span class="jsMemVar8">00000006</span><span class="jsMemVar9">00042bc9</span>
+<span class="jsMemVar5">0xa3800042bc8</span>: 0x<span class="jsMemVar6">00000006</span><span class="jsMemVar7">000008a9</span><span class="under430"><br>0xa3800042bd0:</span> 0x<span class="jsMemVar8">3ff199999999999a</span>
+0xa3800042bd8: 0x<span class="jsMemVar9">400199999999999a</span><span class="under430"><br>0xa3800042be0:</span> 0x<span class="jsMemVar10">400a666666666666</span>
+<span class="jsMemVar1">0xa3800042be8</span>: 0x<span class="jsMemVar2">00000725</span><span class="jsMemVar3">001cb7c5</span><span class="under430"><br>0xa3800042bf0:</span> 0x<span class="jsMemVar4">00000006</span><span class="jsMemVar5">00042bc9</span>
 0xa3800042bf8: 0x00bab9320000010d<span class="under430"><br>0xa3800042c00:</span> 0x7566280a00000adc
 </div>
 <div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
 <div class="jsMemLegend">
-The array is at <span class="jsMemVar10">0xa3800042be8</span>, its <span class="jsMemVar6">properties list</span> is empty, it's a <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> array with a <span class="jsMemVar8">length of 3</span><sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref" style="color:#95dcff">4</a></sup> at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the doubles <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
+The array is at <span class="jsMemVar1">0xa3800042be8</span>, its <span class="jsMemVar2">properties list</span> is empty, it's a <code><span class="jsMemVar3">PACKED_DOUBLE_ELEMENTS</span></code> array with a <span class="jsMemVar4">length of 3</span><sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref" style="color:#95dcff">4</a></sup> at <span class="jsMemVar5">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar7">FixedDoubleArray</span> with a <span class="jsMemVar6">length of 3 (again)</span> and the doubles <span class="jsMemVar8">1.1</span>, <span class="jsMemVar9">2.2</span>, and <span class="jsMemVar10">3.3</span>.
 </div>
 </div>
 
@@ -561,12 +561,12 @@ Let's try to make a new array appear out of thin air. To do that, we have to put
 
 <div class="jsMem">
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
-	<div class="jsMemHex"><span class="over430">0x??????????: 0x????????????????</span><span class="under430">0x??????????:</span> 0x<span class="jsMemVar1">00000100</span><span class="jsMemVar2">000008a9</span></span>
-0x??????????: 0x<span class="jsMemVar6">00000725</span><span class="jsMemVar7">001cb7c5</span><span class="under430"><br>0x??????????:</span> 0x<span class="jsMemVar8">00000100</span><span class="jsMemVar9">00042bd1</span>
+	<div class="jsMemHex"><span class="over430">0x??????????: 0x????????????????</span><span class="under430">0x??????????:</span> 0x<span class="jsMemVar6">00000100</span><span class="jsMemVar7">000008a9</span></span>
+0x??????????: 0x<span class="jsMemVar2">00000725</span><span class="jsMemVar3">001cb7c5</span><span class="under430"><br>0x??????????:</span> 0x<span class="jsMemVar4">00000100</span><span class="jsMemVar5">00042bd1</span>
 </div>
 <div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
 <div class="jsMemLegend">
-Fake <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> array with an <span class="jsMemVar6">empty properties list</span>, with <span class="jsMemVar8">128 elements</span> at <span class="jsMemVar9" style="text-wrap: nowrap">0x???00042bd0</span>. At that address we will have a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 128</span>.
+Fake <code><span class="jsMemVar3">PACKED_DOUBLE_ELEMENTS</span></code> array with an <span class="jsMemVar2">empty properties list</span>, with <span class="jsMemVar4">128 elements</span> at <span class="jsMemVar5" style="text-wrap: nowrap">0x???00042bd0</span>. At that address we will have a <span class="jsMemVar7">FixedDoubleArray</span> with a <span class="jsMemVar6">length of 128</span>.
 </div>
 </div>
 
@@ -660,19 +660,19 @@ Wow! That fake array of ours has lots of cool data that we didn't put there. Let
 	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar0">0x25ec00042bd9</span>: [JSArray]
  - map: 0x25ec001cb7c5 &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
  - prototype: 0x25ec001cb11d &lt;JSArray[0]&gt;
- - elements: <span class="jsMemVar8">0x25ec00042bd1</span> &lt;FixedDoubleArray[128]&gt; [PACKED_DOUBLE_ELEMENTS]
- - length: <span class="jsMemVar7">128</span>
+ - elements: <span class="jsMemVar4">0x25ec00042bd1</span> &lt;FixedDoubleArray[128]&gt; [PACKED_DOUBLE_ELEMENTS]
+ - length: <span class="jsMemVar3">128</span>
  - properties: 0x25ec00000725 &lt;FixedArray[0]&gt;
  - All own properties (excluding elements): {
     0x25ec00000d99: [String] in ReadOnlySpace: #length: 0x25ec00025f85 &lt;AccessorInfo name= 0x25ec00000d99 &lt;String[6]: #length&gt;, data= 0x25ec00000069 &lt;undefined&gt;&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
  }
- - elements: <span class="jsMemVar8">0x25ec00042bd1</span> &lt;FixedDoubleArray[128]&gt; {
-           0: <span class="jsMemVar10 jsMemVar6">3.88113e-311</span>
-           1: <span class="jsMemVar7 jsMemVar8">5.43231e-312</span>
-           2: <span class="jsMemVar2">3.88113e-311</span>
-           3: <span class="jsMemVar3">1.27321e-313</span>
-           4: <span class="jsMemVar4">3.80554e-305</span>
-           5: <span class="jsMemVar5">3.32679e+257</span>
+ - elements: <span class="jsMemVar4">0x25ec00042bd1</span> &lt;FixedDoubleArray[128]&gt; {
+           0: <span class="jsMemVar1 jsMemVar2">3.88113e-311</span>
+           1: <span class="jsMemVar3 jsMemVar4">5.43231e-312</span>
+           2: <span class="jsMemVar7">3.88113e-311</span>
+           3: <span class="jsMemVar8">1.27321e-313</span>
+           4: <span class="jsMemVar9">3.80554e-305</span>
+           5: <span class="jsMemVar10">3.32679e+257</span>
            6: <span class="jsMemVar11">2.03179e-110</span>
            7: <span class="jsMemVar12">1.27991e-152</span>
            8: <span class="jsMemVar13">7.63266e-24</span>
@@ -687,10 +687,10 @@ Wow! That fake array of ours has lots of cool data that we didn't put there. Let
 }</div>
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
 	<div class="jsMemHex">0x25ec00042bb8: 0x00000004000005e5 0x001d3377020801a4
-<span class="jsMemVar8">0x25ec00042bc8</span>: 0x00000006000008a9 0x<span class="jsMemVar9">00000100</span><span class="jsMemVar1">000008a9</span>
-<span class="jsMemVar0">0x25ec00042bd8</span>: 0x<span class="jsMemVar10">00000725</span><span class="jsMemVar6">001cb7c5</span> 0x<span class="jsMemVar8">00000100</span><span class="jsMemVar7">00042bd1</span>
-0x25ec00042be8: 0x<span class="jsMemVar2">00000725001cb7c5</span> 0x<span class="jsMemVar3">0000000600042bc9</span>
-0x25ec00042bf8: 0x<span class="jsMemVar4">00bab9320000010d</span> 0x<span class="jsMemVar5">7566280a00000adc</span>
+<span class="jsMemVar4">0x25ec00042bc8</span>: 0x00000006000008a9 0x<span class="jsMemVar5">00000100</span><span class="jsMemVar6">000008a9</span>
+<span class="jsMemVar0">0x25ec00042bd8</span>: 0x<span class="jsMemVar1">00000725</span><span class="jsMemVar2">001cb7c5</span> 0x<span class="jsMemVar4">00000100</span><span class="jsMemVar3">00042bd1</span>
+0x25ec00042be8: 0x<span class="jsMemVar7">00000725001cb7c5</span> 0x<span class="jsMemVar8">0000000600042bc9</span>
+0x25ec00042bf8: 0x<span class="jsMemVar9">00bab9320000010d</span> 0x<span class="jsMemVar10">7566280a00000adc</span>
 0x25ec00042c08: 0x<span class="jsMemVar11">29286e6f6974636e</span> 0x<span class="jsMemVar12">20657375220a7b20</span>
 0x25ec00042c18: 0x<span class="jsMemVar13">3b22746369727473</span> 0x<span class="jsMemVar14">6d2041202f2f0a0a</span>
 0x25ec00042c28: 0x<span class="jsMemVar15">76696e752065726f</span> 0x<span class="jsMemVar16">7473206c61737265</span>
@@ -1196,16 +1196,16 @@ DebugPrint: 0x25ec00042bd9: [JSArray]
 	--jsMemVarB20:  #0000;
 	--jsMemVarB21:  #0000;
 	--jsMemVarF0:  #ff9999;
-	--jsMemVarF1:  #99ffc1;
-	--jsMemVarF2:  #99ffea;
-	--jsMemVarF3:  #99eaff;
-	--jsMemVarF4:  #99c1ff;
-	--jsMemVarF5:  #9999ff;
-	--jsMemVarF6:  #ffea99;
-	--jsMemVarF7:  #eaff99;
-	--jsMemVarF8:  #c1ff99;
-	--jsMemVarF9:  #99ff99;
-	--jsMemVarF10:  #ffc199;
+	--jsMemVarF1:  #ffc199;
+	--jsMemVarF2:  #ffea99;
+	--jsMemVarF3:  #eaff99;
+	--jsMemVarF4:  #c1ff99;
+	--jsMemVarF5:  #99ff99;
+	--jsMemVarF6:  #99ffc1;
+	--jsMemVarF7:  #99ffea;
+	--jsMemVarF8:  #99eaff;
+	--jsMemVarF9:  #99c1ff;
+	--jsMemVarF10:  #9999ff;
 	--jsMemVarF11:  #c199ff;
 	--jsMemVarF12:  #ea99ff;
 	--jsMemVarF13:  #ff99ea;
