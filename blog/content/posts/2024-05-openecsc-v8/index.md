@@ -261,6 +261,11 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 		display: none;
 	}
 }
+@media (width < 640px) {
+	.over640 {
+		display: none;
+	}
+}
 </style>
 
 Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the hex representations of the values:
@@ -553,7 +558,70 @@ Pretty cool, let's see what happens if we put an array inside of another array:
 </div>
 </div>
 
-The memory order of the elements part here looks a little odd because it doesn't align with the 64-bit words. Instead of reading 64-bit values as `0x1111222233334444`, you have to read them as `0x3333444400000000 0x0000000011112222`.
+The memory order of the elements part here looks a little odd because it doesn't align with the 64-bit words and we're looking at [little endian](https://en.wikipedia.org/wiki/Endianness) memory. This is a bit counter-intuitive because instead of reading the offset value as `0x0000000011112222 0x3333444400000000` you have to read it as `0x3333444400000000 0x0000000011112222`.
+
+<div class="over640"><span class="fineText">Here's a fun little widget to play around with the concept:
+
+<div class="offsetDemo">
+<div class="offsetDemoOverlay"><span>0000000000000000</span>00000000000000000000000000000000<span>0000000000000000</span><br><span>0000000000000000</span>0<span>00000000000000000</span></div>
+<div class="offsetDemoLegend"> read bytes as:                <span style="width:0.5ch;display:inline-block"></span>|<br>  if offset by:                <span style="width:0.5ch;display:inline-block"></span>|</div>
+<div class="offsetDemoNumbers">1111222233334444<span style="color:#AAA">0000000000000000</span>1111222233334444<br>001122334455667788                drag this -&gt;<span class="offsetDemoHandle"></span></div>
+</div>
+</span></div>
+
+
+<style>
+.offsetDemo {
+	font-size: 16px;
+	cursor: default;
+	user-select: none;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	line-height: 1em;
+	width: 64ch;
+	margin: 0 auto;
+	border-radius: 4px;
+	border: 1px solid black;
+	overflow: hidden;
+	position: relative;
+	background: #282C34;
+	color: #FFF;
+}
+.offsetDemoLegend {
+	white-space: pre;
+	color: var(--lyreGold);
+	position: absolute;
+	pointer-events: none;
+}
+.offsetDemoOverlay {
+	color: #0000;
+	position: absolute;
+	height: 1em;
+	pointer-events: none;
+}
+.offsetDemoOverlay > span {
+	background: #282C34;
+}
+.offsetDemoHandle {
+	background: var(--lyreGold);
+	width: 1.5ch;
+	height: 12px;
+	margin: 2px 0.25ch;
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: 4px;
+}
+.offsetDemoNumbers {
+	white-space: pre;
+  overflow: hidden;
+  resize: horizontal;
+  height: 2.1em;
+  width: 64ch;
+  min-width: 48ch;
+  max-width: 64ch;
+  text-wrap: nowrap;
+  text-align: right;
+}
+</style>
 
 The array in our array is just stored as a pointer to that array! At the moment it is pointing at `0xa3800042be8` which has our double array, but if we XOR this pointer to a different address we can make it point to any array or object we want... even if it doesn't "actually" exist!
 
@@ -1282,7 +1350,7 @@ todo:
 make sure we're in 0xa38 address space
 make sure we have mobile addresses available
 
-note: the v8/gdb highlighting thing doesn't work in the current version of ladybird because it doesn't support the :has() selector
+note: the v8/gdb highlighting thing doesn't work in the current version of ladybird because it doesn't support the :has() selector, and the little endian widget won't work due to no resizable handles
 
 -->
 
