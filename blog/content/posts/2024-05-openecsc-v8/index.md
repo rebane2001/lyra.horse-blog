@@ -1,6 +1,6 @@
 +++
 title = 'Exploiting V8 at openECSC'
-date = 2024-05-20T13:37:00Z
+date = 2024-05-25T00:00:00Z
 draft = false
 tags = ['ctf','browser']
 slug = "exploiting-v8-at-openecsc"
@@ -186,6 +186,7 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 	width: calc(100% - 20px);
 	border-radius: 4px;
 	white-space: pre-wrap;
+	cursor: initial;
 }
 .jsConLine:has(details) {
 	text-wrap: nowrap;
@@ -240,6 +241,10 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 .jsConStrOut {
 	color: #5CD5FB;
 }
+.jsConV8 {
+	/* color: #9F0; */
+	color: #FFF;
+}
 .jsConIcon {
 	fill: #C7C7C7;
 	display: inline-block;
@@ -272,6 +277,36 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 	.over640 {
 		display: none;
 	}
+}
+@media (width >= 640px) {
+	.under640 {
+		display: none;
+	}
+	.termCodeComm {
+		float: right;
+	}
+}
+.termCode {
+	white-space: pre-wrap;
+	background: #000;
+	color: #BBB;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 12px;
+	border-radius: 4px;
+	width: calc(100% - 2px - 16px);
+	border: 1px solid var(--lyreGold);
+	padding: 8px;
+	cursor: default;
+}
+.termCode::selection, .termCode *::selection {
+	color: #000;
+	background: var(--lyreGold);
+}
+.termCodeW {
+	color: #FFF;
+}
+.termCodeComm {
+	color: var(--lyreGold);
 }
 </style>
 
@@ -425,7 +460,7 @@ And then it hit me - we're only doing all those fancy checks on the array itself
 	</details></div>
 </div>
 
-We're cooking!
+We're cooking! <!-- todo: maybe change -->
 
 ## Part 2: Breaking out of bounds
 
@@ -435,62 +470,59 @@ But first, we should look at how v8 stores stuff in the memory so that we can fi
 
 With the **d8 natives syntax** and a **debugger**! If we launch d8 (the v8 shell) with the `--allow-natives-syntax` flag, we can use various debug functions such as `%DebugPrint(obj)` to examine what's going on with objects, and if we combine that with a debugger ([gdb](https://gnu.org/software/gdb/) in this case) we can even check out the entire memory to understand it better. Let's try it:
 
-```js
-> gdb --args ./d8 --allow-natives-syntax //<-- use d8 with the natives syntax in gdb
+<div class="termCode"><span class="termCodeW">&gt; gdb --args ./d8 --allow-natives-syntax</span> <span class="termCodeComm">&lt;-- use d8 with the natives syntax in gdb</span>
 GNU gdb (GDB) 14.2
-...                      
-(gdb) run // <-- start d8
+<span class="termCodeW">(gdb) run</span> <span class="termCodeComm">&lt;-- start d8</span>
 Starting program: /home/lyra/Desktop/array.xor/dist/d8 --allow-natives-syntax
 V8 version 12.7.0 (candidate)
-d8> arr = [1.1, 2.2, 3.3] // <-- create an array
+<span class="termCodeW">d8&gt; arr = [1.1, 2.2, 3.3]</span> <span class="termCodeComm">&lt;-- create an array</span>
 [1.1, 2.2, 3.3]
-d8> %DebugPrint(arr) // <-- debugprint the array
-DebugPrint: 0xa3800042be9: [JSArray] // <-- we get the address here
- - map: 0x0a38001cb7c5 <Map[16](PACKED_DOUBLE_ELEMENTS)> [FastProperties]
- - prototype: 0x0a38001cb11d <JSArray[0]>
- - elements: 0x0a3800042bc9 <FixedDoubleArray[3]> [PACKED_DOUBLE_ELEMENTS]
+<span class="termCodeW">d8&gt; %DebugPrint(arr)</span> <span class="termCodeComm">&lt;-- debugprint the array</span>
+DebugPrint: <span class="termCodeW">0xa3800042be9</span>: [JSArray] <span class="termCodeComm">&lt;-- we get the address here</span>
+ - map: 0x0a38001cb7c5 &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
+ - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
+ - elements: 0x0a3800042bc9 &lt;FixedDoubleArray[3]&gt; [PACKED_DOUBLE_ELEMENTS]
  - length: 3
- - properties: 0x0a3800000725 <FixedArray[0]>
+ - properties: 0x0a3800000725 &lt;FixedArray[0]&gt;
  - All own properties (excluding elements): {
-    0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 <AccessorInfo name= 0x0a3800000d99 <String[6]: #length>, data= 0x0a3800000069 <undefined>> (const accessor descriptor, attrs: [W__]), location: descriptor
+    0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 &lt;AccessorInfo name= 0x0a3800000d99 &lt;String[6]: #length&gt;, data= 0x0a3800000069 &lt;undefined&gt;&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
  }
- - elements: 0x0a3800042bc9 <FixedDoubleArray[3]> {
+ - elements: 0x0a3800042bc9 &lt;FixedDoubleArray[3]&gt; {
            0: 1.1
            1: 2.2
            2: 3.3
  }
 0xa38001cb7c5: [Map] in OldSpace
- - map: 0x0a38001c01b5 <MetaMap (0x0a38001c0205 <NativeContext[295]>)>
+ - map: 0x0a38001c01b5 &lt;MetaMap (0x0a38001c0205 &lt;NativeContext[295]&gt;)&gt;
  - type: JS_ARRAY_TYPE
  - instance size: 16
  - inobject properties: 0
  - unused property fields: 0
  - elements kind: PACKED_DOUBLE_ELEMENTS
  - enum length: invalid
- - back pointer: 0x0a38001cb785 <Map[16](HOLEY_SMI_ELEMENTS)>
- - prototype_validity cell: 0x0a3800000a89 <Cell value= 1>
- - instance descriptors #1: 0x0a38001cb751 <DescriptorArray[1]>
- - transitions #1: 0x0a38001cb7ed <TransitionArray[4]>
+ - back pointer: 0x0a38001cb785 &lt;Map[16](HOLEY_SMI_ELEMENTS)&gt;
+ - prototype_validity cell: 0x0a3800000a89 &lt;Cell value= 1&gt;
+ - instance descriptors #1: 0x0a38001cb751 &lt;DescriptorArray[1]&gt;
+ - transitions #1: 0x0a38001cb7ed &lt;TransitionArray[4]&gt;
    Transition array #1:
-     0x0a3800000e5d <Symbol: (elements_transition_symbol)>: (transition to HOLEY_DOUBLE_ELEMENTS) -> 0x0a38001cb805 <Map[16](HOLEY_DOUBLE_ELEMENTS)>
- - prototype: 0x0a38001cb11d <JSArray[0]>
- - constructor: 0x0a38001cae09 <JSFunction Array (sfi = 0xa380002b2f9)>
- - dependent code: 0x0a3800000735 <Other heap object (WEAK_ARRAY_LIST_TYPE)>
+     0x0a3800000e5d &lt;Symbol: (elements_transition_symbol)&gt;: (transition to HOLEY_DOUBLE_ELEMENTS) -&gt; 0x0a38001cb805 &lt;Map[16](HOLEY_DOUBLE_ELEMENTS)&gt;
+ - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
+ - constructor: 0x0a38001cae09 &lt;JSFunction Array (sfi = 0xa380002b2f9)&gt;
+ - dependent code: 0x0a3800000735 &lt;Other heap object (WEAK_ARRAY_LIST_TYPE)&gt;
  - construction counter: 0
-
+<!---->
 [1.1, 2.2, 3.3]
-d8> ^Z  // <-- suspend d8 (ctrl+z) to get to gdb
+<span class="termCodeW">d8&gt; ^Z</span> <span class="termCodeComm">&lt;-- suspend d8 (ctrl+z) to get to gdb</span>
 Thread 1 "d8" received signal SIGTSTP, Stopped (user).
 0x00007ffff7da000a in read () from /usr/lib/libc.so.6
-(gdb) x/8xg 0xa3800042be9-1 // <-- examine the array's address
+<span class="termCodeW">(gdb) x/8xg 0xa3800042be9-1</span> <span class="termCodeComm">&lt;-- examine the array's address</span>
 0xa3800042be8:	0x00000725001cb7c5	0x0000000600042bc9
 0xa3800042bf8:	0x00bab9320000010d	0x7566280a00000adc
 0xa3800042c08:	0x29286e6f6974636e	0x20657375220a7b20
 0xa3800042c18:	0x3b22746369727473	0x6d2041202f2f0a0a
-(gdb) 
-```
+<span class="termCodeW">(gdb)</span></div>
 
-In this example I made an array, used DebugPrint to see it's address, and then used gdb's `x/32xg`[^3] command to see the memory around that address. Going forward I'll be cleaning up the examples shown in the blog post, but this is essentially how you can follow along at home.
+In this example I made an array, used DebugPrint to see it's address, and then used gdb's `x/8xg`[^3] command to see the memory around that address. Going forward I'll be cleaning up the examples shown in the blog post, but this is essentially how you can follow along at home.
 
 <!-- todo: i don't think that's quite true -->
 You'll notice I subtracted 1 from the memory address before viewing it - that's because of tagged pointers! ~~In a `PACKED_ELEMENTS` array, doubles that~~ end with a 0 bit (even) are stored as-is, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
@@ -872,7 +904,7 @@ Let's take our research so far and wrap it up in a nice little script.
 <span class="jsConKw">const</span> <span class="jsConIdx">objArr</span> = [<span class="jsConVar">tmpObj</span>];
 <!---->
 <span class="jsConNull">// check the address of arr</span>
-%<span class="jsConVar">DebugPrint</span>(<span class="jsConVar">arr</span>);
+%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">arr</span>);
 <!---->
 <span class="jsConNull">// set up the fake array</span>
 <span class="jsConKw">const</span> <span class="jsConIdx">arrAddr</span> = <span class="jsConValIn">0x12345678n</span>;
@@ -1042,237 +1074,8 @@ Did you know that strings in JavaScript are immutable! Anyways let's mutate them
 We've done the impossible! Imagine how much we're gonna be able to speed up the performance of our webapps by running this exploit and making strings mutable.
 
 ## Part 4: Code execution
-
-<!--
-DebugPrint: 0x25ec00042be9: [JSArray]
- - map: 0x25ec001cb7c5 <Map[16](PACKED_DOUBLE_ELEMENTS)> [FastProperties]
- - prototype: 0x25ec001cb11d <JSArray[0]>
- - elements: 0x25ec00042bc9 <FixedDoubleArray[3]> [PACKED_DOUBLE_ELEMENTS]
- - length: 3
- - properties: 0x25ec00000725 <FixedArray[0]>
- - All own properties (excluding elements): {
-    0x25ec00000d99: [String] in ReadOnlySpace: #length: 0x25ec00025f85 <AccessorInfo name= 0x25ec00000d99 <String[6]: #length>, data= 0x25ec00000069 <undefined>> (const accessor descriptor, attrs: [W__]), location: descriptor
- }
- - elements: 0x25ec00042bc9 <FixedDoubleArray[3]> {
-           0: 5.43231e-312
-           1: 3.88113e-311
-           2: 5.43231e-312
- }
-0x25ec00042ba8:	0x0000006900000069	0x0000006900000069
-0x25ec00042bb8:	0x00000004000005e5	0x001d3377020801a4
-0x25ec00042bc8:	0x00000006000008a9	0x00000100000008a9
-0x25ec00042bd8:	0x00000725001cb7c5	0x0000010000042bd1
-0x25ec00042be8:	0x00000725001cb7c5	0x0000000600042bc9
-0x25ec00042bf8:	0x00bab9320000010d	0x7566280a00000adc
-0x25ec00042c08:	0x29286e6f6974636e	0x20657375220a7b20
-
-DebugPrint: 0x25ec00042bd9: [JSArray]
- - map: 0x25ec001cb7c5 <Map[16](PACKED_DOUBLE_ELEMENTS)> [FastProperties]
- - prototype: 0x25ec001cb11d <JSArray[0]>
- - elements: 0x25ec00042bd1 <FixedDoubleArray[128]> [PACKED_DOUBLE_ELEMENTS]
- - length: 128
- - properties: 0x25ec00000725 <FixedArray[0]>
- - All own properties (excluding elements): {
-    0x25ec00000d99: [String] in ReadOnlySpace: #length: 0x25ec00025f85 <AccessorInfo name= 0x25ec00000d99 <String[6]: #length>, data= 0x25ec00000069 <undefined>> (const accessor descriptor, attrs: [W__]), location: descriptor
- }
- - elements: 0x25ec00042bd1 <FixedDoubleArray[128]> {
-           0: 3.88113e-311
-           1: 5.43231e-312
-           2: 3.88113e-311
-           3: 1.27321e-313
-           4: 3.80554e-305
-           5: 3.32679e+257
-           6: 2.03179e-110
-           7: 1.27991e-152
-           8: 7.63266e-24
-           9: 4.48268e+217
-          10: 2.50252e+262
-          11: 8.76426e+252
-          12: 3.03108e-152
-          13: 5.32817e+233
-          14: 5.52e+228
-          15: 7.49511e+247
-          16: 1.70307e+93
-          17: 1.13277e+102
-          18: 2.35901e+251
-          19: 1.39617e+195
-          20: 1.94673e+227
-          21: 4.70108e+180
-          22: 4.0255e+260
-          23: 7.35876e+223
-          24: 7.51282e+252
-          25: 2.92295e-14
-          26: 1.16291e-153
-          27: 5.03276e+175
-          28: 7.34746e+223
-          29: 1.53297e+171
-          30: 3.42134e+180
-          31: 1.1629e-153
-          32: 7.2497e+228
-          33: 2.35288e+251
-          34: 1.88754e+219
-          35: 1.67495e+243
-          36: 1.28185e+160
-          37: 3.9935e+252
-          38: 1.47192e+224
-          39: 2.19993e-152
-          40: 4.45197e+252
-          41: 4.38777e+242
-          42: 1.20165e+285
-          43: 1.81668e-152
-          44: 3.85487e-22
-          45: 4.82407e+228
-          46: 1.32904e+272
-          47: 2.04733e+190
-          48: 1.35361e+277
-          49: 3.48325e+183
-          50: 1.81597e-152
-          51: 2.116e+36
-          52: 3.6817e+180
-          53: 6.77826e-109
-          54: 9.32195e+250
-          55: 2.41074e+198
-          56: 2.92646e-14
-          57: 4.82407e+228
-          58: 3.42134e+180
-          59: 7.71012e+241
-          60: 2.3557e+44
-          61: 1.35361e+277
-          62: 5.42578e-109
-          63: 1.70299e+93
-          64: 4.8753e+252
-          65: 2.92294e-14
-          66: 4.82407e+228
-          67: 1.32906e+272
-          68: 6.01335e-154
-          69: 1.06758e+224
-          70: 1.32904e+272
-          71: 2.04733e+190
-          72: 1.35361e+277
-          73: 1.17835e+49
-          74: 7.60998e+179
-          75: 1.14281e+243
-          76: 4.45197e+252
-          77: 1.72341e+243
-          78: 2.44012e-154
-          79: 6.12501e+257
-          80: 4.35431e+242
-          81: 4.29763e+160
-          82: 1.72387e+243
-          83: 2.20813e-259
-          84: 4.95173e-114
-          85: 2.66582e-260
-          86: 4.82407e+228
-          87: 1.69376e+190
-          88: 2.00012e+174
-          89: 3.52845e-258
-          90: 2.61377e+180
-          91: 2.18076e-153
-          92: 3.94356e+180
-          93: 1.99416e+174
-          94: 3.54813e+246
-          95: 6.20757e+276
-          96: 1.1163e+219
-          97: 1.42237e+214
-          98: 2.98362e+174
-          99: 1.03877e-13
-         100: 6.01347e-154
-         101: 2.63177e-144
-         102: 5.98158e-154
-         103: 4.38777e+242
-         104: 9.38333e-154
-         105: 4.70075e+180
-         106: 2.16841e+243
-         107: 4.39401e+242
-         108: 2.00012e+174
-         109: 2.44551e-154
-         110: 1.12185e+200
-         111: 6.32278e+233
-         112: 1.20166e+285
-         113: 6.0785e+247
-         114: 1.81796e+185
-         115: 2.44513e-154
-         116: 4.91347e+252
-         117: 6.02646e+175
-         118: 7.60682e-24
-         119: 6.0785e+247
-         120: 3.68727e+180
-         121: 6.01335e-154
-         122: 3.27614e+222
-         123: 2.12471e-259
-         124: 5.02621e+180
-         125: 9.75395e+199
-         126: 6.01335e-154
-         127: 3.96061e+246
- }
-
- [3.881131231533e-311, 5.432310575454e-312, 3.881131231533e-311, 1.27321098e-313, 3.8055412126965747e-305, 3.3267913058887005e+257, 2.0317942745751732e-110, 1.2799112976201688e-152, 7.632660997817179e-24, 4.48268017468496e+217, 2.502521315148532e+262, 8.764262388001722e+252, 3.031075143147101e-152, 5.328171041616219e+233, 5.5199981093443586e+228, 7.495112028514905e+247, 1.7030718657907086e+93, 1.1327727072654574e+102, 2.359008502145169e+251, 1.3961696417690724e+195, 1.946731766214472e+227, 4.701083965992104e+180, 4.0255010912767526e+260, 7.358764607712314e+223, 7.512821250369065e+252, 2.922947873833435e-14, 1.1629076175361261e-153, 5.032758170002575e+175, 7.347463834617257e+223, 1.5329662439803979e+171, 3.4213414803413857e+180, 1.1628950505465645e-153, 7.249703341733572e+228, 2.3528846409008256e+251, 1.887541324937428e+219, 1.6749482924901434e+243, 1.2818510664374012e+160, 3.9934961143490695e+252, 1.471916185778813e+224, 2.199930330528265e-152, 4.451970048608952e+252, 4.387772969439078e+242, 1.2016473886678996e+285, 1.8166790500083872e-152, 3.854866532902535e-22, 4.824071356773969e+228, 1.3290427309660736e+272, 2.047327829350588e+190, 1.3536126781574966e+277, 3.483253154033512e+183, 1.8159689052330482e-152, 2.1160022451239437e+36, 3.681697791653666e+180, 6.778259720903815e-109, 9.321952567029354e+250, 2.4107445326902345e+198, 2.926457999915565e-14, 4.8240713567684684e+228, 3.4213415341957124e+180, 7.710117380014104e+241, 2.3557041276058587e+44, 1.3536125730510832e+277, 5.425776175576578e-109, 1.7029939446540271e+93, 4.875303082203223e+252, 2.9229369686598505e-14, 4.8240713567684684e+228, 1.3290632567981842e+272, 6.013345103256257e-154, 1.0675799966104346e+224, 1.329042730966254e+272, 2.047327829350588e+190, 1.3536126781574966e+277, 1.1783471031520647e+49, 7.60998266456383e+179, 1.1428127210548877e+243, 4.451969612788515e+252, 1.7234133790274087e+243, 2.4401170345112163e-154, 6.125014536925279e+257, 4.35430680709565e+242, 4.297634921646545e+160, 1.7238679602485346e+243, 2.2081347145256313e-259, 4.951726458333133e-114, 2.665824230613437e-260, 4.824071356773969e+228, 1.6937561043854245e+190, 2.000124904243212e+174, 3.5284469478036997e-258, 2.6137726451616463e+180, 2.1807602048433366e-153, 3.943559380635086e+180, 1.99416198144094e+174, 3.54813185627259e+246, 6.20756822256293e+276, 1.116300455916987e+219, 1.4223736646917546e+214, 2.983616214742915e+174, 1.0387699858413993e-13, 6.013469528779009e-154, 2.6317676997293626e-144, 5.98157614192997e-154, 4.387773091775321e+242, 9.383334639275019e-154, 4.700750235134098e+180, 2.168407739600616e+243, 4.394013183574196e+242, 2.0001249042452393e+174, 2.44550607409185e-154, 1.1218494899515307e+200, 6.3227820238179025e+233, 1.201657563419933e+285, 6.078498613491043e+247, 1.817963013331523e+185, 2.4451319167857815e-154, 4.913474262940492e+252, 6.026462847655484e+175, 7.606824347836941e-24, 6.078498613491043e+247, 3.6872716361531476e+180, 6.013345409343766e-154, 3.276135975506186e+222, 2.124706304589829e-259, 5.026209342472844e+180, 9.753946595358247e+199, 6.013345409343785e-154, 3.960605369357789e+246]
-
- 0x25ec00042af8:	0x0000006900000069	0x000480a500000069
-0x25ec00042b08:	0x00000069001d5921	0x0000006900000069
-0x25ec00042b18:	0x000453fd00000069	0x00000069001d45b9
-0x25ec00042b28:	0x0000006900000069	0x0000006900000069
-0x25ec00042b38:	0x0000006900000069	0x001d432100044e0d
-0x25ec00042b48:	0x0000006900000069	0x0000006900000069
-0x25ec00042b58:	0x0000006900000069	0x0000006900000069
-0x25ec00042b68:	0x0000006900000069	0x001d516100046f99
-0x25ec00042b78:	0x0000006900000069	0x0000006900000069
-0x25ec00042b88:	0x0000006900000069	0x0000006900000069
-0x25ec00042b98:	0x0000006900000069	0x001d4ea500046ae1
-0x25ec00042ba8:	0x0000006900000069	0x0000006900000069
-0x25ec00042bb8:	0x00000004000005e5	0x001d3377020801a4
-0x25ec00042bc8:	0x00000006000008a9	0x00000100000008a9
-0x25ec00042bd8:	0x00000725001cb7c5	0x0000010000042bd1
-0x25ec00042be8:	0x00000725001cb7c5	0x0000000600042bc9
-0x25ec00042bf8:	0x00bab9320000010d	0x7566280a00000adc
-0x25ec00042c08:	0x29286e6f6974636e	0x20657375220a7b20
-0x25ec00042c18:	0x3b22746369727473	0x6d2041202f2f0a0a
-0x25ec00042c28:	0x76696e752065726f	0x7473206c61737265
-0x25ec00042c38:	0x20796669676e6972	0x7075732074616874
-0x25ec00042c48:	0x6f6d207374726f70	0x7365707974206572
-0x25ec00042c58:	0x534a206e61687420	0x55202f2f0a2e4e4f
-0x25ec00042c68:	0x7420796220646573	0x6873203864206568
-0x25ec00042c78:	0x6f206f74206c6c65	0x6572207475707475
-0x25ec00042c88:	0x760a2e73746c7573	0x6e69727473207261
-0x25ec00042c98:	0x7470654479666967	0x3d2074696d694c68
-0x25ec00042ca8:	0x202f2f20203b3420	0x64696f7661206f54
-0x25ec00042cb8:	0x6e69687361726320	0x637963206e6f2067
-0x25ec00042cc8:	0x656a626f2063696c	0x202f2f0a0a737463
-0x25ec00042cd8:	0x6f7320796b636148	0x74206e6f6974756c
-0x25ec00042ce8:	0x6d7563726963206f	0x726f6620746e6576
-0x25ec00042cf8:	0x612d2d20676e6963	0x74616e2d776f6c6c
-0x25ec00042d08:	0x6e79732d73657669	0x20726f6620786174
-0x25ec00042d18:	0x74636e75660a3864	0x72507369206e6f69
-0x25ec00042d28:	0x7b20296f2879786f	0x206e727574657220
-0x25ec00042d38:	0x3b7d2065736c6166	0x6f6974636e75660a
-0x25ec00042d48:	0x786f7250534a206e	0x6772615474654779
-0x25ec00042d58:	0x79786f7270287465	0x660a3b7d207b2029
-0x25ec00042d68:	0x206e6f6974636e75	0x4779786f7250534a
-0x25ec00042d78:	0x656c646e61487465	0x2979786f72702872
-0x25ec00042d88:	0x740a0a3b7d207b20	0x6920200a7b207972
-0x25ec00042d98:	0x3d2079786f725073	0x6f6974636e754620
-0x25ec00042da8:	0x656a626f275b286e	0x7227202c5d277463
-0x25ec00042db8:	0x4925206e72757465	0x79786f7250534a73
-0x25ec00042dc8:	0x297463656a626f28	0x534a20200a3b2927
-0x25ec00042dd8:	0x74654779786f7250	0x3d20746567726154
-0x25ec00042de8:	0x6f6974636e754620	0x786f7270275b286e
-0x25ec00042df8:	0x2020200a2c5d2779	0x6e72757465722720
-0x25ec00042e08:	0x786f7250534a2520	0x6772615474654779
-0x25ec00042e18:	0x79786f7270287465	0x4a20200a3b292729
-0x25ec00042e28:	0x654779786f725053	0x72656c646e614874
-0x25ec00042e38:	0x74636e7546203d20	0x7270275b286e6f69
-0x25ec00042e48:	0x200a2c5d2779786f	0x7574657227202020
-0x25ec00042e58:	0x7250534a25206e72	0x614874654779786f
-0x25ec00042e68:	0x72702872656c646e	0x0a3b29272979786f
-0x25ec00042e78:	0x286863746163207d	0x0a0a3b7d7b202965
-0x25ec00042e88:	0x6f6974636e75660a	0x676e69727453206e
-0x25ec00042e98:	0x64202c7828796669	0x0a7b202968747065
-0x25ec00042ea8:	0x6564282066692020	0x203d3d3d20687470
-0x25ec00042eb8:	0x656e696665646e75	0x64202020200a2964
-0x25ec00042ec8:	0x73203d2068747065	0x796669676e697274
-0x25ec00042ed8:	0x6d694c6874706544	0x6c6520200a3b7469
-0x25ec00042ee8:	0x6428206669206573	0x3d3d3d2068747065
--->
+## Part 5: What could've been
+## Part 6: The end
 
 <style>
 .jsMem {
@@ -1468,7 +1271,7 @@ note: the v8/gdb highlighting thing doesn't work in the current version of ladyb
 
 [^2]: [HasOnlySimpleReceiverElements](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/builtins-array.cc;l=42;drc=fe67713b2ff62f8ba290607bf7482a8efd0ca6cc) makes sure that there are no accessors on any of the elements, and that the array's prototype hasn't been modified.
 
-[^3]: `x/32xg` stands for: e(**x**)amine (**32**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
+[^3]: `x/8xg` stands for: e(**x**)amine (**8**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
 
 [^4]: In memory the length of the array is doubled (6 instead of 3) because each double value takes up two 32-bit "slots". TODO: factcheck this
 
