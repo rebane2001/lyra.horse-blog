@@ -1703,7 +1703,7 @@ this post should work cross-browser, but the v8/gdb hover highlight things and t
 
 feel free to let me know if you have any comments or notice anything wrong ^^
 
-**Discuss this post on:** twitter, mastodon, hackernews, cohost
+**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1794514468040261978), [mastodon](https://infosec.exchange/@rebane2001/112504377357044933), [hackernews](https://news.ycombinator.com/item?id=40478686), [cohost](https://cohost.org/rebane2001/post/6123822-learn-to-read-little)
 
 [^1]: `PACKED_DOUBLE_ELEMENTS` means that the array consists of doubles only, and it also doesn't have any empty "holes". A double array with holes would be `HOLEY_DOUBLE_ELEMENTS` instead.
 
