@@ -7,7 +7,12 @@ slug = "exploiting-v8-at-openecsc"
 summary = "todo: fill this and also the date"
 +++
 
-**(DRAFT)**
+<!--
+todo:
+32bit pointer/memory compression
+make sure we're in 0xa38 address space
+make sure we have mobile addresses available
+-->
 
 Despite having 7 Chrome CVEs, I've never actually exploited a memory corruption in its [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024)<!-- TODO: link -->, a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
 
@@ -89,48 +94,84 @@ Most V8 exploits tend to have two sides to them - figuring out a unique way to t
 
 The challenge consists of the V8 engine with some new functionality added through a patch:
 
-```c
-/*
-  Array.xor()
-  let x = [0.1, 0.2, 0.3];
-  x.xor(5);
-*/
-BUILTIN(ArrayXor) {
-  HandleScope scope(isolate);
-  Factory *factory = isolate->factory();
-  Handle<Object> receiver = args.receiver();
-  if (!IsJSArray(*receiver) || !HasOnlySimpleReceiverElements(isolate, JSArray::cast(*receiver))) {
-    THROW_NEW_ERROR_RETURN_FAILURE(isolate, NewTypeError(MessageTemplate::kPlaceholderOnly,
-      factory->NewStringFromAsciiChecked("Nope")));
-  }
-  Handle<JSArray> array = Handle<JSArray>::cast(receiver);
-  ElementsKind kind = array->GetElementsKind();
-  if (kind != PACKED_DOUBLE_ELEMENTS) {
-    THROW_NEW_ERROR_RETURN_FAILURE(isolate, NewTypeError(MessageTemplate::kPlaceholderOnly,
-      factory->NewStringFromAsciiChecked("Array.xor needs array of double numbers")));
-  }
-  // Array.xor() needs exactly 1 argument
-  if (args.length() != 2) {
-    THROW_NEW_ERROR_RETURN_FAILURE(isolate, NewTypeError(MessageTemplate::kPlaceholderOnly,
-      factory->NewStringFromAsciiChecked("Array.xor needs exactly one argument")));
-  }
-  // Get array len
-  uint32_t length = static_cast<uint32_t>(Object::Number(array->length()));
-  // Get xor value
-  Handle<Object> xor_val_obj;
-  ASSIGN_RETURN_FAILURE_ON_EXCEPTION(isolate, xor_val_obj, Object::ToNumber(isolate, args.at(1)));
-  uint64_t xor_val = static_cast<uint64_t>(Object::Number(*xor_val_obj));
-  // Ah yes, xoring doubles..
-  Handle<FixedDoubleArray> elements(FixedDoubleArray::cast(array->elements()), isolate);
-  FOR_WITH_HANDLE_SCOPE(isolate, uint32_t, i = 0, i, i < length, i++, {
-    double x = elements->get_scalar(i);
-    uint64_t result = (*(uint64_t*)&x) ^ xor_val;
-    elements->set(i, *(double*)&result);
-  });
-  
-  return ReadOnlyRoots(isolate).undefined_value();
+<style type="text/css" media="screen" class="vscode-tokens-styles">
+.cppCode {
+	background: #050c1f;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 12px;
+	border: 1px solid #002;
+	border-radius: 4px;
+	padding: 8px;
+	width: calc(100% - 18px);
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
 }
-```
+.cppCode::selection, .cppCode *::selection {
+	background: #00258a;
+}
+/* some vscode color palette i copied */
+.mtk1 { color: #d4d4d4; }
+.mtk2 { color: #1e1e1e; }
+.mtk3 { color: #000080; }
+.mtk4 { color: #6a9955; }
+.mtk5 { color: #569cd6; }
+.mtk6 { color: #b5cea8; }
+.mtk7 { color: #646695; }
+.mtk8 { color: #d7ba7d; }
+.mtk9 { color: #9cdcfe; }
+.mtk10 { color: #f44747; }
+.mtk11 { color: #ce9178; }
+.mtk12 { color: #6796e6; }
+.mtk13 { color: #808080; }
+.mtk14 { color: #d16969; }
+.mtk15 { color: #dcdcaa; }
+.mtk16 { color: #4ec9b0; }
+.mtk17 { color: #c586c0; }
+.mtk18 { color: #4fc1ff; }
+.mtk19 { color: #c8c8c8; }
+.mtk20 { color: #cd9731; }
+.mtk21 { color: #b267e6; }
+</style>
+<div class="cppCode"><span class="mtk4">/*</span>
+<span class="mtk4">  Array.xor()</span>
+<span class="mtk4">  let x = [0.1, 0.2, 0.3];</span>
+<span class="mtk4">  x.xor(5);</span>
+<span class="mtk4">*/</span>
+<span class="mtk15">BUILTIN</span><span class="mtk1">(ArrayXor) {</span>
+<span class="mtk1">  HandleScope </span><span class="mtk15">scope</span><span class="mtk1">(isolate);</span>
+<span class="mtk1">  Factory *factory = </span><span class="mtk9">isolate</span><span class="mtk1">-&gt;</span><span class="mtk15">factory</span><span class="mtk1">();</span>
+<span class="mtk1">  Handle&lt;Object&gt; receiver = </span><span class="mtk9">args</span><span class="mtk1">.</span><span class="mtk15">receiver</span><span class="mtk1">();</span>
+<span class="mtk1">  </span><span class="mtk17">if</span><span class="mtk1"> (!</span><span class="mtk15">IsJSArray</span><span class="mtk1">(*receiver) || !</span><span class="mtk15">HasOnlySimpleReceiverElements</span><span class="mtk1">(isolate, </span><span class="mtk16">JSArray</span><span class="mtk1">::</span><span class="mtk15">cast</span><span class="mtk1">(*receiver))) {</span>
+<span class="mtk1">    </span><span class="mtk15">THROW_NEW_ERROR_RETURN_FAILURE</span><span class="mtk1">(isolate, </span><span class="mtk15">NewTypeError</span><span class="mtk1">(</span><span class="mtk16">MessageTemplate</span><span class="mtk1">::kPlaceholderOnly,</span>
+<span class="mtk1">      </span><span class="mtk9">factory</span><span class="mtk1">-&gt;</span><span class="mtk15">NewStringFromAsciiChecked</span><span class="mtk1">(</span><span class="mtk11">"Nope"</span><span class="mtk1">)));</span>
+<span class="mtk1">  }</span>
+<span class="mtk1">  Handle&lt;JSArray&gt; array = </span><span class="mtk16">Handle</span><span class="mtk1">&lt;</span><span class="mtk16">JSArray</span><span class="mtk1">&gt;::</span><span class="mtk15">cast</span><span class="mtk1">(receiver);</span>
+<span class="mtk1">  ElementsKind kind = </span><span class="mtk9">array</span><span class="mtk1">-&gt;</span><span class="mtk15">GetElementsKind</span><span class="mtk1">();</span>
+<span class="mtk1">  </span><span class="mtk17">if</span><span class="mtk1"> (kind != PACKED_DOUBLE_ELEMENTS) {</span>
+<span class="mtk1">    </span><span class="mtk15">THROW_NEW_ERROR_RETURN_FAILURE</span><span class="mtk1">(isolate, </span><span class="mtk15">NewTypeError</span><span class="mtk1">(</span><span class="mtk16">MessageTemplate</span><span class="mtk1">::kPlaceholderOnly,</span>
+<span class="mtk1">      </span><span class="mtk9">factory</span><span class="mtk1">-&gt;</span><span class="mtk15">NewStringFromAsciiChecked</span><span class="mtk1">(</span><span class="mtk11">"Array.xor needs array of double numbers"</span><span class="mtk1">)));</span>
+<span class="mtk1">  }</span>
+<span class="mtk4">  // Array.xor() needs exactly 1 argument</span>
+<span class="mtk1">  </span><span class="mtk17">if</span><span class="mtk1"> (</span><span class="mtk9">args</span><span class="mtk1">.</span><span class="mtk15">length</span><span class="mtk1">() != </span><span class="mtk6">2</span><span class="mtk1">) {</span>
+<span class="mtk1">    </span><span class="mtk15">THROW_NEW_ERROR_RETURN_FAILURE</span><span class="mtk1">(isolate, </span><span class="mtk15">NewTypeError</span><span class="mtk1">(</span><span class="mtk16">MessageTemplate</span><span class="mtk1">::kPlaceholderOnly,</span>
+<span class="mtk1">      </span><span class="mtk9">factory</span><span class="mtk1">-&gt;</span><span class="mtk15">NewStringFromAsciiChecked</span><span class="mtk1">(</span><span class="mtk11">"Array.xor needs exactly one argument"</span><span class="mtk1">)));</span>
+<span class="mtk1">  }</span>
+<span class="mtk4">  // Get array len</span>
+<span class="mtk1">  </span><span class="mtk5">uint32_t</span><span class="mtk1"> length = </span><span class="mtk5">static_cast</span><span class="mtk1">&lt;</span><span class="mtk5">uint32_t</span><span class="mtk1">&gt;(</span><span class="mtk16">Object</span><span class="mtk1">::</span><span class="mtk15">Number</span><span class="mtk1">(</span><span class="mtk9">array</span><span class="mtk1">-&gt;</span><span class="mtk15">length</span><span class="mtk1">()));</span>
+<span class="mtk4">  // Get xor value</span>
+<span class="mtk1">  Handle&lt;Object&gt; xor_val_obj;</span>
+<span class="mtk1">  </span><span class="mtk15">ASSIGN_RETURN_FAILURE_ON_EXCEPTION</span><span class="mtk1">(isolate, xor_val_obj, </span><span class="mtk16">Object</span><span class="mtk1">::</span><span class="mtk15">ToNumber</span><span class="mtk1">(isolate, </span><span class="mtk9">args</span><span class="mtk1">.</span><span class="mtk15">at</span><span class="mtk1">(</span><span class="mtk6">1</span><span class="mtk1">)));</span>
+<span class="mtk1">  </span><span class="mtk5">uint64_t</span><span class="mtk1"> xor_val = </span><span class="mtk5">static_cast</span><span class="mtk1">&lt;</span><span class="mtk5">uint64_t</span><span class="mtk1">&gt;(</span><span class="mtk16">Object</span><span class="mtk1">::</span><span class="mtk15">Number</span><span class="mtk1">(*xor_val_obj));</span>
+<span class="mtk4">  // Ah yes, xoring doubles..</span>
+<span class="mtk1">  Handle&lt;FixedDoubleArray&gt; </span><span class="mtk15">elements</span><span class="mtk1">(</span><span class="mtk16">FixedDoubleArray</span><span class="mtk1">::</span><span class="mtk15">cast</span><span class="mtk1">(</span><span class="mtk9">array</span><span class="mtk1">-&gt;</span><span class="mtk15">elements</span><span class="mtk1">()), isolate);</span>
+<span class="mtk1">  </span><span class="mtk15">FOR_WITH_HANDLE_SCOPE</span><span class="mtk1">(isolate, </span><span class="mtk5">uint32_t</span><span class="mtk1">, i = </span><span class="mtk6">0</span><span class="mtk1">, i, i &lt; length, i++, {</span>
+<span class="mtk1">    </span><span class="mtk5">double</span><span class="mtk1"> x = </span><span class="mtk9">elements</span><span class="mtk1">-&gt;</span><span class="mtk15">get_scalar</span><span class="mtk1">(i);</span>
+<span class="mtk1">    </span><span class="mtk5">uint64_t</span><span class="mtk1"> result = (*(</span><span class="mtk5">uint64_t</span><span class="mtk1">*)&amp;x) ^ xor_val;</span>
+<span class="mtk1">    </span><span class="mtk9">elements</span><span class="mtk1">-&gt;</span><span class="mtk15">set</span><span class="mtk1">(i, *(</span><span class="mtk5">double</span><span class="mtk1">*)&amp;result);</span>
+<span class="mtk1">  });</span>
+<span class="mtk1">  </span>
+<span class="mtk1">  </span><span class="mtk17">return</span><span class="mtk1"> </span><span class="mtk15">ReadOnlyRoots</span><span class="mtk1">(isolate).</span><span class="mtk15">undefined_value</span><span class="mtk1">();</span>
+<span class="mtk1">}</span></div>
 
 The patch adds a new **Array.xor()** prototype that can be used to xor all values within an array of doubles, let's try it:
 
@@ -383,12 +424,11 @@ Alright, let's try an array with an object in it then:
 
 Hmm, seems like there's a check in-place to prevent us from doing this:
 
-```c
-  if (kind != PACKED_DOUBLE_ELEMENTS) {
-    THROW_NEW_ERROR_RETURN_FAILURE(isolate, NewTypeError(MessageTemplate::kPlaceholderOnly,
-      factory->NewStringFromAsciiChecked("Array.xor needs array of double numbers")));
-  }
-```
+<div class="cppCode"><span class="mtk1">ElementsKind kind = </span><span class="mtk9">array</span><span class="mtk1">-&gt;</span><span class="mtk15">GetElementsKind</span><span class="mtk1">();</span>
+<span class="mtk1"></span><span class="mtk17">if</span><span class="mtk1"> (kind != PACKED_DOUBLE_ELEMENTS) {</span>
+<span class="mtk1">  </span><span class="mtk15">THROW_NEW_ERROR_RETURN_FAILURE</span><span class="mtk1">(isolate, </span><span class="mtk15">NewTypeError</span><span class="mtk1">(</span><span class="mtk16">MessageTemplate</span><span class="mtk1">::kPlaceholderOnly,</span>
+<span class="mtk1">    </span><span class="mtk9">factory</span><span class="mtk1">-&gt;</span><span class="mtk15">NewStringFromAsciiChecked</span><span class="mtk1">(</span><span class="mtk11">"Array.xor needs array of double numbers"</span><span class="mtk1">)));</span>
+<span class="mtk1">}</span></div>
 
 But what if we create a double array, but then wrap it in an evil [proxy](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)?
 
@@ -441,12 +481,10 @@ But what if we create a double array, but then wrap it in an evil [proxy](https:
 
 No dice, seems like they've thought of that too:
 
-```c
-if (!IsJSArray(*receiver) || !HasOnlySimpleReceiverElements(isolate, JSArray::cast(*receiver))) {
-  THROW_NEW_ERROR_RETURN_FAILURE(isolate, NewTypeError(MessageTemplate::kPlaceholderOnly,
-    factory->NewStringFromAsciiChecked("Nope")));
-}
-```
+<div class="cppCode"><span class="mtk1"></span><span class="mtk17">if</span><span class="mtk1"> (!</span><span class="mtk15">IsJSArray</span><span class="mtk1">(*receiver) || !</span><span class="mtk15">HasOnlySimpleReceiverElements</span><span class="mtk1">(isolate, </span><span class="mtk16">JSArray</span><span class="mtk1">::</span><span class="mtk15">cast</span><span class="mtk1">(*receiver))) {</span>
+<span class="mtk1">  </span><span class="mtk15">THROW_NEW_ERROR_RETURN_FAILURE</span><span class="mtk1">(isolate, </span><span class="mtk15">NewTypeError</span><span class="mtk1">(</span><span class="mtk16">MessageTemplate</span><span class="mtk1">::kPlaceholderOnly,</span>
+<span class="mtk1">    </span><span class="mtk9">factory</span><span class="mtk1">-&gt;</span><span class="mtk15">NewStringFromAsciiChecked</span><span class="mtk1">(</span><span class="mtk11">"Nope"</span><span class="mtk1">)));</span>
+<span class="mtk1">}</span></div>
 
 The **IsJSArray** method makes sure that we are in fact passing an array, and the **HasOnlySimpleReceiverElements** method checks for anything sus[^2] within the array or it's prototype.
 
@@ -505,7 +543,7 @@ And then it hit me - we're only doing all those fancy checks on the array itself
 	</details></div>
 </div>
 
-We're cooking! <!-- todo: maybe change -->
+We're cooking!
 
 ## Part 2: Breaking out of bounds
 
@@ -1163,7 +1201,7 @@ Looking it up, it seems like it's bytecode generated by [Ignition](https://v8.de
 
 But our function is still the trampoline thing! How do we turn it into a turbofan thing?
 
-We need to make V8 think it's important to optimize our code by running it a lot of times, or using debug commands. If we still have the V8 natives syntax enabled from earlier, we can use **%PrepareFunctionForOptimization()** and **%OptimizeFunctionOnNextCall()** to do the trick.
+We need to make V8 think it's important to optimize our code by running it a lot of times, or using debug commands. If we still have the V8 natives syntax enabled from earlier, we can use **%PrepareFunction<wbr>ForOptimization()** and **%OptimizeFunction<wbr>OnNextCall()** to do the trick.
 
 <div class="jsConsole" style="margin-bottom: 4px">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConKw">function</span> <span class="jsConIdx">func</span><span style="white-space: pre-wrap">() {
@@ -1573,7 +1611,7 @@ You have a deep interest in all that is artistic.
 
 ## Part 5: Please don't collect the garbage
 
-We're still reliant on the **%PrepareFunctionForOptimization()** and **%OptimizeFunctionOnNextCall()** debug functions. We can't use them in the actual CTF, so let's try to replace them.
+We're still reliant on the **%PrepareFunction<wbr>ForOptimization()** and **%OptimizeFunction<wbr>OnNextCall()** debug functions. We can't use them in the actual CTF, so let's try to replace them.
 
 We want to somehow tell V8 to optimize our function with Turbofan, and the easiest way to accomplish that is to just run our function a lot of times, let's give it a shot!
 
@@ -1642,11 +1680,11 @@ Running shellcode
 [Inferior 1 (process 3735) exited normally]
 <span class="termCodeW">(gdb)</span></div>
 
-Hmm, so our code gets optimized into Turbofan just fine, but the funcAddr is all wrong! It seems like the *for loop* causes the garbage collector to run, and what the garbage collector does it look at all the stuff in the memory and rearrange it to look nicer. More specifically, [it identifies objects no longer in use, removes them, and also defragments the memory](https://v8.dev/blog/trash-talk).
+Hmm, so our code gets optimized into Turbofan just fine, but the funcAddr is all wrong! It seems like the *for loop* causes the garbage collector to run, and what the garbage collector does is look at all the stuff in the memory and rearrange it to look nicer. More specifically, [it identifies objects no longer in use, removes them, and also defragments the memory](https://v8.dev/blog/trash-talk).
 
 What this means for us is that it takes our cool oob array and all the other stuff we've set up and throws it all over the place! Our primitives no longer work. In my original exploit at the CTF I fought hard against the GC and eventually found a setup that worked regardless, but it was a bit unreliable. Wouldn't it be nice if we could somehow optimize our function without causing a GC?
 
-I wasn't able to find a way to do this with Turbofan, but perhaps we could try out that Maglev thing we ignored earlier? It's output is a bit different, so we'll have to change our offsets, but it should still work the same.
+I wasn't able to find a way to do this with Turbofan, but perhaps we could try out that Maglev thing we ignored earlier? Its output is a bit different, so we'll have to change our offsets, but it should still work the same.
 
 With that added, **we have our final exploit code**.
 
@@ -1784,7 +1822,7 @@ or
 hashcash -mCb24 "k2v9WzPBJK2N"
 Result: <span class="termCodeW">1:24:240525:k2v9WzPBJK2N::KmFvCdJ0h09D4MEm:00002QUYY</span>
 Send me your js exploit b64-encoded followed by a newline
-<span class="termCodeW">Ly8gc2V0IHVwIGhlbHBlciBzdHVmZgpjb25zdCBidWZmZXIgPSBuZXcgQXJyYXl...
+<span class="termCodeW">Ly8gc2V0IHVwIGhlbHBlciBzdHVmZgpjb25zdCBidWZmZXIgPSBuZXcgQ...
 cat flag
 ;</span>
 <span class="termCodeFlag">openECSC{t00_e5zy_w1th0ut_s4nb0x_gg_wp_5ec4376e}</span></div>
@@ -2002,7 +2040,7 @@ thank you so much for checking out my writeup!!
 
 quite the blogpost, isn't it! i've never actually done this kind of pwn before, and i think i learned a lot, so i wanted to pass it forward and share it with you all!
 
-i worked really hard on making all of the html/css on this page be as helpful, interactive, and pretty as possible. as with my last post, everything here is html/css handcrafted with love - no images or javascript were used and it's all just 30kB<!-- todo change this number --> gzipped. oh and everything's responsive too so it should look great no matter if you're on a small phone or a big hidpi screen! try resizing your window and see how different parts of the post react to it.
+i worked really hard on making all of the html/css on this page be as helpful, interactive, and pretty as possible. as with my last post, everything here is html/css handcrafted with love - no images or javascript were used and it's all just 42kB<!-- todo change this number --> gzipped. oh and everything's responsive too so it should look great no matter if you're on a small phone or a big hidpi screen! try resizing your window and see how different parts of the post react to it.
 
 this post should work cross-browser, but the v8/gdb hover highlight things and the little endian widget don't work in the current version of ladybird because it doesn't support the `:has()` selector and resizable handles, hopefully it'll get those too at some point!
 
@@ -2186,29 +2224,6 @@ body:has(.jsMemVarExt7:hover) { --jsMemVarB7: var(--jsMemVarB); --jsMemVarF7: va
 body:has(.jsMemVarExt8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
 body:has(.jsMemVarExt11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
 </style>
-
-<!--
-
-## Part x: There's better ways
-
-args.gn has v8_enable_sandbox = false
-
-other solutions:
- - rdjgr: change length
- - popax21: flip obj/ptr bit
-
---allow-natives-syntax
-
-todo:
-32bit pointer/memory compression
-make sure we're in 0xa38 address space
-make sure we have mobile addresses available
-hex32/64 responses need to be str not num
-bigint responses need to be gray not num
-
-note: the v8/gdb highlighting thing doesn't work in the current version of ladybird because it doesn't support the :has() selector, and the little endian widget won't work due to no resizable handles
-
--->
 
 [^1]: `PACKED_DOUBLE_ELEMENTS` means that the array consists of doubles only, and it also doesn't have any empty "holes". A double array with holes would be `HOLEY_DOUBLE_ELEMENTS` instead.
 
