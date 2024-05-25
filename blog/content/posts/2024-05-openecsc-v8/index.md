@@ -1,16 +1,13 @@
 +++
 title = 'Exploiting V8 at openECSC'
-date = 2024-05-25T00:00:00Z
+date = 2024-05-26T00:00:00Z
 draft = false
 tags = ['ctf','browser']
 slug = "exploiting-v8-at-openecsc"
-summary = "todo: fill this and also the date"
+summary = "A beginner-friendly journey from a memory corruption to a browser pwn."
 +++
 
-# Exploiting V8 at openECSC
-## Lyra Rebane
-
-Despite having 7 Chrome CVEs, I've never actually exploited a memory corruption in its [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024)<!-- TODO: link -->, a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
+Despite having 7 Chrome CVEs, I've never actually fully exploited a memory corruption in its [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024/tree/main/round-3/pwn03), a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
 
 Most V8 exploits tend to have two stages to them - figuring out a unique way to trigger some sort of a memory corruption of at least one byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
 
@@ -28,15 +25,15 @@ Most V8 exploits tend to have two stages to them - figuring out a unique way to 
 	<div class="challSection challHr">
 		<div class="challSubtitle">Attachments</div>
 		<details class="challFiles"><summary>array.xor.zip</summary>
-			<ul><!-- TODO: links -->
-			  <li><a href="https://github.com/ECSC2024/openECSC-2024" target="_blank">dist/args.gn</a></li>
-			  <li><a href="https://github.com/ECSC2024/openECSC-2024" target="_blank">dist/d8</a></li>
-			  <li><a href="https://github.com/ECSC2024/openECSC-2024" target="_blank">dist/snapshot_blob.bin</a></li>
-			  <li><a href="https://github.com/ECSC2024/openECSC-2024" target="_blank">docker-compose.yml</a></li>
-			  <li><a href="https://github.com/ECSC2024/openECSC-2024" target="_blank">Dockerfile</a></li>
-			  <li><a href="https://github.com/ECSC2024/openECSC-2024" target="_blank">README.md</a></li>
-			  <li><a href="https://github.com/ECSC2024/openECSC-2024" target="_blank">v8.patch</a></li>
-			  <li><a href="https://github.com/ECSC2024/openECSC-2024" target="_blank">wrapper.py</a></li>
+			<ul>
+			  <li><a href="https://lyra.horse/f/tmp/dist/args.gn" target="_blank">dist/args.gn</a><a href="https://lyra.horse/f/tmp/array.xor.zip" style="float: right" target="_blank">[download zip]</a></li>
+			  <li><a href="https://lyra.horse/f/tmp/dist/d8" target="_blank">dist/d8</a></li>
+			  <li><a href="https://lyra.horse/f/tmp/dist/snapshot_blob.bin" target="_blank">dist/snapshot_blob.bin</a></li>
+			  <li><a href="https://lyra.horse/f/tmp/docker-compose.yml" target="_blank">docker-compose.yml</a></li>
+			  <li><a href="https://lyra.horse/f/tmp/Dockerfile" target="_blank">Dockerfile</a></li>
+			  <li><a href="https://lyra.horse/f/tmp/README.md" target="_blank">README.md</a></li>
+			  <li><a href="https://lyra.horse/f/tmp/v8.patch" target="_blank">v8.patch</a></li>
+			  <li><a href="https://lyra.horse/f/tmp/wrapper.py" target="_blank">wrapper.py</a></li>
 			</ul>
 		</details>
 	</div>
@@ -135,14 +132,6 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, <span class="jsConValIn">0.3</span>]</div>
-	<!-- <div class="jsConBorder"></div> 🢒 ► ⋖ ≻
-	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><details><summary><i>(3) [<span class="jsConValOut">0.1</span>, <span class="jsConValOut">0.2</span>, <span class="jsConValOut">0.3</span>]</i></summary>
-<div style="padding-left: 24px">
-	<span class="jsConIdx jsConB">0</span>: <span class="jsConValOut">3fb999999999999a</span><br/>
-	<span class="jsConIdx jsConB">1</span>: <span class="jsConValOut">3fc999999999999a</span><br/>
-	<span class="jsConIdx jsConB">2</span>: <span class="jsConValOut">3fd3333333333333</span><br/>
-</div>
-	</details></div> -->
 	<div class="jsConBorder"></div>
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span>.<span class="jsConProp">xor</span>(<span class="jsConValIn">1337</span>) <span class="jsConNull">// 0x539</span></div>
 	<div class="jsConBorder"></div>
@@ -170,8 +159,6 @@ Quite the peculiar feature. It may seem a little confusing if you aren't familia
 It pretty much just interprets the double as an integer, and then performs the XOR operation on it. In this example we XORed the doubles with 0x539 (1337 in decimal), so the last three hex digits of each double changed. It's a pretty silly operation to perform on a double.
 
 Just XORing doubles isn't going to get us anywhere though, since the values are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`[^1]) as just *raw 64-bit doubles*. All we can do is change some numbers around, but that's something we can already do without xor. It'd be a lot more interesting if we could run this xor thingie on a mixed array (`PACKED_ELEMENTS`) consisting of *memory pointers* to other JavaScript objects, because we could point the pointers to places in memory we're not supposed to.
-
-<!-- Alright, let's see if we can break it somehow.  .To achieve memory corruption, we must somehow use this xor functionality on an array that has other kinds of elements in it . We'll see later why that is, but for now let's just try to find a way to do it. -->
 
 Alright, let's try an array with an object in it then:
 
@@ -409,7 +396,6 @@ You may be wondering why the memory only contains half the address - `0xa3800042
 
 Pretty cool, let's see what happens if we put an array inside of another array:
 
-<!-- arr = [1.1, 2.2, 3.3]; arr2 = [arr] -->
 <div class="jsConsole" style="margin-bottom: 4px">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr2</span> = [<span class="jsConVar">arr</span>]</div>
 </div>
@@ -1504,7 +1490,7 @@ gg.
 
 Since this was my first time doing anything like this I made a few "mistakes" along the way. I think that's really the best way to learn, but I promised to show you a few different ways my exploit could've been significantly improved.
 
-The first thing is something I've already implemented in the final exploit code above - the `obj2ptr` function I nabbed from Popax21's exploit code. Originally, I used `%DebugPrint(arr)` to see the address of the `arr` array on every run to change the code accordingly, but there's a pretty easy way to not have to do that at all!
+The first thing is something I've already implemented in the final exploit code above - the `obj2ptr` function I nabbed from **Popax21**'s exploit code. Originally, I used `%DebugPrint(arr)` to see the address of the `arr` array on every run to change the code accordingly, but there's a pretty easy way to not have to do that at all!
 
 <div class="jsConsole">
 	<div class="jsConCode"><span class="jsConNull">// snippet from Popax21's exploit code</span>
@@ -1539,7 +1525,7 @@ The first thing is something I've already implemented in the final exploit code 
 
 Since the difference between a pointer and an SMI is just the last bit, we can put any object or pointer into an array, xor its last bit, and get out the pointer or object accordingly. While I only used those functions in my example exploit code to get the initial address of `arr`, they are pretty much equal to the full **addrof** and **fakeobj** primitives! Beautiful.
 
-Another approach to exploiting the xor I saw in a few solves was changing the length of the array to something small, then forcing a GC to defragment some other object into a region beyond past the array, and then changing the length back to a big amount to get an out-of-bounds read/write. This approach was probably quite brutal to work with, but earned rdjgr their first blood[^6].
+Another approach to exploiting the xor I saw in a few solves was changing the length of the array to something small, then forcing a GC to defragment some other object into a region beyond past the array, and then changing the length back to a big amount to get an out-of-bounds read/write. This approach was probably quite brutal to work with, but earned **rdjgr** their first blood[^6].
 
 <div class="jsConsole">
 	<div class="jsConCode"><span class="jsConNull">// snippet from rdjgr's exploit code</span>
@@ -1711,7 +1697,7 @@ thank you so much for checking out my writeup!!
 
 quite the blogpost, isn't it! i've never actually done this kind of pwn before, and i think i learned a lot, so i wanted to pass it forward and share it with you all!
 
-i worked really hard on making all of the html/css on this page be as helpful, interactive, and pretty as possible. as with my last post, everything here is html/css handcrafted with love - no images or javascript were used and it's all just 42kB<!-- todo change this number --> gzipped. oh and everything's responsive too so it should look great no matter if you're on a small phone or a big hidpi screen! try resizing your window and see how different parts of the post react to it.
+i worked really hard on making all of the html/css on this page be as helpful, interactive, and pretty as possible. as with my last post, everything here is html/css handcrafted with love - no images or javascript were used and it's all just 42kB gzipped. oh and everything's responsive too so it should look great no matter if you're on a small phone or a big hidpi screen! try resizing your window and see how different parts of the post react to it.
 
 this post should work cross-browser, but the v8/gdb hover highlight things and the little endian widget don't work in the current version of ladybird because it doesn't support the `:has()` selector and resizable handles, hopefully it'll get those too at some point!
 
@@ -1803,20 +1789,10 @@ feel free to let me know if you have any comments or notice anything wrong ^^
 	color: #FFF;
 }
 
-.jsMemDbg {
+.jsMemDbg, .jsMemHex {
 	font-size: 12px;
 	white-space: pre-wrap;
 	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-}
-
-.jsMemHex {
-	font-size: 12px;
-	white-space: pre-wrap;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-}
-
-.jsMemLegend span {
-	/* text-decoration: underline wavy; */
 }
 
 :root {
@@ -1842,7 +1818,6 @@ feel free to let me know if you have any comments or notice anything wrong ^^
 	--jsMemVarB18:  #0000;
 	--jsMemVarB19:  #0000;
 	--jsMemVarB20:  #0000;
-	--jsMemVarB21:  #0000;
 	--jsMemVarF0:  #ff9999;
 	--jsMemVarF1:  #ffc199;
 	--jsMemVarF2:  #ffea99;
@@ -1864,7 +1839,6 @@ feel free to let me know if you have any comments or notice anything wrong ^^
 	--jsMemVarF18:  #eaff99;
 	--jsMemVarF19:  #c1ff99;
 	--jsMemVarF20:  #99ff99;
-	--jsMemVarF21:  #99ffc1;
 	--jsMemVarB: var(--lyreGold);
 	--jsMemVarF: #000;
 }
@@ -1890,7 +1864,6 @@ feel free to let me know if you have any comments or notice anything wrong ^^
 .jsMemVar18 { color: var(--jsMemVarF18); background: var(--jsMemVarB18) }
 .jsMemVar19 { color: var(--jsMemVarF19); background: var(--jsMemVarB19) }
 .jsMemVar20 { color: var(--jsMemVarF20); background: var(--jsMemVarB20) }
-.jsMemVar21 { color: var(--jsMemVarF21); background: var(--jsMemVarB21) }
 .jsMem:has(.jsMemVar0:hover) { --jsMemVarB0: var(--jsMemVarB); --jsMemVarF0: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar1:hover) { --jsMemVarB1: var(--jsMemVarB); --jsMemVarF1: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar2:hover) { --jsMemVarB2: var(--jsMemVarB); --jsMemVarF2: var(--jsMemVarF) }
@@ -1912,7 +1885,6 @@ feel free to let me know if you have any comments or notice anything wrong ^^
 .jsMem:has(.jsMemVar18:hover) { --jsMemVarB18: var(--jsMemVarB); --jsMemVarF18: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar20:hover) { --jsMemVarB20: var(--jsMemVarB); --jsMemVarF20: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar21:hover) { --jsMemVarB21: var(--jsMemVarB); --jsMemVarF21: var(--jsMemVarF) }
 
 .jsMemVarExt6 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
 .jsMemVarExt7 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
@@ -2197,9 +2169,6 @@ body:has(.jsMemVarExt19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19:
 	}
 }
 @media (width >= 640px) {
-	.under640 {
-		display: none;
-	}
 	.termCodeComm {
 		float: right;
 	}
@@ -2209,18 +2178,8 @@ body:has(.jsMemVarExt19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19:
 		display: none;
 	}
 }
-@media (width >= 800px) {
-	.under800 {
-		display: none;
-	}
-}
 @media (height < 960px) {
 	.over960h {
-		display: none;
-	}
-}
-@media (height >= 960px) {
-	.under960h {
 		display: none;
 	}
 }
