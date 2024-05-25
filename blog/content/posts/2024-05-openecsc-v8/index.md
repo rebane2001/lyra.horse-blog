@@ -7,16 +7,12 @@ slug = "exploiting-v8-at-openecsc"
 summary = "todo: fill this and also the date"
 +++
 
-<!--
-todo:
-32bit pointer/memory compression
-make sure we're in 0xa38 address space
-make sure we have mobile addresses available
--->
+# Exploiting V8 at openECSC
+## Lyra Rebane
 
 Despite having 7 Chrome CVEs, I've never actually exploited a memory corruption in its [V8 JavaScript engine](https://v8.dev/) before. [Baby array.xor](https://github.com/ECSC2024/openECSC-2024)<!-- TODO: link -->, a challenge at this year's openECSC CTF, was my first time going from a V8 bug to popping a `/bin/sh` shell.
 
-Most V8 exploits tend to have two sides to them - figuring out a unique way to trigger some sort of a memory corruption of at least one byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
+Most V8 exploits tend to have two stages to them - figuring out a unique way to trigger some sort of a memory corruption of at least one byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
 
 <div class="challDetails">
 	<div class="challTitle challHr">Baby Array.xor</div>
@@ -94,44 +90,6 @@ Most V8 exploits tend to have two sides to them - figuring out a unique way to t
 
 The challenge consists of the V8 engine with some new functionality added through a patch:
 
-<style type="text/css" media="screen" class="vscode-tokens-styles">
-.cppCode {
-	background: #050c1f;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	font-size: 12px;
-	border: 1px solid #002;
-	border-radius: 4px;
-	padding: 8px;
-	width: calc(100% - 18px);
-	white-space: pre-wrap;
-	overflow-wrap: anywhere;
-}
-.cppCode::selection, .cppCode *::selection {
-	background: #00258a;
-}
-/* some vscode color palette i copied */
-.mtk1 { color: #d4d4d4; }
-.mtk2 { color: #1e1e1e; }
-.mtk3 { color: #000080; }
-.mtk4 { color: #6a9955; }
-.mtk5 { color: #569cd6; }
-.mtk6 { color: #b5cea8; }
-.mtk7 { color: #646695; }
-.mtk8 { color: #d7ba7d; }
-.mtk9 { color: #9cdcfe; }
-.mtk10 { color: #f44747; }
-.mtk11 { color: #ce9178; }
-.mtk12 { color: #6796e6; }
-.mtk13 { color: #808080; }
-.mtk14 { color: #d16969; }
-.mtk15 { color: #dcdcaa; }
-.mtk16 { color: #4ec9b0; }
-.mtk17 { color: #c586c0; }
-.mtk18 { color: #4fc1ff; }
-.mtk19 { color: #c8c8c8; }
-.mtk20 { color: #cd9731; }
-.mtk21 { color: #b267e6; }
-</style>
 <div class="cppCode"><span class="mtk4">/*</span>
 <span class="mtk4">  Array.xor()</span>
 <span class="mtk4">  let x = [0.1, 0.2, 0.3];</span>
@@ -198,213 +156,6 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 </div>
 	</details></div>
 </div>
-
-<style>
-.jsConsole {
-	background: #282828;
-	border-radius: 4px;
-	width: calc(100% - 2px);
-	color: #E3E3E3;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	font-size: 12px;
-	border: 1px solid #5E5E5E;
-	cursor: default;
-}
-.jsConsole *::selection {
-	background: #004A77;
-}
-.jsConLine {
-	min-height: 14px;
-	margin: 3px;
-	padding: 1px;
-	width: calc(100% - 8px);
-	border-radius: 4px;
-}
-.jsConTerm {
-	white-space: pre-wrap;
-	background: #000;
-	color: #FFF;
-	margin: 0;
-	padding: 4px;
-}
-.jsConTerm::selection, .jsConTerm *::selection {
-	color: #000;
-	background: #FFF;
-}
-.jsConCode {
-	min-height: 14px;
-	margin: 3px;
-	padding: 7px;
-	width: calc(100% - 20px);
-	border-radius: 4px;
-	white-space: pre-wrap;
-	cursor: initial;
-}
-.jsConLine:has(details) {
-	text-wrap: nowrap;
-}
-.jsConBorder {
-	background: #5E5E5E;
-	width: 100%;
-	height: 1px;
-}
-.jsConLine:hover {
-	background: #3D3D3D;
-}
-.jsConTerm:hover {
-	background: #111;
-}
-.jsConLine:has(.jsConErr):hover {
-	background: #E46962;
-}
-.jsConLine > details {
-	padding-left: 4px;
-	display: inline-block;
-	text-wrap: wrap;
-	max-width: calc(100% - 4px - 18px);
-}
-.jsConLine > details > summary::marker {
-	line-height: 0;
-}
-.jsConVar {
-	color: #C7C7C7;
-}
-.jsConValIn {
-	color: #C4EED0;
-}
-.jsConValOut {
-	color: #9980FF;
-}
-.jsConProp {
-	color: #FACC15;
-}
-.jsConIdx {
-	color: #7CACF8;
-}
-.jsConB {
-	font-weight: bold;
-}
-.jsConNull {
-	color: #6F6F6F;
-}
-.jsConKw {
-	color: #BF67FF;
-}
-.jsConStr {
-	color: #FE8D59;
-}
-.jsConStrOut {
-	color: #5CD5FB;
-}
-.jsConV8 {
-	/* color: #9F0; */
-	color: #FFF;
-}
-.jsConIcon {
-	fill: #C7C7C7;
-	display: inline-block;
-	width: 16px;
-	height: 14px;
-	vertical-align: top;
-	padding-right: 2px;
-}
-.jsConErr {
-	background: #4E3534;
-	color: #F9DEDC;
-	padding: 4px;
-	border-radius: 4px;
-}
-.jsConErr > .jsConIcon {
-	padding-right: 4px;
-}
-
-@media (width >= 430px) {
-	.under430 {
-		display: none;
-	}
-}
-@media (width < 430px) {
-	.over430 {
-		display: none;
-	}
-}
-@media (width < 640px) {
-	.over640 {
-		display: none;
-	}
-}
-@media (width >= 640px) {
-	.under640 {
-		display: none;
-	}
-	.termCodeComm {
-		float: right;
-	}
-}
-@media (width < 800px) {
-	.over800 {
-		display: none;
-	}
-}
-@media (width >= 800px) {
-	.under800 {
-		display: none;
-	}
-}
-@media (height < 960px) {
-	.over960h {
-		display: none;
-	}
-}
-@media (height >= 960px) {
-	.under960h {
-		display: none;
-	}
-}
-.termCode {
-	white-space: pre-wrap;
-	background: #000;
-	color: #BBB;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	font-size: 12px;
-	border-radius: 4px;
-	width: calc(100% - 2px - 16px);
-	border: 1px solid var(--lyreGold);
-	padding: 8px;
-	cursor: default;
-}
-.termCode::selection, .termCode *::selection {
-	color: #000;
-	background: var(--lyreGold);
-}
-.termCodeW {
-	color: #FFF;
-}
-.termCodeComm {
-	color: var(--lyreGold);
-}
-.termCodeFlag {
-	display: inline-block;
-	color: #FFF;
-	transform: scale(1);
-	text-shadow: 0 0 8px #f440;
-	transition: transform 0.6s, text-shadow 0.5s, background 0.5s;
-	background: linear-gradient(90deg, #fa0 0%, #f0d 50%, #80f 100%);
-	font-weight: bold;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent; 
-  -moz-background-clip: text;
-  -moz-text-fill-color: transparent;
-  background-size: 200%;
-  background-position: 100%;
-  cursor: grabbing;
-}
-.termCodeFlag:hover {
-	transform: scale(1.2);
-	text-shadow: 0 0 8px #f44f;
-	background-position: 0%;
-}
-</style>
 
 Quite the peculiar feature. It may seem a little confusing if you aren't familiar with [IEEE 754](https://en.wikipedia.org/wiki/IEEE_754) [doubles](https://en.wikipedia.org/wiki/Double-precision_floating-point_format), but it makes sense once we look at the hex representations of the values:
 
@@ -697,60 +448,6 @@ The memory order of the elements part here looks a little odd because it doesn't
 <div class="offsetDemoNumbers">1111222233334444<span style="color:#AAA">0000000000000000</span>1111222233334444<br>0 1 2 3 4 5 6 7 8                 drag this -&gt;<span class="offsetDemoHandle"></span></div>
 </div>
 </span></div>
-
-
-<style>
-.offsetDemo {
-	font-size: 16px;
-	cursor: default;
-	user-select: none;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	line-height: 1em;
-	width: 64ch;
-	margin: 0 auto;
-	border-radius: 4px;
-	border: 1px solid black;
-	overflow: hidden;
-	position: relative;
-	background: #282C34;
-	color: #FFF;
-}
-.offsetDemoLegend {
-	white-space: pre;
-	color: var(--lyreGold);
-	position: absolute;
-	pointer-events: none;
-}
-.offsetDemoOverlay {
-	color: #0000;
-	position: absolute;
-	height: 1em;
-	pointer-events: none;
-}
-.offsetDemoOverlay > span {
-	background: #282C34;
-}
-.offsetDemoHandle {
-	background: var(--lyreGold);
-	width: 1.5ch;
-	height: 12px;
-	margin: 2px 0.25ch;
-	display: inline-block;
-	vertical-align: middle;
-	border-radius: 4px;
-}
-.offsetDemoNumbers {
-	white-space: pre;
-  overflow: hidden;
-  resize: horizontal;
-  height: 2.1em;
-  width: 64ch;
-  min-width: 48ch;
-  max-width: 64ch;
-  text-wrap: nowrap;
-  text-align: right;
-}
-</style>
 
 The array in our array is just stored as a pointer to that array! At the moment it is pointing at `0xa3800042be8` which has our double array, but if we XOR this pointer to a different address we can make it point to any array or object we want... even if it doesn't "actually" exist!
 
@@ -1061,7 +758,7 @@ Let's write the primitives to get and set the upper 32 bits:
 <div class="jsConsole">
 	<div class="jsConCode"><span class="jsConKw">function</span> <span class="jsConIdx">addrof</span>(<span class="jsConIdx">o</span>) {
   <span class="jsConVar">objArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">o</span>;
-  <span class="jsConKw">return</span> <span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>]) >> <span class="jsConValIn">32n</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>]) &gt;&gt; <span class="jsConValIn">32n</span>;
 }
 <!---->
 <span class="jsConKw">function</span> <span class="jsConIdx">fakeobj</span>(<span class="jsConIdx">a</span>) {
@@ -1205,7 +902,7 @@ We'd probably want to start by looking at how code gets stored and run for funct
 0x3069001d34e8: 0x<span class="jsMemVar12">001d33bd</span>00000a91<span class="under430"><br>0x3069001d34f0:</span> 0x001d34c9000084a0</div>
 </div>
 
-Ooh we've got something called <span class="jsMemVarExt19">**code**</span> there! But it's some sort of a <span class="jsMemVarExt19">**InterpreterEntryTrampoline**</span>, what's that?
+Ooh we've got something called <span class="jsMemVarExt19">**code**</span> there! But it's some sort of <span class="jsMemVarExt19">**InterpreterEntryTrampoline**</span>, what's that?
 
 Looking it up, it seems like it's bytecode generated by [Ignition](https://v8.dev/blog/ignition-interpreter). This V8-specific bytecode is run by a VM and is made specifically for JavaScript. It won't be much use to us because we want to run computer code that can hack a computer, not chrome code that can hack a website. Looking further into V8 docs we find [Maglev](https://v8.dev/blog/maglev) and [Turbofan](https://v8.dev/docs/turbofan), the latter of which seems like a great fit for us because it compiles into machine code.
 
@@ -1311,7 +1008,7 @@ Instructions (size = 124)
 0x5555b7941710: 0x<span class="jsMemVar16">48</span><span class="jsMemVar15">50</span><span class="jsMemVar14">57</span><span class="jsMemVar13">56</span><span class="jsMemVar12">e58948</span><span class="jsMemVar11">55</span><span class="under430"><br>0x5555b7941718:</span> 0x<span class="jsMemVar18">0f</span><span class="jsMemVar17">a0653b49</span><span class="jsMemVar16">08ec83</span></div>
 </div>
 
-Awesome, we have a code object that points to an address where the code gets run from, and we can change it to whatever we want. Let's make a part of the memory just the [0xCC INT3](https://en.wikipedia.org/wiki/INT_%28x86_instruction%29#INT3) breakpoint opcode - this will temporarily pause the execution and send a [SIGTRAP signal](https://en.wikipedia.org/wiki/Signal_%28IPC%29#SIGTRAP) to gdb so we can look into the current state.
+Awesome, we have a code object that <span class="jsMemVarExt6">points to an address</span> where the code gets run from, and we can change it to whatever we want. Let's make a part of the memory just the [0xCC INT3](https://en.wikipedia.org/wiki/INT_%28x86_instruction%29#INT3) breakpoint opcode - this will temporarily pause the execution and send a [SIGTRAP signal](https://en.wikipedia.org/wiki/Signal_%28IPC%29#SIGTRAP) to gdb so we can look into the current state.
 
 <div class="jsConsole" style="margin-bottom: 4px">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">funcAddr</span> = <span class="jsConVar">addrof</span>(<span class="jsConVar">func</span>)</div>
@@ -1358,7 +1055,7 @@ Huh, that didn't work, why is that?
 The `SEGV_ACCERR` signal gives us a hint - it means that there was some sort of a permissions error accessing the memory map. It turns out not all memory is made equal and different parts of the memory have different permissions. In Linux we can see this by looking at the map of a process.
 
 <div class="termCode"><span class="termCodeW">$ ./d8 &amp;</span> <span class="termCodeComm">&lt;-- run d8 in the background</span>
-[1] 1962 <span class="termCodeComm">&lt;-- that's the d8 process id</span>
+[1] <span class="termCodeW">1962</span> <span class="termCodeComm">&lt;-- that's the d8 process id</span>
 <span class="termCodeW">$</span> V8 version 12.7.0 (candidate)
 d8> 
 [1]+  Stopped                 ./d8
@@ -1441,29 +1138,11 @@ a6b00000000-1a6b00010000 <span class="termCodePr">r--p</span> <span class="over8
 ffffffffff600000-ffffffffff601000 <span class="termCodePx">--xp</span> <span class="over800">00000000 00:00 0                 </span>&nbsp;[vsyscall]
 <span class="termCodeW">$</span></div>
 
-<style>
-.termCodePp {
-	color: #444;
-}
-.termCodePr {
-	color: #8e1;
-}
-.termCodePw {
-	color: #EF0;
-}
-.termCodePx {
-	color: #FA0;
-}
-.termCodePrwx {
-	color: #F00;
-}
-</style>
+These are all the memory addresses d8 uses, and each one of them has permissions associated with them - **r**ead, **w**rite, and e**x**ecute respectively. The array we made is in one of the read-write maps, so trying to execute code from there is going to result in a crash. We'll need to write into a map with execute permissions.
 
-These are all the memory addresses d8 uses, and each one of them has permissions associated with them - **r**ead, **w**rite, and e**x**ecute respectively. The array we made is in one of the read-write maps, so trying to execute code from there is going to result in a crash.
+But how are we going to write data into that one memory map that does have the **rwx** permissions? We cannot use our write primitive because it can only write into the lower 32 bits our compressed pointer can access.
 
-But how are we going to write data into that one memory map that has the **rwx** permissions? We cannot use our write primitive because it can only write into the lower 32 bits our compressed pointer can access.
-
-I then came across [this awesome writeup by Anvbis](https://anvbis.au/posts/code-execution-in-chromiums-v8-heap-sandbox/) demonstrating how we can use Turbofan to do exactly that through a very clever trick. I'll be borrowing heavily from that post, but it goes a lot more in-depth so please check it out if this sounds interesting.
+In figuring this out, I came across [this awesome writeup by Anvbis](https://anvbis.au/posts/code-execution-in-chromiums-v8-heap-sandbox/) demonstrating how we can use Turbofan to do exactly that through a very clever trick. I'll be borrowing heavily from that post, but it goes a lot more in-depth so please check it out if this sounds interesting.
 
 What Anvbis did was create a function with doubles in it, and those doubles got Turbofan-optimized into bytes in the **rwx** area. They could then offset the instruction start pointer to start execution from those doubles instead of the original code.
 
@@ -1674,9 +1353,9 @@ Running shellcode
 
 Hmm, so our code gets optimized into Turbofan just fine, but the funcAddr is all wrong! It seems like the *for loop* causes the garbage collector to run, and what the garbage collector does is look at all the stuff in the memory and rearrange it to look nicer. More specifically, [it identifies objects no longer in use, removes them, and also defragments the memory](https://v8.dev/blog/trash-talk).
 
-What this means for us is that it takes our cool oob array and all the other stuff we've set up and throws it all over the place! Our primitives no longer work. In my original exploit at the CTF I fought hard against the GC and eventually found a setup that worked regardless, but it was a bit unreliable. Wouldn't it be nice if we could somehow optimize our function without causing a GC?
+What this means for us is that it takes our cool oob array and all the other stuff we've set up and throws it all over the place. Our primitives no longer work! In my original exploit at the CTF I fought hard against the GC and eventually found a setup that worked regardless, but it was a bit unreliable. Wouldn't it be nice if we could somehow optimize our function without causing a GC?
 
-I wasn't able to find a way to do this with Turbofan, but perhaps we could try out that Maglev thing we ignored earlier? Its output is a bit different, so we'll have to change our offsets, but it should still work the same.
+I wasn't able to find a way to do this with Turbofan, but perhaps we could try out that Maglev thing we ignored earlier? Its output is a bit different, so we'll have to change our offsets, but since Maglev too compiles into machine code it should still work the same.
 
 With that added, **we have our final exploit code**.
 
@@ -2040,7 +1719,34 @@ feel free to let me know if you have any comments or notice anything wrong ^^
 
 **Discuss this post on:** twitter, mastodon, hackernews, cohost
 
+[^1]: `PACKED_DOUBLE_ELEMENTS` means that the array consists of doubles only, and it also doesn't have any empty "holes". A double array with holes would be `HOLEY_DOUBLE_ELEMENTS` instead.
+
+[^2]: [HasOnlySimpleReceiverElements](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/builtins-array.cc;l=42;drc=fe67713b2ff62f8ba290607bf7482a8efd0ca6cc) makes sure that there are no accessors on any of the elements, and that the array's prototype hasn't been modified.
+
+[^3]: `x/8xg` stands for: e(**x**)amine (**8**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
+
+[^4]: In memory, the length of the array appears as twice what it really is (eg 6 instead of 3) because SMIs need to end with a 0 bit or they'll become a tagged pointer. If the length of an array was over 2<sup>31</sup>-1 we'd see a pointer to a double instead.
+
+[^5]: JavaScript floating-point numbers can only accurately represent integers up to 2<sup>53</sup>–1. You *can* have larger numbers, but they won't be accurate. [BigInts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) are a separate data type that doesn't have this issue - they can be infinitely big while still being accurate! Well, perhaps not infinitely big, but [in V8](https://v8.dev/features/bigint) their size can be [over a billion bits](https://stackoverflow.com/a/70537884/2251833), which would be about 128MiB of just a single number.
+
+[^6]: In CTF competitions, a "first blood" is the first (and often fastest) solve of a challenge.
+
 <style>
+.termCodePp {
+	color: #444;
+}
+.termCodePr {
+	color: #8e1;
+}
+.termCodePw {
+	color: #EF0;
+}
+.termCodePx {
+	color: #FA0;
+}
+.termCodePrwx {
+	color: #F00;
+}
 .jsMem {
 	color: #DCDFE4;
 	background: #282C34;
@@ -2208,135 +1914,407 @@ feel free to let me know if you have any comments or notice anything wrong ^^
 .jsMem:has(.jsMemVar20:hover) { --jsMemVarB20: var(--jsMemVarB); --jsMemVarF20: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar21:hover) { --jsMemVarB21: var(--jsMemVarB); --jsMemVarF21: var(--jsMemVarF) }
 
+.jsMemVarExt6 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
 .jsMemVarExt7 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
 .jsMemVarExt8 { text-decoration: #09b underline; text-decoration-skip-ink: none; }
 .jsMemVarExt11 { text-decoration: var(--jsMemVarF11) underline; }
 .jsMemVarExt19 { text-decoration: var(--jsMemVarF19) underline; }
+.jsMemVarExt6:hover { background: var(--jsMemVarB6); color: var(--jsMemVarF6);	border-radius: 1px; }
 .jsMemVarExt7:hover { background: var(--jsMemVarB7); color: var(--jsMemVarF7);	border-radius: 1px; }
 .jsMemVarExt8:hover { background: var(--jsMemVarB8); color: var(--jsMemVarF8);	border-radius: 1px; }
 .jsMemVarExt11:hover { background: var(--jsMemVarB11); color: var(--jsMemVarF11);	border-radius: 1px; }
 .jsMemVarExt19:hover { background: var(--jsMemVarB19); color: var(--jsMemVarF19);	border-radius: 1px; }
+body:has(.jsMemVarExt6:hover) { --jsMemVarB6: var(--jsMemVarB); --jsMemVarF6: var(--jsMemVarF) }
 body:has(.jsMemVarExt7:hover) { --jsMemVarB7: var(--jsMemVarB); --jsMemVarF7: var(--jsMemVarF) }
 body:has(.jsMemVarExt8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
 body:has(.jsMemVarExt11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
 body:has(.jsMemVarExt19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
-</style>
 
-[^1]: `PACKED_DOUBLE_ELEMENTS` means that the array consists of doubles only, and it also doesn't have any empty "holes". A double array with holes would be `HOLEY_DOUBLE_ELEMENTS` instead.
+.challDetails {
+	line-height: 12px;
+	font-size: 16px;
+	background: #212529;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	color: #dee2e6;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+	border-radius: 8px;
+	max-width: 500px;
+	margin: 16px auto;
+}
+.challDetails *::selection {
+	background: #073BA6;
+}
+.challFiles *::selection {
+	background: #0F0;
+	color: #000;
+}
+.challTitle {
+	font-size: 24px;
+	font-weight: 500;
+	padding: 16px;
+}
+.challSubtitle {
+	font-size: 20px;
+	font-weight: 500;
+	text-align: center;
+	padding: 12px 0;
+}
+.challHr {
+	border-bottom: 1px solid #495057;
+}
+.challTags {
+	text-align: center;
+	padding: 16px 16px 0 16px;
+	user-select: none;
+}
+.challSection {
+	padding: 0 16px 16px 16px;
+}
+.challSection code {
+	overflow-wrap: break-word;
+}
+.challTag {
+	border-radius: 6px;
+	font-weight: bold;
+	height: 32px;
+	padding: 2px 6px;
+	font-size: 13px;
+}
+.challFiles > ul {
+	border-radius: 6px;
+	background: #111;
+	border: 1px solid #fff;
+	line-height: 20px;
+	padding: 14px;
+	margin-bottom: 0;
+	list-style-type: none;
+	font-size: 12px;
+	font-family: 'Nimbus Mono PS', 'Courier New', monospace;
+}
+.challFiles a {
+	color: #0F0;
+}
+.challFiles a:hover {
+	text-decoration: underline;
+}
+.challFiles > summary {
+	color: #fff;
+	background: #007bff;
+	width: fit-content;
+	padding: 12px;
+	border-radius: 6px;
+	user-select: none;
+	cursor: pointer;
+}
+.challScores {
+	width: 100%;
+	border-collapse: collapse;
+	background: #1c232b;
+}
+.challScores tr > * {
+	border: solid 1px rgb(73, 80, 87);
+	padding: 4px 8px;
+	line-height: 20px;
+	text-align: left;
+}
+.challScores tr > :first-child {
+		text-align:center;
+		width: 0;
+}
+.challScores tbody tr:nth-of-type(odd) {
+		background: #29313b;
+}
+.challScores tbody tr:hover {
+		background: #2b3a4d;
+}
+.cppCode {
+	background: #050c1f;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 12px;
+	border: 1px solid #002;
+	border-radius: 4px;
+	padding: 8px;
+	width: calc(100% - 18px);
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.cppCode::selection, .cppCode *::selection {
+	background: #00258a;
+}
+/* some vscode color palette i copied */
+.mtk1 { color: #d4d4d4; }
+.mtk2 { color: #1e1e1e; }
+.mtk3 { color: #000080; }
+.mtk4 { color: #6a9955; }
+.mtk5 { color: #569cd6; }
+.mtk6 { color: #b5cea8; }
+.mtk7 { color: #646695; }
+.mtk8 { color: #d7ba7d; }
+.mtk9 { color: #9cdcfe; }
+.mtk10 { color: #f44747; }
+.mtk11 { color: #ce9178; }
+.mtk12 { color: #6796e6; }
+.mtk13 { color: #808080; }
+.mtk14 { color: #d16969; }
+.mtk15 { color: #dcdcaa; }
+.mtk16 { color: #4ec9b0; }
+.mtk17 { color: #c586c0; }
+.mtk18 { color: #4fc1ff; }
+.mtk19 { color: #c8c8c8; }
+.mtk20 { color: #cd9731; }
+.mtk21 { color: #b267e6; }
+.jsConsole {
+	background: #282828;
+	border-radius: 4px;
+	width: calc(100% - 2px);
+	color: #E3E3E3;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 12px;
+	border: 1px solid #5E5E5E;
+	cursor: default;
+}
+.jsConsole *::selection {
+	background: #004A77;
+}
+.jsConLine {
+	min-height: 14px;
+	margin: 3px;
+	padding: 1px;
+	width: calc(100% - 8px);
+	border-radius: 4px;
+}
+.jsConTerm {
+	white-space: pre-wrap;
+	background: #000;
+	color: #FFF;
+	margin: 0;
+	padding: 4px;
+}
+.jsConTerm::selection, .jsConTerm *::selection {
+	color: #000;
+	background: #FFF;
+}
+.jsConCode {
+	min-height: 14px;
+	margin: 3px;
+	padding: 7px;
+	width: calc(100% - 20px);
+	border-radius: 4px;
+	white-space: pre-wrap;
+	cursor: initial;
+}
+.jsConLine:has(details) {
+	text-wrap: nowrap;
+}
+.jsConBorder {
+	background: #5E5E5E;
+	width: 100%;
+	height: 1px;
+}
+.jsConLine:hover {
+	background: #3D3D3D;
+}
+.jsConTerm:hover {
+	background: #111;
+}
+.jsConLine:has(.jsConErr):hover {
+	background: #E46962;
+}
+.jsConLine > details {
+	padding-left: 4px;
+	display: inline-block;
+	text-wrap: wrap;
+	max-width: calc(100% - 4px - 18px);
+}
+.jsConLine > details > summary::marker {
+	line-height: 0;
+}
+.jsConVar {
+	color: #C7C7C7;
+}
+.jsConValIn {
+	color: #C4EED0;
+}
+.jsConValOut {
+	color: #9980FF;
+}
+.jsConProp {
+	color: #FACC15;
+}
+.jsConIdx {
+	color: #7CACF8;
+}
+.jsConB {
+	font-weight: bold;
+}
+.jsConNull {
+	color: #6F6F6F;
+}
+.jsConKw {
+	color: #BF67FF;
+}
+.jsConStr {
+	color: #FE8D59;
+}
+.jsConStrOut {
+	color: #5CD5FB;
+}
+.jsConV8 {
+	/* color: #9F0; */
+	color: #FFF;
+}
+.jsConIcon {
+	fill: #C7C7C7;
+	display: inline-block;
+	width: 16px;
+	height: 14px;
+	vertical-align: top;
+	padding-right: 2px;
+}
+.jsConErr {
+	background: #4E3534;
+	color: #F9DEDC;
+	padding: 4px;
+	border-radius: 4px;
+}
+.jsConErr > .jsConIcon {
+	padding-right: 4px;
+}
 
-[^2]: [HasOnlySimpleReceiverElements](https://source.chromium.org/chromium/chromium/src/+/main:v8/src/builtins/builtins-array.cc;l=42;drc=fe67713b2ff62f8ba290607bf7482a8efd0ca6cc) makes sure that there are no accessors on any of the elements, and that the array's prototype hasn't been modified.
-
-[^3]: `x/8xg` stands for: e(**x**)amine (**8**) he(**x**)adecimal (**g**)iant words (64-bit values). I recommend checking out [a reference](https://visualgdb.com/gdbreference/commands/x) to see other ways this command can be used.
-
-[^4]: In memory, the length of the array appears as twice what it really is (eg 6 instead of 3) because SMIs need to end with a 0 bit or they'll become a tagged pointer. If the length of an array was over 2<sup>31</sup>-1 we'd see a pointer to a double instead.
-
-[^5]: JavaScript floating-point numbers can only accurately represent integers up to 2<sup>53</sup>–1. You *can* have larger numbers, but they won't be accurate. [BigInts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) are a separate data type that doesn't have this issue - they can be infinitely big while still being accurate! Well, perhaps not infinitely big, but [in V8](https://v8.dev/features/bigint) their size can be [over a billion bits](https://stackoverflow.com/a/70537884/2251833), which would be about 128MiB of just a single number.
-
-[^6]: In CTF competitions, a "first blood" is the first (and often fastest) solve of a challenge.
-
-<style>
-	.challDetails {
-		line-height: 12px;
-		font-size: 16px;
-		background: #212529;
-		border: 1px solid rgba(255, 255, 255, 0.15);
-		color: #dee2e6;
-		font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-		border-radius: 8px;
-		max-width: 500px;
-		margin: 16px auto;
+@media (width >= 430px) {
+	.under430 {
+		display: none;
 	}
-	.challDetails *::selection {
-		background: #073BA6;
+}
+@media (width < 430px) {
+	.over430 {
+		display: none;
 	}
-	.challFiles *::selection {
-		background: #0F0;
-		color: #000;
+}
+@media (width < 640px) {
+	.over640 {
+		display: none;
 	}
-	.challTitle {
-		font-size: 24px;
-		font-weight: 500;
-		padding: 16px;
+}
+@media (width >= 640px) {
+	.under640 {
+		display: none;
 	}
-	.challSubtitle {
-		font-size: 20px;
-		font-weight: 500;
-		text-align: center;
-		padding: 12px 0;
+	.termCodeComm {
+		float: right;
 	}
-	.challHr {
-		border-bottom: 1px solid #495057;
+}
+@media (width < 800px) {
+	.over800 {
+		display: none;
 	}
-	.challTags {
-		text-align: center;
-		padding: 16px 16px 0 16px;
-		user-select: none;
+}
+@media (width >= 800px) {
+	.under800 {
+		display: none;
 	}
-	.challSection {
-		padding: 0 16px 16px 16px;
+}
+@media (height < 960px) {
+	.over960h {
+		display: none;
 	}
-	.challSection code {
-		overflow-wrap: break-word;
+}
+@media (height >= 960px) {
+	.under960h {
+		display: none;
 	}
-	.challTag {
-		border-radius: 6px;
-		font-weight: bold;
-		height: 32px;
-		padding: 2px 6px;
-		font-size: 13px;
-	}
-	.challFiles > ul {
-		border-radius: 6px;
-		background: #111;
-		border: 1px solid #fff;
-		line-height: 20px;
-		padding: 14px;
-		margin-bottom: 0;
-		list-style-type: none;
-		font-size: 12px;
-		font-family: 'Nimbus Mono PS', 'Courier New', monospace;
-	}
-	.challFiles a {
-		color: #0F0;
-	}
-	.challFiles a:hover {
-		text-decoration: underline;
-	}
-	.challFiles > summary {
-		color: #fff;
-		background: #007bff;
-		width: fit-content;
-		padding: 12px;
-		border-radius: 6px;
-		user-select: none;
-		cursor: pointer;
-	}
-	.challScores {
-		width: 100%;
-		border-collapse: collapse;
-		background: #1c232b;
-	}
-	.challScores tr > * {
-		border: solid 1px rgb(73, 80, 87);
-		padding: 4px 8px;
-		line-height: 20px;
-		text-align: left;
-	}
-	.challScores tr > :first-child {
-  		text-align:center;
-  		width: 0;
-	}
-	.challScores tbody tr:nth-of-type(odd) {
-  		background: #29313b;
-	}
-	.challScores tbody tr:hover {
-  		background: #2b3a4d;
-	}
-</style>
-<style>
-	/* temporary */
-	.highlight > pre {
-		white-space: pre-wrap;
-		overflow-wrap: anywhere;
-	}
+}
+.termCode {
+	white-space: pre-wrap;
+	background: #000;
+	color: #BBB;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 12px;
+	border-radius: 4px;
+	width: calc(100% - 2px - 16px);
+	border: 1px solid var(--lyreGold);
+	padding: 8px;
+	cursor: default;
+}
+.termCode::selection, .termCode *::selection {
+	color: #000;
+	background: var(--lyreGold);
+}
+.termCodeW {
+	color: #FFF;
+}
+.termCodeComm {
+	color: var(--lyreGold);
+}
+.termCodeFlag {
+	display: inline-block;
+	color: #FFF;
+	transform: scale(1);
+	text-shadow: 0 0 8px #f440;
+	transition: transform 0.6s, text-shadow 0.5s, background 0.5s;
+	background: linear-gradient(90deg, #fa0 0%, #f0d 50%, #80f 100%);
+	font-weight: bold;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; 
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+  background-size: 200%;
+  background-position: 100%;
+  cursor: grabbing;
+}
+.termCodeFlag:hover {
+	transform: scale(1.2);
+	text-shadow: 0 0 8px #f44f;
+	background-position: 0%;
+}
+.offsetDemo {
+	font-size: 16px;
+	cursor: default;
+	user-select: none;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	line-height: 1em;
+	width: 64ch;
+	margin: 0 auto;
+	border-radius: 4px;
+	border: 1px solid black;
+	overflow: hidden;
+	position: relative;
+	background: #282C34;
+	color: #FFF;
+}
+.offsetDemoLegend {
+	white-space: pre;
+	color: var(--lyreGold);
+	position: absolute;
+	pointer-events: none;
+}
+.offsetDemoOverlay {
+	color: #0000;
+	position: absolute;
+	height: 1em;
+	pointer-events: none;
+}
+.offsetDemoOverlay > span {
+	background: #282C34;
+}
+.offsetDemoHandle {
+	background: var(--lyreGold);
+	width: 1.5ch;
+	height: 12px;
+	margin: 2px 0.25ch;
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: 4px;
+}
+.offsetDemoNumbers {
+	white-space: pre;
+  overflow: hidden;
+  resize: horizontal;
+  height: 2.1em;
+  width: 64ch;
+  min-width: 48ch;
+  max-width: 64ch;
+  text-wrap: nowrap;
+  text-align: right;
+}
 </style>
