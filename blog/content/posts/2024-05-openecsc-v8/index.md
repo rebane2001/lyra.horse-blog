@@ -351,6 +351,16 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 		display: none;
 	}
 }
+@media (height < 960px) {
+	.over960h {
+		display: none;
+	}
+}
+@media (height >= 960px) {
+	.under960h {
+		display: none;
+	}
+}
 .termCode {
 	white-space: pre-wrap;
 	background: #000;
@@ -844,16 +854,16 @@ Wow! That fake array of ours has lots of cool data that we didn't put there. Let
 
 <div class="jsMem">
 	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
-	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar0">0x25ec00042bd9</span>: [JSArray]
- - map: <span class="jsMemVar2">0x25ec001cb7c5</span> &lt;Map[16](<span class="jsMemVar2">PACKED_DOUBLE_ELEMENTS</span>)&gt; [FastProperties]
- - prototype: 0x25ec001cb11d &lt;JSArray[0]&gt;
- - elements: <span class="jsMemVar4">0x25ec00042bd1</span> &lt;<span class="jsMemVar6">FixedDoubleArray</span>[<span class="jsMemVar5">128</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
+	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar0">0xa3800042bd9</span>: [JSArray]
+ - map: <span class="jsMemVar2">0x0a38001cb7c5</span> &lt;Map[16](<span class="jsMemVar2">PACKED_DOUBLE_ELEMENTS</span>)&gt; [FastProperties]
+ - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
+ - elements: <span class="jsMemVar4">0x0a3800042bd1</span> &lt;<span class="jsMemVar6">FixedDoubleArray</span>[<span class="jsMemVar5">128</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
  - length: <span class="jsMemVar18">128</span>
- - properties: <span class="jsMemVar16">0x25ec00000725</span> &lt;FixedArray[0]&gt;
+ - properties: <span class="jsMemVar16">0x0a3800000725</span> &lt;FixedArray[0]&gt;
  - All own properties (excluding elements): {
-    0x25ec00000d99: [String] in ReadOnlySpace: #length: 0x25ec00025f85 &lt;AccessorInfo name= 0x25ec00000d99 &lt;String[6]: #length&gt;, data= 0x25ec00000069 &lt;undefined&gt;&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
+    0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 &lt;AccessorInfo name= 0x0a3800000d99 &lt;String[6]: #length&gt;, data= 0x0a3800000069 &lt;undefined&gt;&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
  }
- - elements: <span class="jsMemVar4">0x25ec00042bd1</span> &lt;<span class="jsMemVar6">FixedDoubleArray</span>[<span class="jsMemVar5">128</span>]&gt; {
+ - elements: <span class="jsMemVar4">0x0a3800042bd1</span> &lt;<span class="jsMemVar6">FixedDoubleArray</span>[<span class="jsMemVar5">128</span>]&gt; {
            0: <span class="jsMemVar16 jsMemVar2">3.88113e-311</span>
            1: <span class="jsMemVar18 jsMemVar4">5.43231e-312</span>
            2: <span class="jsMemVar7">3.88113e-311</span>
@@ -873,16 +883,16 @@ Wow! That fake array of ours has lots of cool data that we didn't put there. Let
           ...
 }</div>
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
-	<div class="jsMemHex">0x25ec00042bb8: 0x00000004000005e5<span class="under430"><br>0x25ec00042bc0:</span> 0x001d3377020801a4
-<span class="jsMemVar4 over430">0x25ec00042bc8</span><span class="under430">0x25ec00042bc8</span>: 0x00000006000008a9<span class="under430 jsMemVar4"><br>0x25ec00042bd0:</span> 0x<span class="jsMemVar5">00000100</span><span class="jsMemVar6">000008a9</span>
-<span class="jsMemVar0">0x25ec00042bd8</span>: 0x<span class="jsMemVar16">00000725</span><span class="jsMemVar2">001cb7c5</span><span class="under430"><br>0x25ec00042be0:</span> 0x<span class="jsMemVar18">00000100</span><span class="jsMemVar4">00042bd1</span>
-0x25ec00042be8: 0x<span class="jsMemVar7">00000725001cb7c5</span><span class="under430"><br>0x25ec00042bf0:</span> 0x<span class="jsMemVar8">0000000600042bc9</span>
-0x25ec00042bf8: 0x<span class="jsMemVar9">00bab9320000010d</span><span class="under430"><br>0x25ec00042c00:</span> 0x<span class="jsMemVar10">7566280a00000adc</span>
-0x25ec00042c08: 0x<span class="jsMemVar11">29286e6f6974636e</span><span class="under430"><br>0x25ec00042c10:</span> 0x<span class="jsMemVar12">20657375220a7b20</span>
-0x25ec00042c18: 0x<span class="jsMemVar13">3b22746369727473</span><span class="under430"><br>0x25ec00042c20:</span> 0x<span class="jsMemVar14">6d2041202f2f0a0a</span>
-0x25ec00042c28: 0x<span class="jsMemVar15">76696e752065726f</span><span class="under430"><br>0x25ec00042c30:</span> 0x<span class="jsMemVar1">7473206c61737265</span>
-0x25ec00042c38: 0x<span class="jsMemVar17">20796669676e6972</span><span class="under430"><br>0x25ec00042c40:</span> 0x<span class="jsMemVar3">7075732074616874</span>
-0x25ec00042c48: 0x<span class="jsMemVar19">6f6d207374726f70</span><span class="under430"><br>0x25ec00042c50:</span> 0x<span class="jsMemVar20">7365707974206572</span></div>
+	<div class="jsMemHex">0xa3800042bb8: 0x00000004000005e5<span class="under430"><br>0xa3800042bc0:</span> 0x001d3377020801a4
+<span class="jsMemVar4 over430">0xa3800042bc8</span><span class="under430">0xa3800042bc8</span>: 0x00000006000008a9<span class="under430 jsMemVar4"><br>0xa3800042bd0:</span> 0x<span class="jsMemVar5">00000100</span><span class="jsMemVar6">000008a9</span>
+<span class="jsMemVar0">0xa3800042bd8</span>: 0x<span class="jsMemVar16">00000725</span><span class="jsMemVar2">001cb7c5</span><span class="under430"><br>0xa3800042be0:</span> 0x<span class="jsMemVar18">00000100</span><span class="jsMemVar4">00042bd1</span>
+0xa3800042be8: 0x<span class="jsMemVar7">00000725001cb7c5</span><span class="under430"><br>0xa3800042bf0:</span> 0x<span class="jsMemVar8">0000000600042bc9</span>
+0xa3800042bf8: 0x<span class="jsMemVar9">00bab9320000010d</span><span class="under430"><br>0xa3800042c00:</span> 0x<span class="jsMemVar10">7566280a00000adc</span>
+0xa3800042c08: 0x<span class="jsMemVar11">29286e6f6974636e</span><span class="under430"><br>0xa3800042c10:</span> 0x<span class="jsMemVar12">20657375220a7b20</span>
+0xa3800042c18: 0x<span class="jsMemVar13">3b22746369727473</span><span class="under430"><br>0xa3800042c20:</span> 0x<span class="jsMemVar14">6d2041202f2f0a0a</span>
+0xa3800042c28: 0x<span class="jsMemVar15">76696e752065726f</span><span class="under430"><br>0xa3800042c30:</span> 0x<span class="jsMemVar1">7473206c61737265</span>
+0xa3800042c38: 0x<span class="jsMemVar17">20796669676e6972</span><span class="under430"><br>0xa3800042c40:</span> 0x<span class="jsMemVar3">7075732074616874</span>
+0xa3800042c48: 0x<span class="jsMemVar19">6f6d207374726f70</span><span class="under430"><br>0xa3800042c50:</span> 0x<span class="jsMemVar20">7365707974206572</span></div>
 </div>
 
 That's so cool!! It really is just picking up the next 1024 bytes of memory as doubles, letting us see it all by just looking at the array. In fact, we can even see the <span class="jsMemVarExt7 jsMemVarExt8">original `arr` array's header</span> in elements <span class="jsMemVarExt7">2</span> and <span class="jsMemVarExt8">3</span>, let's try to read it out from within JavaScript. We'll want a function to turn floats back into hex, for that we can just create the reverse of the `i2f` function from earlier.
@@ -1251,15 +1261,15 @@ We need to make V8 think it's important to optimize our code by running it a lot
 
 <div class="jsMem">
 	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
-	<div class="jsMemDbg">DebugPrint: 0x2d7a002006ed: [Code]
- - map: 0x2d7a00000d61 &lt;Map[64](CODE_TYPE)&gt;
+	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar1">0x2d7a002006ed</span>: [Code]
+ - map: <span class="jsMemVar3">0x2d7a00000d61</span> &lt;Map[64](<span class="jsMemVar3">CODE_TYPE</span>)&gt;
  - kind: TURBOFAN
- - deoptimization_data_or_interpreter_data: 0x2d7a0020066d &lt;Other heap object (PROTECTED_FIXED_ARRAY_TYPE)&gt;
- - position_table: 0x2d7a00180011 &lt;Other heap object (TRUSTED_BYTE_ARRAY_TYPE)&gt;
- - instruction_stream: 0x5555b79416f1 &lt;InstructionStream TURBOFAN&gt;
- - instruction_start: 0x5555b7941700
+ - deoptimization_data_or_interpreter_data: <span class="jsMemVar2">0x2d7a0020066d</span> &lt;Other heap object (PROTECTED_FIXED_ARRAY_TYPE)&gt;
+ - position_table: <span class="jsMemVar4">0x2d7a00180011</span> &lt;Other heap object (TRUSTED_BYTE_ARRAY_TYPE)&gt;
+ - instruction_stream: <span class="jsMemVar5">0x5555b79416f1</span> &lt;InstructionStream TURBOFAN&gt;
+ - instruction_start: <span class="jsMemVar6">0x5555b7941700</span>
  - is_turbofanned: 1
- - stack_slots: 6
+<span class="over960h"> - stack_slots: 6
  - marked_for_deoptimization: 0
  - embedded_objects_cleared: 0
  - can_have_weak_objects: 1
@@ -1272,51 +1282,33 @@ We need to make V8 think it's important to optimize our code by running it a lot
  - code_comments_offset: 12
  - instruction_stream.relocation_info: 0x2d7a002006dd &lt;Other heap object (TRUSTED_BYTE_ARRAY_TYPE)&gt;
  - instruction_stream.body_size: 136
-<!---->
+</span><!---->
 --- Disassembly: ---
 kind = TURBOFAN
 stack_slots = 6
 compiler = turbofan
-address = 0x2d7a002006ed
+address = <span class="jsMemVar1">0x2d7a002006ed</span>
 <!---->
 Instructions (size = 124)
-0x5555b7941700     0  8b59f4               movl rbx,[rcx-0xc]
-0x5555b7941703     3  4903de               REX.W addq rbx,r14
-0x5555b7941706     6  f6431e20             testb [rbx+0x1e],0x20
-0x5555b794170a     a  0f85f05e03a0         jnz 0x555557977600  (CompileLazyDeoptimizedCode)    ;; near builtin entry
-0x5555b7941710    10  55                   push rbp
+0x5555b7941700   0 <span class="jsMemVar7">8b59f4       movl rbx,[rcx-0xc]</span>
+0x5555b7941703   3 <span class="jsMemVar8">4903de       REX.W addq rbx,r14</span>
+0x5555b7941706   6 <span class="jsMemVar9">f6431e20     testb [rbx+0x1e],0x20</span>
+0x5555b794170a   a <span class="jsMemVar10">0f85f05e03a0 jnz 0x555557977600 (CompileLazyDeoptimizedCode) ;; near builtin entry</span>
+0x5555b7941710  10 <span class="jsMemVar11">55           push rbp</span>
+0x5555b7941711  11 <span class="jsMemVar12">4889e5       REX.W movq rbp,rsp</span>
+0x5555b7941714  14 <span class="jsMemVar13">56           push rsi</span>
+0x5555b7941715  15 <span class="jsMemVar14">57           push rdi</span>
+0x5555b7941716  16 <span class="jsMemVar15">50           push rax</span>
+0x5555b7941717  17 <span class="jsMemVar16">4883ec08     REX.W subq rsp,0x8</span>
+0x5555b794171b  1b <span class="jsMemVar17">493b65a0     REX.W cmpq rsp,[r13-0x60] (external value (StackGuard::address_of_jslimit()))</span>
+0x5555b794171f  1f <span class="jsMemVar18">0f861f000000 jna 0x5555b7941744  &lt;+0x44&gt;</span>
 ...</div>
 <div class="jsMemTitle">GDB [0x2d7a002006ed]<div class="jsMemSep"></div></div>
-	<div class="jsMemHex">0x2d7a002006ec: 0x0020066d00000d61<span class="under430"><br>0x2d7a002006f4:</span> 0x001d485100180011
-0x2d7a002006fc: 0xb7941700b79416f1<span class="under430"><br>0x2d7a00200704:</span> 0x800000dc00005555
-0x2d7a0020070c: 0x0000000c0000007c<span class="under430"><br>0x2d7a00200714:</span> 0xffffffff00000000
-0x2d7a0020071c: 0x0000000c0000000c<span class="under430"><br>0x2d7a00200724:</span> 0xffff00010000000c
-0x2d7a0020072c: 0x0000000800000595<span class="under430"><br>0x2d7a00200734:</span> 0x001d33fd001d3459
-0x2d7a0020073c: 0x001d4881001d3541<span class="under430"><br>0x2d7a00200744:</span> 0x0000004e00000949
-0x2d7a0020074c: 0x00000000001d4891<span class="under430"><br>0x2d7a00200754:</span> 0x0020072d00180011
-0x2d7a0020075c: 0x0000001000000010<span class="under430"><br>0x2d7a00200764:</span> 0x00b0081700000000
-0x2d7a0020076c: 0xf8f937030bc90cca<span class="under430"><br>0x2d7a00200774:</span> 0xb00f17ca03012100
-0x2d7a0020077c: 0xc905f8310a0dc902<span class="under430"><br>0x2d7a00200784:</span> 0x450313ca07f8f965
-0x2d7a0020078c: 0x0000059500af02f9<span class="under430"><br>0x2d7a00200794:</span> 0x001d48f500000012
-0x2d7a0020079c: 0x001d4901001d33ed<span class="under430"><br>0x2d7a002007a4:</span> 0x001d4921001d4911
-0x2d7a002007ac: 0x001d3595001d33fd<span class="under430"><br>0x2d7a002007b4:</span> 0x001d4931001d3581
-0x2d7a002007bc: 0x000000b400000949<span class="under430"><br>0x2d7a002007c4:</span> 0x00000000001d4941
-0x2d7a002007cc: 0x0020079100180011<span class="under430"><br>0x2d7a002007d4:</span> 0x0000001000000028
-0x2d7a002007dc: 0x2500007e00000000<span class="under430"><br>0x2d7a002007e4:</span> 0x13c7010121c80cca
-0x2d7a002007ec: 0xf93703f5f665c602<span class="under430"><br>0x2d7a002007f4:</span> 0x010121c8010d05f7</div>
+	<div class="jsMemHex"><span class="jsMemVar1">0x2d7a002006ec</span>: 0x<span class="jsMemVar2">0020066d</span><span class="jsMemVar3">00000d61</span><span class="under430"><br>0x2d7a002006f4:</span> 0x001d4851<span class="jsMemVar4">00180011</span>
+0x2d7a002006fc: 0x<span class="jsMemVar6">b7941700</span><span class="jsMemVar5">b79416f1</span><span class="under430"><br>0x2d7a00200704:</span> 0x800000dc<span class="jsMemVar6">00005555</span></div>
 <div class="jsMemTitle">GDB [0x5555b7941700]<div class="jsMemSep"></div></div>
-	<div class="jsMemHex">0x5555b7941700: 0x43f6de0349f4598b<span class="under430"><br>0x5555b7941708:</span> 0xa0035ef0850f201e
-0x5555b7941710: 0x48505756e5894855<span class="under430"><br>0x5555b7941718:</span> 0x0fa0653b4908ec83
-0x5555b7941720: 0x266eb80000001f86<span class="under430"><br>0x5555b7941728:</span> 0x8b48e84d8b480000
-0x5555b7941730: 0x037f01f983485de5<span class="under430"><br>0x5555b7941738:</span> 0x248d485a410008c2
-0x5555b7941740: 0x000030bac35241cc<span class="under430"><br>0x5555b7941748:</span> 0xbb48e07589485200
-0x5555b7941750: 0x0000555556d0ccf0<span class="under430"><br>0x5555b7941758:</span> 0x05ba4800000001b8
-0x5555b7941760: 0x4800002d7a001c02<span class="under430"><br>0x5555b7941768:</span> 0xb8a00d1851e8f28b
-0x5555b7941770: 0x4190b4eb0000266e<span class="under430"><br>0x5555b7941778:</span> 0x0000000190d855ff
-0x5555b7941780: 0x0178016f00000491<span class="under430"><br>0x5555b7941788:</span> 0x0000000000000000
-0x5555b7941790: 0x0000000000000000<span class="under430"><br>0x5555b7941798:</span> 0x0000000000000000
-0x5555b79417a0: 0x0000000000000000<span class="under430"><br>0x5555b79417a8:</span> 0x0000000000000000
-0x5555b79417b0: 0x0000000000000000<span class="under430"><br>0x5555b79417b8:</span> 0x0000000000000000</div>
+	<div class="jsMemHex"><span class="jsMemVar6">0x5555b7941700</span>: 0x<span class="jsMemVar9">43f6</span><span class="jsMemVar8">de0349</span><span class="jsMemVar7">f4598b</span><span class="under430"><br>0x5555b7941708:</span> 0x<span class="jsMemVar10">a0035ef0850f</span><span class="jsMemVar9">201e</span>
+0x5555b7941710: 0x<span class="jsMemVar16">48</span><span class="jsMemVar15">50</span><span class="jsMemVar14">57</span><span class="jsMemVar13">56</span><span class="jsMemVar12">e58948</span><span class="jsMemVar11">55</span><span class="under430"><br>0x5555b7941718:</span> 0x<span class="jsMemVar18">0f</span><span class="jsMemVar17">a0653b49</span><span class="jsMemVar16">08ec83</span></div>
 </div>
 
 Awesome, we have a code object that points to an address where the code gets run from, and we can change it to whatever we want. Let's make a part of the memory just the [0xCC INT3](https://en.wikipedia.org/wiki/INT_%28x86_instruction%29#INT3) breakpoint opcode - this will temporarily pause the execution and send a [SIGTRAP signal](https://en.wikipedia.org/wiki/Signal_%28IPC%29#SIGTRAP) to gdb so we can look into the current state.
