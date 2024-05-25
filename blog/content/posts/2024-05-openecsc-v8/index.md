@@ -654,26 +654,26 @@ Pretty cool, let's see what happens if we put an array inside of another array:
 </div>
 <div class="jsMem">
 	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
-	<div class="jsMemDbg">DebugPrint: 0xa3800044a31: [JSArray]
- - map: 0x0a38001cb845 &lt;Map[16](PACKED_ELEMENTS)&gt; [FastProperties]
+	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar1">0xa3800044a31</span>: [JSArray]
+ - map: <span class="jsMemVar3">0x0a38001cb845</span> &lt;Map[16](<span class="jsMemVar3">PACKED_ELEMENTS</span>)&gt; [FastProperties]
  - prototype: 0x0a38001cb11d &lt;JSArray[0]&gt;
- - elements: 0x0a3800044a25 &lt;FixedArray[1]&gt; [PACKED_ELEMENTS]
- - length: 1
- - properties: 0x0a3800000725 &lt;FixedArray[0]&gt;
+ - elements: <span class="jsMemVar5">0x0a3800044a25</span> &lt;<span class="jsMemVar7">FixedArray</span>[<span class="jsMemVar6">1</span>]&gt; [PACKED_ELEMENTS]
+ - length: <span class="jsMemVar4">1</span>
+ - properties: <span class="jsMemVar2">0x0a3800000725</span> &lt;FixedArray[0]&gt;
  - All own properties (excluding elements): {
     0xa3800000d99: [String] in ReadOnlySpace: #length: 0x0a3800025f85 &lt;AccessorInfo name= 0x0a3800000d99 &lt;String[6]: #length&gt;, data= 0x0a3800000069 &lt;undefined&gt;&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
  }
- - elements: 0x0a3800044a25 &lt;FixedArray[1]&gt; {
-           0: 0x0a3800042be9 &lt;JSArray[3]&gt;
+ - elements: <span class="jsMemVar5">0x0a3800044a25</span> &lt;<span class="jsMemVar7">FixedArray</span>[<span class="jsMemVar6">1</span>]&gt; {
+           0: <span class="jsMemVar8">0x0a3800042be9</span> &lt;JSArray[3]&gt;
  }</div>
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
 	<div class="jsMemHex">0xa3800044a10: 0x000005e5000449f5<span class="under430"><br>0xa3800044a18:</span> 0x1d1a6d7400000004
-0xa3800044a20: 0x0000056d001d3fb7<span class="under430"><br>0xa3800044a28:</span> 0x00042be900000002
-0xa3800044a30: 0x00000725001cb845<span class="under430"><br>0xa3800044a38:</span> 0x0000000200044a25
+<span class="jsMemVar5">0xa3800044a20</span>: 0x<span class="jsMemVar7">0000056d</span>001d3fb7<span class="under430"><br>0xa3800044a28:</span> 0x<span class="jsMemVar8">00042be9</span><span class="jsMemVar6">00000002</span>
+<span class="jsMemVar1">0xa3800044a30</span>: 0x<span class="jsMemVar2">00000725</span><span class="jsMemVar3">001cb845</span><span class="under430"><br>0xa3800044a38:</span> 0x<span class="jsMemVar4">00000002</span><span class="jsMemVar5">00044a25</span>
 0xa3800044a40: 0x00000725001cb845<span class="under430"><br>0xa3800044a48:</span> 0x0000000200044b99</div>
 <div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
 <div class="jsMemLegend">
-	The PACKED_ELEMENTS array is at 0xa3800044a30, its 1 element is at 0xa3800044a24 in a FixedArray[1] and the element is a pointer to the previous array at 0xa3800042be8.
+	The <span class="jsMemVar3">PACKED_ELEMENTS</span> array is at <span class="jsMemVar1">0xa3800044a30</span>, its <span class="jsMemVar4">1 element</span> is at <span class="jsMemVar5">0xa3800044a24</span> in a <span class="jsMemVar7">FixedArray</span>[<span class="jsMemVar6">1</span>] and the element is a pointer to the previous array at <span class="jsMemVar8">0xa3800042be8</span>.
 </div>
 </div>
 
@@ -845,15 +845,15 @@ Wow! That fake array of ours has lots of cool data that we didn't put there. Let
 <div class="jsMem">
 	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
 	<div class="jsMemDbg">DebugPrint: <span class="jsMemVar0">0x25ec00042bd9</span>: [JSArray]
- - map: 0x25ec001cb7c5 &lt;Map[16](PACKED_DOUBLE_ELEMENTS)&gt; [FastProperties]
+ - map: <span class="jsMemVar2">0x25ec001cb7c5</span> &lt;Map[16](<span class="jsMemVar2">PACKED_DOUBLE_ELEMENTS</span>)&gt; [FastProperties]
  - prototype: 0x25ec001cb11d &lt;JSArray[0]&gt;
- - elements: <span class="jsMemVar4">0x25ec00042bd1</span> &lt;FixedDoubleArray[128]&gt; [PACKED_DOUBLE_ELEMENTS]
+ - elements: <span class="jsMemVar4">0x25ec00042bd1</span> &lt;<span class="jsMemVar6">FixedDoubleArray</span>[<span class="jsMemVar5">128</span>]&gt; [PACKED_DOUBLE_ELEMENTS]
  - length: <span class="jsMemVar18">128</span>
- - properties: 0x25ec00000725 &lt;FixedArray[0]&gt;
+ - properties: <span class="jsMemVar16">0x25ec00000725</span> &lt;FixedArray[0]&gt;
  - All own properties (excluding elements): {
     0x25ec00000d99: [String] in ReadOnlySpace: #length: 0x25ec00025f85 &lt;AccessorInfo name= 0x25ec00000d99 &lt;String[6]: #length&gt;, data= 0x25ec00000069 &lt;undefined&gt;&gt; (const accessor descriptor, attrs: [W__]), location: descriptor
  }
- - elements: <span class="jsMemVar4">0x25ec00042bd1</span> &lt;FixedDoubleArray[128]&gt; {
+ - elements: <span class="jsMemVar4">0x25ec00042bd1</span> &lt;<span class="jsMemVar6">FixedDoubleArray</span>[<span class="jsMemVar5">128</span>]&gt; {
            0: <span class="jsMemVar16 jsMemVar2">3.88113e-311</span>
            1: <span class="jsMemVar18 jsMemVar4">5.43231e-312</span>
            2: <span class="jsMemVar7">3.88113e-311</span>
