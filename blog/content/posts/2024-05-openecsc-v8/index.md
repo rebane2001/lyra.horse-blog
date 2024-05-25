@@ -320,7 +320,7 @@ Quite the peculiar feature. It may seem a little confusing if you aren't familia
 	<div class="jsConLine">= <span class="jsConValIn">0x3fb9999999999<span class="jsConFun">ca3</span></span></div>
 </div>
 
-It pretty much just interprets the double as an integer, and then performs the XOR operation on it. In this example we XORed the doubles with 0x539 (1337 in hex), so the last three hex digits of each double changed. It's a pretty silly operation to perform on a double.
+It pretty much just interprets the double as an integer, and then performs the XOR operation on it. In this example we XORed the doubles with 0x539 (1337 in decimal), so the last three hex digits of each double changed. It's a pretty silly operation to perform on a double.
 
 Just XORing doubles isn't going to get us anywhere though, since the values are stored in a doubles array (`PACKED_DOUBLE_ELEMENTS`[^1]) as just *raw 64-bit doubles*. All we can do is change some numbers around, but that's something we can already do without xor. It'd be a lot more interesting if we could run this xor thingie on a mixed array (`PACKED_ELEMENTS`) consisting of *memory pointers* to other JavaScript objects, because we could point the pointers to places in memory we're not supposed to.
 
@@ -560,7 +560,7 @@ The array is at <span class="jsMemVar1">0xa3800042be8</span>, its <span class="j
 </div>
 </div>
 
-<span style="display: none">[^4]</span>
+<span style="display: none">[^4]</span><!-- hack to force my markdown engine add the footnote -->
 
 Try <span class="fineText">hovering over</span><span class="coarseText">tapping on</span> the text and stuff above. You'll see what the memory values mean and how they're represented in the %DebugPrint output.
 
@@ -604,7 +604,7 @@ The memory order of the elements part here looks a little odd because it doesn't
 <div class="offsetDemo">
 <div class="offsetDemoOverlay"><span>0000000000000000</span>00000000000000000000000000000000<span>0000000000000000</span><br><span>0000000000000000</span>0<span>00000000000000000</span></div>
 <div class="offsetDemoLegend"> read bytes as:                <span style="width:0.5ch;display:inline-block"></span>|<br>  if offset by:                <span style="width:0.5ch;display:inline-block"></span>|</div>
-<div class="offsetDemoNumbers">1111222233334444<span style="color:#AAA">0000000000000000</span>1111222233334444<br>001122334455667788                drag this -&gt;<span class="offsetDemoHandle"></span></div>
+<div class="offsetDemoNumbers">1111222233334444<span style="color:#AAA">0000000000000000</span>1111222233334444<br>0 1 2 3 4 5 6 7 8                 drag this -&gt;<span class="offsetDemoHandle"></span></div>
 </div>
 </span></div>
 
@@ -803,12 +803,9 @@ Wow! That fake array of ours has lots of cool data that we didn't put there. Let
 0x25ec00042c28: 0x<span class="jsMemVar15">76696e752065726f</span> 0x<span class="jsMemVar16">7473206c61737265</span>
 0x25ec00042c38: 0x<span class="jsMemVar17">20796669676e6972</span> 0x<span class="jsMemVar18">7075732074616874</span>
 0x25ec00042c48: 0x<span class="jsMemVar19">6f6d207374726f70</span> 0x<span class="jsMemVar20">7365707974206572</span></div>
-<div class="jsMemTitle">ENG<div class="jsMemSep"></div></div>
-<div class="jsMemLegend">
-</div>
 </div>
 
-That's so cool!! It really is just picking up the next 1024 bytes of memory as doubles, letting us see it all by just looking at the array. In fact, we can even see the original `arr` array's header in elements 2 and 3, let's try to read it out from within JavaScript. We'll want a function to turn floats back into hex, for that we can just create the reverse of the `i2f` function from earlier.
+That's so cool!! It really is just picking up the next 1024 bytes of memory as doubles, letting us see it all by just looking at the array. In fact, we can even see the <span class="jsMemVarExt7 jsMemVarExt8">original `arr` array's header</span> in elements <span class="jsMemVarExt7">2</span> and <span class="jsMemVarExt8">3</span>, let's try to read it out from within JavaScript. We'll want a function to turn floats back into hex, for that we can just create the reverse of the `i2f` function from earlier.
 
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">f2i</span> = 
@@ -967,7 +964,7 @@ Once everything's set up we do the xor exploit thing and end up with the fake ar
 0x00043348: 0x<span class="jsMemVar9">0000000200043335</span>
 ...</div></div>
 
-Neat! If we stare at the patterns in the memory we can make out the other arrays and stuff we initialized earlier. And if you think about it, we pretty much already have the **addrof** and **fakeobj** primitives here. We can get the address of the object in **objArr**, so if we put any object of our choice in that array we can see its address. And similarly, if we put an address to an object at that spot, we'll be able to access it through that array.
+Neat! If we stare at the patterns in the memory we can make out the other arrays and stuff we initialized earlier. And if you think about it, we pretty much already have the **addrof** and **fakeobj** primitives here. At <span class="jsMemVarExt11">index 10</span>, we can get the address of the object currently in **objArr**, so if we put any object of our choice in that array we can see its address. And similarly, if we put an address to an object at that spot, we'll be able to access it through that array. That'll be our **addrof** and **fakeobj**!
 
 Let's write the primitives to get and set the upper 32 bits:
 
@@ -984,7 +981,7 @@ Let's write the primitives to get and set the upper 32 bits:
 }</div>
 </div>
 
-If the address was at the lower bits, we'd need to modify the code a bit:
+If the address were at the lower bits instead, we'd need to modify the code a bit accordingly:
 
 <div class="jsConsole">
 	<div class="jsConCode"><span class="jsConKw">function</span> <span class="jsConIdx">addrof</span>(<span class="jsConIdx">o</span>) {
@@ -1028,7 +1025,7 @@ Lastly we'll want to create primitives to arbitrarily **read** and **write** mem
 <div class="jsConsole">
 	<div class="jsConCode"><span class="jsConKw">function</span> <span class="jsConIdx">read</span>(<span class="jsConIdx">addr</span>) {
   <span class="jsConKw">const</span> <span class="jsConIdx">readArr</span> = [<span class="jsConValIn">1.1</span>, <span class="jsConValIn">2.2</span>];
-  <span class="jsConVar">readArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000725001cb7c5n</span>);
+  <span class="jsConVar">readArr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x00000725001cb7c5n</span>);<wbr><span class="jsConNull" style="text-wrap: nowrap"> // array header from earlier</span>
   <span class="jsConVar">readArr</span>[<span class="jsConValIn">1</span>] = <span class="jsConVar">i2f</span>(<span class="jsConValIn">0x0000000200000000n</span> + <span class="jsConVar">addr</span> - <span class="jsConValIn">0x8n</span>);
   <span class="jsConKw">return</span> <span class="jsConVar">f2i</span>(<span class="jsConVar">fakeobj</span>(<span class="jsConVar">addrof</span>(<span class="jsConVar">readArr</span>) - <span class="jsConValIn">0x10n</span>)[<span class="jsConValIn">0</span>]);
 }
@@ -1061,9 +1058,9 @@ Did you know that strings in JavaScript are immutable! Anyways let's mutate them
 	<div class="jsConBorder"></div>
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">hex64</span>(<span class="jsConVar">read</span>(<span class="jsConVar">textAddr</span> + <span class="jsConValIn">0xcn</span>))</div>
 	<div class="jsConBorder"></div>
-	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><span class="jsConValOut">0x796e6f70796e6f70</span> <span class="jsConNull">// ynopynop</span></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><span class="jsConValOut">0x796e6f70796e6f70</span><wbr><span class="jsConNull" style="white-space: pre"> // ynopynop</span></div>
 	<div class="jsConBorder"></div>
-	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">write</span>(<span class="jsConVar">textAddr</span> + <span class="jsConValIn">0xcn</span>, <span class="jsConValIn">0x6172796c6172796cn</span>) <span class="jsConNull">// arylaryl</span></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">write</span>(<span class="jsConVar">textAddr</span> + <span class="jsConValIn">0xcn</span>, <span class="jsConValIn">0x6172796c6172796cn</span>)<wbr><span class="jsConNull" style="white-space: pre"> // arylaryl</span></div>
 	<div class="jsConBorder"></div>
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">text</span></div>
 	<div class="jsConBorder"></div>
@@ -1244,6 +1241,16 @@ We've done the impossible! Imagine how much we're gonna be able to speed up the 
 .jsMem:has(.jsMemVar19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar20:hover) { --jsMemVarB20: var(--jsMemVarB); --jsMemVarF20: var(--jsMemVarF) }
 .jsMem:has(.jsMemVar21:hover) { --jsMemVarB21: var(--jsMemVarB); --jsMemVarF21: var(--jsMemVarF) }
+
+.jsMemVarExt7 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
+.jsMemVarExt8 { text-decoration: #09b underline; text-decoration-skip-ink: none; }
+.jsMemVarExt11 { text-decoration: var(--jsMemVarF11) underline; }
+.jsMemVarExt7:hover { background: var(--jsMemVarB7); color: var(--jsMemVarF7);	border-radius: 1px; }
+.jsMemVarExt8:hover { background: var(--jsMemVarB8); color: var(--jsMemVarF8);	border-radius: 1px; }
+.jsMemVarExt11:hover { background: var(--jsMemVarB11); color: var(--jsMemVarF11);	border-radius: 1px; }
+body:has(.jsMemVarExt7:hover) { --jsMemVarB7: var(--jsMemVarB); --jsMemVarF7: var(--jsMemVarF) }
+body:has(.jsMemVarExt8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
+body:has(.jsMemVarExt11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
 </style>
 
 <!--
