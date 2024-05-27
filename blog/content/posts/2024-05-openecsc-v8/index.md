@@ -26,14 +26,14 @@ Most V8 exploits tend to have two stages to them - figuring out a unique way to 
 		<div class="challSubtitle">Attachments</div>
 		<details class="challFiles"><summary>array.xor.zip</summary>
 			<ul>
-			  <li><a href="https://lyra.horse/f/tmp/dist/args.gn" target="_blank">dist/args.gn</a><a href="https://lyra.horse/f/tmp/array.xor.zip" style="float: right" target="_blank">[download zip]</a></li>
-			  <li><a href="https://lyra.horse/f/tmp/dist/d8" target="_blank">dist/d8</a></li>
-			  <li><a href="https://lyra.horse/f/tmp/dist/snapshot_blob.bin" target="_blank">dist/snapshot_blob.bin</a></li>
-			  <li><a href="https://lyra.horse/f/tmp/docker-compose.yml" target="_blank">docker-compose.yml</a></li>
-			  <li><a href="https://lyra.horse/f/tmp/Dockerfile" target="_blank">Dockerfile</a></li>
-			  <li><a href="https://lyra.horse/f/tmp/README.md" target="_blank">README.md</a></li>
-			  <li><a href="https://lyra.horse/f/tmp/v8.patch" target="_blank">v8.patch</a></li>
-			  <li><a href="https://lyra.horse/f/tmp/wrapper.py" target="_blank">wrapper.py</a></li>
+			  <li><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/src/dist/args.gn" target="_blank">dist/args.gn</a><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/attachments/array.xor.zip" style="float: right" target="_blank">[download zip]</a></li>
+			  <li><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/src/dist/d8" target="_blank">dist/d8</a></li>
+			  <li><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/src/dist/snapshot_blob.bin" target="_blank">dist/snapshot_blob.bin</a></li>
+			  <li><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/src/docker-compose.yml" target="_blank">docker-compose.yml</a></li>
+			  <li><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/src/Dockerfile" target="_blank">Dockerfile</a></li>
+			  <li><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/src/README.md" target="_blank">README.md</a></li>
+			  <li><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/src/v8.patch" target="_blank">v8.patch</a></li>
+			  <li><a href="https://raw.githubusercontent.com/ECSC2024/openECSC-2024/main/round-3/pwn03/src/wrapper.py" target="_blank">wrapper.py</a></li>
 			</ul>
 		</details>
 	</div>
