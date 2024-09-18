@@ -134,7 +134,6 @@ In my security research I often come across weird quirks and behaviours that are
         min-height: 48px;
         font-size: 14px;
         font-weight: 400;
-        /* display: none; */
         padding: 8px 14px;
     }
     .sldsHlt {
@@ -305,21 +304,70 @@ Looking at the network traffic, it seems like adding a video onto a slide will s
 
 The obvious thing to try here is path traversal - if we change the videoid to **../**, the full url will be <span class="urlBox" style="white-space:nowrap">www.youtube.com/embed/../</span>, which should turn into just <span class="urlBox" style="white-space:nowrap">www.youtube.com/</span>, leading us straight to the YouTube home page. Let's try it!
 
-> graphic - slides slide with an errored iframe in the middle (maybe devtools also)
 <div class="genericContainer" style="background:#F9FBFD">
     <div class="sldsMain" style="margin:20px 10px">
             <div class="sldsSlide" style="aspect-ratio:unset;height:420px">
-                <div style="width:94%;height:90%;margin:auto;overflow:hidden;border: 2px inset #EEE;background:#0E0E0E">
+                <div style="width:94%;height:90%;margin:auto;overflow:hidden;border: 2px inset #EEE" class="iframeError">
+                    <svg width="11" height="14" fill="#ACACAC" version="1.1" xmlns="http://www.w3.org/2000/svg">
+                      <rect y="0" width="9" height="1"/>
+                      <rect y="1" width="1" height="13"/>
+                      <rect x="1" y="13" width="10" height="1"/>
+                      <rect x="10" y="2" width="1" height="11"/>
+                      <rect x="9" y="1" width="1" height="1"/>
+                      <rect x="6" y="1" width="1" height="4"/>
+                      <rect x="7" y="4" width="3" height="1"/>
+                      <rect x="3" y="3" width="1" height="2"/>
+                      <rect x="3" y="10" width="1" height="1"/>
+                      <rect x="4" y="9" width="3" height="1"/>
+                      <rect x="7" y="10" width="1" height="1"/>
+                    </svg>
+                    <div><b>www.youtube.com</b> refused to connect.</div>
+                    <!-- By default this "refused to connect" text should
+                         only be visible if you're hovering over it with
+                         your mouse, but I decided for the sake of clarity
+                         it'd be good to have the message visible at all
+                         times for the blogpost. -->
+                </div>
+            </div>
+        </div>
+</div>
+<style>
+    .iframeError {
+        background: #DDD;
+        transition: background 0.2s ease-in-out;
+        color: #8F8F8F;
+        font-size: 15px;
+        font-family: 'Segoe UI', Tahoma, sans-serif;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+    .iframeError svg {
+        transform: scale(3);
+        margin-bottom: 30px;
+    }
+    .iframeError:hover {
+        color: #8F8F8F;
+        background: #EEE;
+    }
+</style>
+
+To my surprise, it worked! We now have the YouTube homepage within this Slides iframe... or at least an error page representing it. YouTube, like most modern webapps, disallows framing most of its pages to prevent clickjacking attacks. Of course, the **/embed/** page is an exception because that page is intended to be embedded on other sites, but are there any other interesting **www\.youtube.com** pages we could frame?
+
+<div class="genericContainer" style="background:#F9FBFD">
+    <div class="sldsMain" style="margin:20px 10px">
+            <div class="sldsSlide" style="aspect-ratio:unset;height:420px">
+                <div style="width:94%;height:90%;margin:auto;overflow:hidden;border: 2px inset #EEE;background:#FFF;text-align:center">
+                    <!-- I recreated this emoji SVG to optimize it a little, took it from ~2.86kiB to 1.23kiB. You can find the original at https://www.youtube.com/s/gaming/emoji/7ff574f2/emoji_u1f63a.svg
+                    In hindsight, I think the YouTube one looks better but I already put in the effort so :P -->
+                    <svg height="100%" viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg"><g fill="#ffc022"><path d="m17.5 59s-9.77-28.5-2.53-46 32.9 17.6 32.9 17.6z"/><path d="m110 58s9.77-28.5 2.53-46-33.3 18.2-33.3 18.2z"/></g><g fill="#ffd1d1"><path d="m25 48s-7.24-5-5-25 20 15 20 15z"/><path d="m103 47s7.24-5 5-25-20 15-20 15z"/></g><ellipse cx="65" cy="73" rx="50" ry="45" fill="#ffc022"/><ellipse cx="41" cy="65" rx="6.6" ry="8.15"/><ellipse cx="87" cy="65" rx="6.6" ry="8.15"/><path d="m56 77.2c-0.05-2.86 4.06-4.24 7.95-4.3 3.89-0.07 8.07 1.2 8.12 4.06s-4.86 6.64-7.95 6.64-8.07-3.54-8.12-6.4z"/><path d="m52.5 90.2 11.2-6.52 12.2 7.53-12.3 7.91z" fill="#EF7F9D"/><g fill="none" stroke="#9E9E9E" stroke-linecap="round" stroke-miterlimit="10" stroke-width="3"><path d="m2.4 70.4s9.31-1.69 20 3.95"/><path d="m2.31 83.2s8.21-3.72 19.2-1.76"/><path d="m5.5 94.4s7.82-5.18 17.8-6.06"/><path d="m125 68.3s-9.36-1.38-19.9 4.62"/><path d="m126 81.1s-8.33-3.44-19.3-1.11"/><path d="m123 92.4s-7.99-4.92-17.9-5.45"/><g stroke="#000" stroke-width="4"><path d="m40.8 84.9s4.04 4.92 11.9 4.92c9.5 0 11.9-10.5 11.9-10.5"/><path d="m87.2 84.9s-4.04 4.92-11.9 4.92c-9.5 0-11.9-10.5-11.9-10.5"/><path d="m76.1 90.3s-3.37 7.99-11.8 7.99c-8.13 0-12.5-7.99-12.5-7.99"/></g></g></svg>
                 </div>
             </div>
         </div>
 </div>
 
-To my surprise, it worked! We now have the YouTube homepage within this Slides iframe... or at least an error page representing it. YouTube, like most modern webapps, disallows framing most of its pages to prevent clickjacking attacks. Of course, the **/embed/** page is an exception because that page is intended to be embedded on other sites, but are there any other interesting **www\.youtube.com** pages we could frame?
-
 I looked into it for a bit, and found a bunch of framable resources on **/s/**. We can have stuff like YouTube's emoji and css/js source code inside of a presentation! Unfortunately, it doesn't seem very useful for now, it's just a fun trick we can do.
-
-> graphic - slides has youtube emoji embedded
 
 ## Part 2: Redirects
 
@@ -621,19 +669,83 @@ If we could redirect our iframe to **docs.google.com** it'd open up a lot of pos
 
 Let's try chaining our previous path-traversed **/signin** redirect to the new **accounts.youtube.com** one and see if we can make it embed Docs pages within itself.
 
-> graphics - docs inside docs
+<div class="slds">
+    <div class="sldsH">
+        <div class="sldsHicon"><div><div></div></div></div>
+        <div class="sldsHlt">
+            <span class="sldsHtitle" contenteditable="plaintext-only">Untitled presentation</span><br>
+            <div class="sldsHlnks">
+                <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Slide</span><span>Arrange</span><span>Tools</span><span>Extensions</span><span>Help</span>
+            </div>
+        </div>
+        <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto">
+            <div class="sldsHbtn sldsHbtnWhite over640"><div>Slideshow</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHbtn sldsHbtnBlue over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHpfp over360"><div>L</div></div>
+        </div>
+    </div>
+    <div class="sldsBody" style="height:fit-content;padding:16px 0">
+        <div class="sldsMain">
+            <div class="sldsSlide">
+<div class="slds">
+    <div class="sldsH">
+        <div class="sldsHicon"><div><div></div></div></div>
+        <div class="sldsHlt">
+            <span class="sldsHtitle" contenteditable="plaintext-only">Untitled presentation</span><br>
+            <div class="sldsHlnks">
+                <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Slide</span><span>Arrange</span><span>Tools</span><span>Extensions</span><span>Help</span>
+            </div>
+        </div>
+        <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto">
+            <div class="sldsHbtn sldsHbtnWhite over640"><div>Slideshow</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHbtn sldsHbtnBlue over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHpfp over360"><div>L</div></div>
+        </div>
+    </div>
+    <div class="sldsBody" style="height:fit-content;padding:16px 0">
+        <div class="sldsMain">
+            <div class="sldsSlide">
+<div class="slds">
+    <div class="sldsH">
+        <div class="sldsHicon"><div><div></div></div></div>
+        <div class="sldsHlt">
+            <span class="sldsHtitle" contenteditable="plaintext-only">Untitled presentation</span><br>
+            <div class="sldsHlnks">
+                <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Slide</span><span>Arrange</span><span>Tools</span><span>Extensions</span><span>Help</span>
+            </div>
+        </div>
+        <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto">
+            <div class="sldsHbtn sldsHbtnWhite over640"><div>Slideshow</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHbtn sldsHbtnBlue over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHpfp over360"><div>L</div></div>
+        </div>
+    </div>
+    <div class="sldsBody" style="height:fit-content;padding:16px 0">
+        <div class="sldsMain">
+            <div class="sldsSlide" style="background:#8BCF00;color:#000;display:flex;align-items:center;justify-content:center;overflow:hidden">
+                <span style="font-family:Arial,sans-serif;filter:blur(0.9px);transform:scaleY(1.5);font-size:64px;text-align:center" contenteditable="plaintext-only">yeah</span>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
+            </div>
+        </div>
+    </div>
+</div>
 
 And meow - Docs inside Docs!! So epic!
 
 ## Part 4: Okay but what now?
 
-So we have Docs inside of Docs, which is incredibly fun for a few minutes, but can we actually do anything useful with this? The document pages themselves already have clickjacking protections in place, and the only interesting interaction on the Docs homepage is deleting a document. We'll need to find something more impactful on the Docs domain.
+So we have Docs inside of Docs, which is incredibly fun for a few minutes, but can we actually do anything useful with this? I played around with the Docs homepage for a bit, but the only interesting interaction I managed to find is deleting a document, and that's something you could restore from trash anyways. We'll need to find something more impactful on the Docs domain.
 
-You might think that the document editing pages themselves would be useful, but those pages already have protections in place because they're already (intentionally) framable on any website. If a page detects that it is within an iframe, it'll disable a lot of the dangerous functionality, such as the sharing options of the document.
+You might think that the document editing pages themselves would be useful, but those pages already have protections in place because they're already (intentionally) framable on external websites. If a page detects that it is within an iframe, it'll disable a lot of the dangerous functionality, such as the sharing options of the document.
 
-> graphic - can't share framed document
-
-This part here is what actually took me the longest to figure out. I spent a while looking for anything interesting on the **docs.google.com** domain to frame and clickjack. Looking through the Wayback Machine[^2] and trying various Google dorks[^1], I kept finding a bunch of old endpoints that would've been useful in the past, but now just redirect to Google Drive, which we cannot frame.
+This part here is what actually took me the longest to figure out. I spent a while looking for anything interesting on the **docs.google.com** domain to frame and clickjack. Looking through the Wayback Machine[^iarchive] and trying various Google dorks[^dorks], I kept finding a bunch of old endpoints that would've been useful in the past, but now just redirect to Google Drive, which we cannot frame.
 
 Going through link after link, I eventually stumbled upon this url: <span class="urlBox" style="white-space:nowrap">docs.google.com/file/d/{ID}/edit</span>. This page lets us preview and perform actions (such as sharing) on Google Drive files, and unlike the other links I found earlier, it stays on the **docs.google.com** domain instead of redirecting to Drive. And not only does it work with Drive files, it also works with folders and other such entities (such as Google Sites pages). You could even open up your Drive's "Root" folder[^root] with it!
 
@@ -773,7 +885,7 @@ The page has a share button that stays enabled even within an iframe. If we can 
 
 ## Part 5: But can we?
 
-But let's do a reality check - can we *really* trick someone into performing all those actions? Maybe, if we try hard enough, but even with all our iframing and clickjacking abilities it's going to take a lot to convince someone to do all that. I don't think the VRP panel[^3] would be very impressed with this much reliance on social engineering. We must find a way to make it more convincing - ideally condensing it down to just a single click.
+But let's do a reality check - can we *really* trick someone into performing all those actions? Maybe, if we try hard enough, but even with all our iframing and clickjacking abilities it's going to take a lot to convince someone to do all that. I don't think the VRP panel[^thevrp] would be very impressed with *this* much reliance on social engineering. We must find a way to make it more convincing - ideally condensing it down to just a single click.
 
 Thinking of ways to improve the attack, I remembered the feature in Drive that lets you request access to other people's documents. Doing so sends out an e-mail with a cool little button to immediately manage the permissions.
 
@@ -838,7 +950,7 @@ Thinking of ways to improve the attack, I remembered the feature in Drive that l
 </div>
 
 The button in that e-mail links to <span class="urlBox">https://drive.google.com/drive/folders/{ID}?usp=sharing_esp&userstoinvite=lyra.horse@gmail.com&sharingaction=manageaccess&role=writer&ts=66e724ba
-</span>, which when opened, pops up the Share dialog with a notification of the request. Of course, that's a Drive link, not a Docs one, but I tried copying all of the query parameters over to our Docs link and to my surprise, it worked!
+</span>, which when opened, pops up the Share dialog with a notification of the request. Of course, that's a Drive link, not a Docs one, but I tried copying all of the query parameters over to our Docs link and that seemed to do the trick!
 
 <div class="genericContainer">
     <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span class="urlBarDomain">docs.google.com</span>/file/d/1sHy3aQXsIlnOCj-mBFxQ0ZXm4TzjjfFL/edit?usp=sharing_esp&userstoinvite=lyra.horse@gmail.com&sharingaction=manageaccess&role=writer&ts=66e724ba</span></div></div>
@@ -1100,8 +1212,6 @@ The button in that e-mail links to <span class="urlBox">https://drive.google.com
     }
 </style>
 
-<!--<div style="width:100%;text-align:center;margin-top:4px"><i>Try <span class="fineText">clicking</span><span class="coarseText">tapping</span> "<span style="color:#0842A0;font-weight:bold"><label style="cursor:pointer" for="reviewDialog">Review</label></span>" above to see the second screen!</i></div>-->
-
 In its current state, this page requires us to make two clicks to complete the attack - first a click on the "Review" label, and then a click on the "Share" button (try <span class="fineText">clicking</span><span class="coarseText">tapping</span> "<span style="color:#0842A0;font-weight:bold"><label style="cursor:pointer" for="reviewDialog">Review</label></span>" above). That's already quite good, but I still *really* wanted to get the entire attack down to just one click.
 
 I pulled out my DevTools and began digging through the JavaScript of the page to see how the query parameters are handled. As a simple test, I started off with just the *userstoinvite* query parameter.
@@ -1140,8 +1250,6 @@ Pretty much all we need to do here is convince someone to do a single click on t
 ## Part 6: Re-re-redirects
 
 I began putting the attack together, combining all the cool tricks we've come up with so far.
-
-<!-- todo: replace with real urls ; add line breaks and color the various parts of the urls -->
 
 <ol style="word-break: break-all">
 <li>We first take cool little docs invite url.<br>
@@ -1451,18 +1559,18 @@ thank you for reading, you're awesome!!
 <!-- https://tallinn.bsides.ee/2024/ -->
 i tried to keep this writeup condensed because i'm also presenting my research with additional story elements at [bsides tallinn 2024](https://tallinn.bsides.ee/) the same day this blogpost goes out. i hope it goes well! i'm not sure when the bsides talk recordings will be released (keep an eye on [this channel](https://www.youtube.com/@bsidestallinn427/videos)), but for now you can check out [the slides](https://docs.google.com/presentation/d/10LlimFowOJ_noDrJsv4CnRgU8XoUKRAa6YjTeJFrs70/edit)!
 
-as with my previous posts, everything on the page is just html/css crafted with love. no images, javascript, or other external resources, and just 1337kB (TBD) gzipped! it takes a lot of time and effort compared to just throwing screenshots on the page, but i think it's really fun to have a blogpost come to life like that, with interactivity and all. and it's responsive!
+as with my previous posts, everything on the page is just html/css crafted with love. no images, javascript, or other external resources, and just 31kB gzipped (that's 5 seconds over dial-up)! it takes a lot of time and effort compared to just throwing screenshots on the page, but i think it's really fun to have a blogpost come to life like that, with interactivity and all. and it's responsive!
 
 i hope this writeup is conherent and interesting to read, the attack chain involves quite a few elements so the article is all over the place at times, you can always feel free to ask me any questions if anything's unclear ^^
 
 love you all &lt;3!
 
-**Discuss this post on:** [twitter](https://twitter.com/rebane2001/), [mastodon](https://infosec.exchange/@rebane2001/), [lobsters](https://lobste.rs/s/)
+**Discuss this post on:** twitter, mastodon, lobsters
 
 [^goog]: This specific example will probably display a warning - but let's just pretend it doesn't.
-[^1]: Google dorks are blabla
-[^2]: The [Internet Archive](https://web.archive.org/) allows listing all archived URLs for a domain, quite handy for recon.
-[^3]: The [VRP](https://bughunters.google.com/about/rules/google-friends/6625378258649088/google-and-alphabet-vulnerability-reward-program-vrp-rules) is Google's bug bounty program, and its panel is a group of people who decide how much $$$ you'll get for a bug.
+[^dorks]: Dorks are the various search operations and tricks you can use on Google, such as `site:docs.google.com` or `inurl:document`.
+[^iarchive]: The [Internet Archive](https://web.archive.org/) allows listing all archived URLs for a domain, quite handy for recon.
+[^thevrp]: The [VRP](https://bughunters.google.com/about/rules/google-friends/6625378258649088/google-and-alphabet-vulnerability-reward-program-vrp-rules) is Google's bug bounty program, and its panel is a group of people who decide how much $$$ you'll get for a bug.
 [^root]: Every Google Drive file and folder has an ID associated with it, and your entire drive's Root folder is no exception! Want to find yours? Open Drive's page with DevTools open, and then search for `9PVA` in the network requests.
 [^wyo]: I'm using this domain as an example because it's short and came up a lot in my Google searches, but there isn't anything special about it, you can use other gsuite domains too. In case anyone from the [Wyoming goverment](https://ets.wyo.gov/cybersecurity) happens across this post - no, this isn't touching your IT systems in any way, it's only affecting Google's systems and they're already aware of and working on the topics discussed in this blog post.
 
