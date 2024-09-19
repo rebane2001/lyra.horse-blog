@@ -201,13 +201,22 @@ In my security research I often come across weird quirks and behaviours that are
     .sldsHbtnWhite > div:active {
         background: #e1e3e6;
     }
-    .sldsHbtnBlue > div:first-child {
+    .sldsHbtnBlue > div:first-child,
+    .sldsHbtnDsbl > div:first-child {
         border-right-color: #f9fbfd;
     }
     .sldsHbtnBlue > div {
         border: 1px solid #0000;
         color: #001d35;
         background: #c2e7ff;
+    }
+    .sldsHbtnDsbl > div {
+        border: 1px solid #0000;
+        color: #838383;
+        background: #ECECED;
+    }
+    .sldsHbtn.sldsHbtnDsbl > div:last-child {
+        cursor: default;
     }
     .sldsHbtnBlue > div:hover {
         background: #B2D7EF;
@@ -342,6 +351,7 @@ The obvious thing to try here is path traversal - if we change the videoid to **
         flex-direction: column;
         justify-content: center;
         align-items: center;
+        text-align: center;
     }
     .iframeError svg {
         transform: scale(3);
@@ -698,7 +708,7 @@ Let's try chaining our previous path-traversed **/signin** redirect to the new *
         </div>
         <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto">
             <div class="sldsHbtn sldsHbtnWhite over640"><div>Slideshow</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
-            <div class="sldsHbtn sldsHbtnBlue over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHbtn sldsHbtnDsbl over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
             <div class="sldsHpfp over360"><div>L</div></div>
         </div>
     </div>
@@ -716,7 +726,7 @@ Let's try chaining our previous path-traversed **/signin** redirect to the new *
         </div>
         <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto">
             <div class="sldsHbtn sldsHbtnWhite over640"><div>Slideshow</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
-            <div class="sldsHbtn sldsHbtnBlue over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHbtn sldsHbtnDsbl over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
             <div class="sldsHpfp over360"><div>L</div></div>
         </div>
     </div>
