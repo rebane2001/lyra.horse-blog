@@ -1575,7 +1575,7 @@ i hope this writeup is conherent and interesting to read, the attack chain invol
 
 love you all &lt;3!
 
-**Discuss this post on:** twitter, mastodon, lobsters
+**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1836653696639271329), [mastodon](https://infosec.exchange/@rebane2001/113162802490491321), [lobsters](https://lobste.rs/s/fjixgp/using_youtube_steal_your_files) (rip cohost :c)
 
 [^goog]: This specific example will probably display a warning - but let's just pretend it doesn't.
 [^dorks]: Dorks are the various search operations and tricks you can use on Google, such as `site:docs.google.com` or `inurl:document`.
