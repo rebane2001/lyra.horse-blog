@@ -1368,7 +1368,7 @@ so to bypass that, we want to chain a redirect like this:
 
 and it should work! But we have to find something that'd work for that part in the middle. And lucky for us, I had already spotted something like that in my googling earlier.
 
-It seems like there's an old legacy GSuite URL format of **docs.google.com/a/&lt;domain&gt;/...**, which probably did something useful years ago, but these days just disappears when you open an URL. If you're logged out, you must find some working donor URL to use, such as **/a/wyo.gov/**[^wyo], but logged in you can even do **/a/a/** and it'll just work.
+It seems like there's an old legacy GSuite URL format of **docs.google.com/a/&lt;domain&gt;/...**, which probably did something useful years ago (edit: and still does[^adva]), but these days just disappears when you open an URL. If you're logged out, you must find some working donor URL to use, such as **/a/wyo.gov/**[^wyo], but logged in you can even do **/a/a/** and it'll just work.
 
 Here are a couple of example URLs to try out.
 
@@ -1583,6 +1583,7 @@ love you all &lt;3!
 [^thevrp]: The [VRP](https://bughunters.google.com/about/rules/google-friends/6625378258649088/google-and-alphabet-vulnerability-reward-program-vrp-rules) is Google's bug bounty program, and its panel is a group of people who decide how much $$$ you'll get for a bug.
 [^root]: Every Google Drive file and folder has an ID associated with it, and your entire drive's Root folder is no exception! Want to find yours? Open Drive's page with DevTools open, and then search for `9PVA` in the network requests.
 [^wyo]: I'm using this domain as an example because it's short and came up a lot in my Google searches, but there isn't anything special about it, you can use other gsuite domains too. In case anyone from the [Wyoming goverment](https://ets.wyo.gov/cybersecurity) happens across this post - no, this isn't touching your IT systems in any way, it's only affecting Google's systems and they're already aware of and working on the topics discussed in this blog post.
+[^adva]: advaith [let me know](https://twitter.com/advaithj1/status/1836940041756750021) that /a/domain urls automatically switch your account to the one under the domain, so they're still handy if you use multiple accounts.
 
 <style>
 .urlBox {
