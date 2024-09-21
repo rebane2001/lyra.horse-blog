@@ -1352,7 +1352,7 @@ And there we go! I threw it in my slides and...
 
 ...it didn't work, why?
 
-It seems like Docs has some sort of a mitigation in place that prevents me from using a cross-site redirect for the file page within an iframe. More precisely, it checks for the *Sec-Fetch-Dest* and and *Sec-Fetch-Site* headers, and if they're both set to *iframe* and *cross-site* respectively, we get a 403 back. Pretty weird.
+It seems like Docs has some sort of a mitigation in place that prevents me from using a cross-site redirect for the file page within an iframe. More precisely, it checks for the *Sec-Fetch-Dest* and<!-- fixed typo, thx old.reddit.com/r/netsec/comments/1flln55/_/lo5d7w1/ --> *Sec-Fetch-Site* headers, and if they're both set to *iframe* and *cross-site* respectively, we get a 403 back. Pretty weird.
 
 I got the opportunity to chat with a couple security people from Google, so I asked about this behavior, and it seems like this is some sort of a mitigation to prevent cross-origin framing on the server-side. I'm still not entirely sure as to what threat scenario it'd be useful in, but the idea is that an iframe can tell whether it's on a same-origin page or not from just the *Sec-Fetch-Site* header. On a cross-origin page, the header will *always* be set to *cross-site*, even if the redirect within the iframe is same-origin.
 
