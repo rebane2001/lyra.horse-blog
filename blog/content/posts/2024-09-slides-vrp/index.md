@@ -1566,8 +1566,9 @@ I reported this vulnerability chain to Google on the 1st of July 2024, and got i
 
 thank you for reading, you're awesome!!
 
-<!-- https://tallinn.bsides.ee/2024/ -->
-i tried to keep this writeup condensed because i'm also presenting my research with additional story elements at [bsides tallinn 2024](https://tallinn.bsides.ee/) the same day this blogpost goes out. i hope it goes well! i'm not sure when the bsides talk recordings will be released (keep an eye on [this channel](https://www.youtube.com/@bsidestallinn427/videos)), but for now you can check out [the slides](https://docs.google.com/presentation/d/10LlimFowOJ_noDrJsv4CnRgU8XoUKRAa6YjTeJFrs70/edit)!
+i tried to keep this writeup condensed because i'm also presenting my research with additional story elements at [bsides tallinn 2024](https://tallinn.bsides.ee/2024/) the same day this blogpost goes out. i hope it goes well! ~~i'm not sure when the bsides talk recordings will be released (keep an eye on [this channel](https://www.youtube.com/@bsidestallinn427/videos)), but for now you can check out [the slides](https://docs.google.com/presentation/d/10LlimFowOJ_noDrJsv4CnRgU8XoUKRAa6YjTeJFrs70/edit)!~~
+
+**check out the [talk recording](https://www.youtube.com/watch?v=2ZENE8ua_gU), and [the slides](https://docs.google.com/presentation/d/10LlimFowOJ_noDrJsv4CnRgU8XoUKRAa6YjTeJFrs70/edi)!!**
 
 as with my previous posts, everything on the page is just html/css crafted with love. no images, javascript, or other external resources, and just 31kB gzipped (that's 5 seconds over dial-up)! it takes a lot of time and effort compared to just throwing screenshots on the page, but i think it's really fun to have a blogpost come to life like that, with interactivity and all. and it's responsive!
 
