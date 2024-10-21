@@ -25,4 +25,5 @@
   <meta property="og:type" content="website">
 {{- end }}{{/* todo: og:image / og:video stuff */}}
   <meta content="#8CFFDB" name="theme-color" />
+  <meta name="fediverse:creator" content="@rebane2001@infosec.exchange">
 {{ with .OutputFormats.Get "rss" -}}{{ printf `  <link rel=%q type=%q href=%q title=%q>` .Rel .MediaType.Type .Permalink site.Title | safeHTML }}{{ end }}
