@@ -9,7 +9,7 @@ summary = "A writeup of my $4133.70 Google Drive vulnerability chain."
 
 In my security research I often come across weird quirks and behaviours that aren't particularly useful beyond a neat party trick. It's always a good idea to keep track of them though, perhaps one day they'll be just the missing piece you need.
 
-<div class="slds">
+<div class="slds" role=img aria-label="Empty google slides presentation">
     <div class="sldsH">
         <div class="sldsHicon"><div><div></div></div></div>
         <div class="sldsHlt">
@@ -313,7 +313,7 @@ Looking at the network traffic, it seems like adding a video onto a slide will s
 
 The obvious thing to try here is path traversal - if we change the videoid to **../**, the full url will be <span class="urlBox" style="white-space:nowrap">www.youtube.com/embed/../</span>, which should turn into just <span class="urlBox" style="white-space:nowrap">www.youtube.com/</span>, leading us straight to the YouTube home page. Let's try it!
 
-<div class="genericContainer" style="background:#F9FBFD">
+<div class="genericContainer" style="background:#F9FBFD" role=img aria-label="iframe within a slide, showing the error page: www.youtube.com refused to connect">
     <div class="sldsMain" style="margin:20px 10px">
             <div class="sldsSlide" style="aspect-ratio:unset;height:420px">
                 <div style="width:94%;height:90%;margin:auto;overflow:hidden;border: 2px inset #EEE" class="iframeError">
@@ -365,7 +365,7 @@ The obvious thing to try here is path traversal - if we change the videoid to **
 
 To my surprise, it worked! We now have the YouTube homepage within this Slides iframe... or at least an error page representing it. YouTube, like most modern webapps, disallows framing most of its pages to prevent clickjacking attacks. Of course, the **/embed/** page is an exception because that page is intended to be embedded on other sites, but are there any other interesting **www\.youtube.com** pages we could frame?
 
-<div class="genericContainer" style="background:#F9FBFD">
+<div class="genericContainer" style="background:#F9FBFD" role=img aria-label="iframe within a slide, containing a cat emoji">
     <div class="sldsMain" style="margin:20px 10px">
             <div class="sldsSlide" style="aspect-ratio:unset;height:420px">
                 <div style="width:94%;height:90%;margin:auto;overflow:hidden;border: 2px inset #EEE;background:#FFF;text-align:center">
@@ -391,7 +391,7 @@ The first obvious place to look would be the external links around the site - su
 
 The redirect works for now, but you'll notice it has a *redir_token* parameter - this parameter is some sort of a token for redirects that's unique to your session. If someone else opened the same link, they'd see this page instead:
 
-<div class="genericContainer" style="background:#FFF;height:480px">
+<div class="genericContainer" style="background:#FFF;height:480px" role=figure aria-label="Browser window">
     <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span class="urlBarDomain">youtube.com</span>/redirect?event=video_description&redir_token=QUFFLUhqbjdTaFRBeHRfSW95bkJDVmRGcl96VXV6MkNmd3xBQ3Jtc0tuOVg2b2ZsQVV6V3hpaUJfdXB0UWY2Z1A1bE1sUjlQeHZ4WlVYSzNVUXZBcUF0RFYzNHhLazVUUVFQM1Y5N3VGZEV4bmtCVWhmYXRwY05KWlEyY0w3ZHBBdDY5SEtBa1hpQXBkalpqT3liYzFqYVZxSQ&q=https%3A%2F%2Flyra.horse%2F&v=tbYxAFHnzG0</span></div></div>
     <div style="font-family: 'YouTube Noto', Roboto, 'Noto Sans', arial, sans-serif;font-size: 14px;display:flex;flex-direction:column;align-items:center;text-align:center;max-width:90%;margin:auto" class="defSelect">
         <!-- I admit, this YouTube logotype looks quite goofy with the fonts and CSS I used. -->
@@ -410,7 +410,7 @@ The next obvious place to look for open redirects is usually the authentication 
 
 This endpoint does redirects without using a verification token! We can just specify an url of our choice in the *next* parameter and it'll work. Let's try it out with my website.
 
-<div class="ytErr">
+<div class="ytErr" role=figure aria-label="Browser window">
 <!-- I'm reusing the CSS for the URL bar from my Telegram blog post, but this time I added a mobile theme for smaller screens to make it more cute! Also hover animations! -->
 <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span class="urlBarDomain">youtube.com</span>/signin?next=https://lyra.horse/</span></div></div>
 <div class="ytAlert defSelect">
@@ -679,7 +679,7 @@ If we could redirect our iframe to **docs.google.com** it'd open up a lot of pos
 
 Let's try chaining our previous path-traversed **/signin** redirect to the new **accounts.youtube.com** one and see if we can make it embed Docs pages within itself.
 
-<div class="slds">
+<div class="slds" role=img aria-label="Multiple Google Slides presentations within each-other. The inner ones have the Share button grayed-out. The final Slides pages contains the text yeah on a green background.">
     <div class="sldsH">
         <div class="sldsHicon"><div><div></div></div></div>
         <div class="sldsHlt">
@@ -759,7 +759,7 @@ This part here is what actually took me the longest to figure out. I spent a whi
 
 Going through link after link, I eventually stumbled upon this url: <span class="urlBox" style="white-space:nowrap">docs.google.com/file/d/{ID}/edit</span>. This page lets us preview and perform actions (such as sharing) on Google Drive files, and unlike the other links I found earlier, it stays on the **docs.google.com** domain instead of redirecting to Drive. And not only does it work with Drive files, it also works with folders and other such entities (such as Google Sites pages). You could even open up your Drive's "Root" folder[^root] with it!
 
-<div class="genericContainer">
+<div class="genericContainer" role="figure" aria-label="Browser window">
     <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span class="urlBarDomain">docs.google.com</span>/file/d/0ALK4w9WgXcQUUk9PVA/edit</span></div></div>
     <div class="filePg defSelect">
         <div class="filePgH">
@@ -769,7 +769,7 @@ Going through link after link, I eventually stumbled upon this url: <span class=
                 <div class="iconButton over480"><div class="dotsIcon"><div></div><div></div><div></div></div></div>
                 <div class="sldsHbtn sldsHbtnBlueDark over480"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
                 <div class="sldsHbtn sldsHbtnBlueDark under480"><div>Share</div></div>
-                <div class="sldsHpfp"><div>L</div></div>
+                <div class="sldsHpfp" role=img aria-label="profile picture"><div>L</div></div>
             </div>
         </div>
         <div class="filePgNoPrev">No preview available</div>
@@ -920,7 +920,7 @@ Thinking of ways to improve the attack, I remembered the feature in Drive that l
         padding-right: 12px;
     }
 </style>
-<div class="genericContainer defSelect" style="position:relative;background:#FFF;font-family:'Google Sans',Roboto,Arial,Helvetica,sans-serif;font-size:14px;color:#3C4043">
+<div class="genericContainer defSelect" role="figure" aria-label="e-mail" style="position:relative;background:#FFF;font-family:'Google Sans',Roboto,Arial,Helvetica,sans-serif;font-size:14px;color:#3C4043">
     <input type="checkbox" style="display:none" id="gmailInfoCheck" checked />
     <div class="gmailTable" id="gmailTable1">
         <label for="gmailInfoCheck"><div style="text-align:right;cursor:pointer" class="under480">×</div></label>
@@ -935,7 +935,7 @@ Thinking of ways to improve the attack, I remembered the feature in Drive that l
             <tr><td>security:</td><td>🔒 Standard encryption (TLS) <a href="https://blog.aegrel.ee/" style="color:inherit;text-decoration:underline">Learn more</a></td></tr>
         </table>
     </div>
-    <div style="display:flex;align-items:center;margin:12px 8px 12px 70px"><input type="checkbox" style="display:none" id="gmailInboxCheck" /><div style="font-size:22px;color:#1F1F1F">Share request for "Secret Folder"</div><div style="border-radius:4px 0 0 4px;padding-right:2px;margin-left:10px" class="inboxBtn over560" id="inboxBtn1">Inbox</div><label id="inboxBtn2" for="gmailInboxCheck"><div style="border-radius:0 4px 4px 0;padding-left:2px" class="inboxBtn over560">×</div></label></div>
+    <div style="display:flex;align-items:center;margin:12px 8px 12px 70px"><input type="checkbox" style="display:none" id="gmailInboxCheck" /><div style="font-size:22px;color:#1F1F1F">Share request for "Secret Folder"</div><div style="border-radius:4px 0 0 4px;padding-right:2px;margin-left:10px" class="inboxBtn over560" id="inboxBtn1" aria-hidden=true>Inbox</div><label aria-hidden=true id="inboxBtn2" for="gmailInboxCheck"><div style="border-radius:0 4px 4px 0;padding-left:2px" class="inboxBtn over560">×</div></label></div>
     <div style="color:#5E5E5E;font-size:12px;display:flex;margin-right:12px">
         <div style="flex-shrink:0;width:40px;height:40px;background:#A0C3FF;border-radius:40px;margin:-2px 16px;overflow:hidden"><div style="background:#4374E0;width:15px;height:15px;border-radius:30px;margin:9px auto 2px;"></div><div style="background:#4374E0;width:27px;height:30px;border-radius:30px;margin:auto"></div></div>
         <div style="overflow:hidden;white-space:nowrap">
@@ -948,7 +948,7 @@ Thinking of ways to improve the attack, I remembered the feature in Drive that l
     <div style="border-radius:8px;border:1px solid #dadce0;width:75%;margin:24px auto;padding:4.5%">
         <div style="margin-bottom:32px;font-size:28px">Share a folder?</div>
         <div style="display:flex">
-        <div class="shareDlgCircle" style="width:50px;height:50px"><div style="width:100%;height:100%;background:#7B1FA2;color:#FFF;text-align:center;font-size:30px;line-height:50px;user-select:none;border-radius:50px">L</div></div>
+        <div class="shareDlgCircle" style="width:50px;height:50px" role=img aria-label="profile picture"><div style="width:100%;height:100%;background:#7B1FA2;color:#FFF;text-align:center;font-size:30px;line-height:50px;user-select:none;border-radius:50px">L</div></div>
         <div style="margin-left:12px">
         <div style="color:#202124;font-size:16px">Lyra Rebane (lyra.horse<wbr>@gmail.com) is <b>requesting access</b> to the following folder:</div>
         <div style="margin:24px 0 28px;color:#5f6368;font-size:16px">hi pls give access kthxbye</div>
@@ -962,17 +962,17 @@ Thinking of ways to improve the attack, I remembered the feature in Drive that l
 The button in that e-mail links to <span class="urlBox">https://drive.google.com/drive/folders/{ID}?usp=sharing_esp&userstoinvite=lyra.horse@gmail.com&sharingaction=manageaccess&role=writer&ts=66e724ba
 </span>, which when opened, pops up the Share dialog with a notification of the request. Of course, that's a Drive link, not a Docs one, but I tried copying all of the query parameters over to our Docs link and that seemed to do the trick!
 
-<div class="genericContainer">
+<div class="genericContainer" role="figure" aria-label="Browser window, Google Drive dialog">
     <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span class="urlBarDomain">docs.google.com</span>/file/d/1sHy3aQXsIlnOCj-mBFxQ0ZXm4TzjjfFL/edit?usp=sharing_esp&userstoinvite=lyra.horse@gmail.com&sharingaction=manageaccess&role=writer&ts=66e724ba</span></div></div>
     <div class="filePg defSelect" style="height:512px">
-        <div class="filePgH">
+        <div class="filePgH" aria-hidden=true>
             <div class="filePgName"><span class="folderIcon" style="margin: 0 11px"><div></div><div></div></span>Secret Folder</div>
             <div class="filePgOpenW over640">Open with</div>
             <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto;margin-right:2px">
                 <div class="iconButton over480"><div class="dotsIcon"><div></div><div></div><div></div></div></div>
                 <div class="sldsHbtn sldsHbtnBlueDark over480"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
                 <div class="sldsHbtn sldsHbtnBlueDark under480"><div>Share</div></div>
-                <div class="sldsHpfp"><div>L</div></div>
+                <div class="sldsHpfp" role=img aria-label="profile picture"><div>L</div></div>
             </div>
         </div>
         <div class="filePgO">
@@ -984,7 +984,7 @@ The button in that e-mail links to <span class="urlBox">https://drive.google.com
                 <div class="shareDlgBanner">Lyra Rebane asked to be an editor<span style="padding-left:0"><label for="reviewDialog" style="cursor:inherit">Review</label></span><span class="over480">✖</span></div>
                 <input class="shareDlgTbox shareDlgBbox" placeholder="Add people, groups, and calendar events"></input>
                 <div class="shareDlgSubtitle">People with access</div>
-                <div class="shareDlgEntry shareDlgEntryH"><div class="shareDlgCircle"><div style="width:100%;height:100%;background:#7B1FA2;color:#FFF;text-align:center;font-size:20px;line-height:32px;user-select:none;border-radius:20px">L</div></div><div style="margin-left:10px"><div style="font-weight:501;margin-left:4px">Lyra Rebane (you)</div><div style="color:#444746;font-size:12px;letter-spacing:0.1px;margin-left:4px">lyra.horse@gmail.com</div></div><div style="margin-left:auto;color:#AAA;letter-spacing:0.15px;user-select:none" class="over480">Owner</div></div>
+                <div class="shareDlgEntry shareDlgEntryH"><div class="shareDlgCircle" role=img aria-label="profile picture"><div style="width:100%;height:100%;background:#7B1FA2;color:#FFF;text-align:center;font-size:20px;line-height:32px;user-select:none;border-radius:20px">L</div></div><div style="margin-left:10px"><div style="font-weight:501;margin-left:4px">Lyra Rebane (you)</div><div style="color:#444746;font-size:12px;letter-spacing:0.1px;margin-left:4px">lyra.horse@gmail.com</div></div><div style="margin-left:auto;color:#AAA;letter-spacing:0.15px;user-select:none" class="over480">Owner</div></div>
                 <div class="shareDlgSubtitle">General access</div>
                 <div class="shareDlgEntry shareDlgEntryH"><div class="shareDlgCircle"><svg width="20" height="20" viewBox="0 0 24 24" style="margin:auto"><path d="M18 8h-1V6c0-2.76-2.24-5-5-5S7 3.24 7 6v2H6c-1.1 0-2 .9-2 2v10c0 1.1.9 2 2 2h12c1.1 0 2-.9 2-2V10c0-1.1-.9-2-2-2zM9 6c0-1.66 1.34-3 3-3s3 1.34 3 3v2H9V6zm9 14H6V10h12v10zm-6-3c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2z"></path></svg></div><div style="margin-left:10px"><div class="shareDlgDrop over360">Restricted<div class="sldsDrop" style="margin: 0 2px 0 12px"></div></div><div style="color:#444746;font-size:12px;letter-spacing:0.1px;margin-left:4px">Only people with access can open with the link</div></div></div>
                 <div style="display:flex;margin: 16px 0;justify-content: space-between"><div class="over360 shareDlgBtn shareDlgBtnWhite">Copy link</div><div class="shareDlgBtn shareDlgBtnBlue">Done</div></div>
@@ -992,7 +992,7 @@ The button in that e-mail links to <span class="urlBox">https://drive.google.com
                 <div id="shareDlgReview2">
                     <label for="reviewDialog" style="cursor:inherit"><div class="iconButton iconButtonLight" style="position:absolute;left:16px;top:12px"><svg width="24" height="24" viewBox="0 0 24 24" style="margin:auto"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg></div></label>
                     <div class="shareDlgTitle" style="margin-left: 42px">Request for access</div>
-                    <div class="shareDlgEntry"><div class="shareDlgCircle"><div style="width:100%;height:100%;background:#7B1FA2;color:#FFF;text-align:center;font-size:20px;line-height:32px;user-select:none;border-radius:20px">L</div></div><div style="margin-left:10px"><div style="font-weight:501;margin-left:4px">Lyra Rebane asked to be an editor</div><div style="color:#444746;font-size:12px;letter-spacing:0.1px;margin-left:4px">lyra.horse@gmail.com</div></div></div>
+                    <div class="shareDlgEntry"><div class="shareDlgCircle" role=img aria-label="profile picture"><div style="width:100%;height:100%;background:#7B1FA2;color:#FFF;text-align:center;font-size:20px;line-height:32px;user-select:none;border-radius:20px">L</div></div><div style="margin-left:10px"><div style="font-weight:501;margin-left:4px">Lyra Rebane asked to be an editor</div><div style="color:#444746;font-size:12px;letter-spacing:0.1px;margin-left:4px">lyra.horse@gmail.com</div></div></div>
                     <div style="margin-left:46px">
                         <div style="background:#D3E3FD;border-radius:4px 16px 16px;width:fit-content;padding:8px;margin-bottom:24px">hi pls give access kthxbye</div>
                         <div class="shareDlgBbox" style="padding:10px 18px;width:fit-content;user-select:none;cursor:default;display:flex;align-items:center">Editor<div class="sldsDrop" style="margin-left:12px"></div></div>
@@ -1226,17 +1226,17 @@ In its current state, this page requires us to make two clicks to complete the a
 
 I pulled out my DevTools and began digging through the JavaScript of the page to see how the query parameters are handled. As a simple test, I started off with just the *userstoinvite* query parameter.
 
-<div class="genericContainer">
+<div class="genericContainer" role="figure" aria-label="Browser window, Google Drive dialog">
     <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span class="urlBarDomain">docs.google.com</span>/file/d/<span class="over720">1sHy3aQXsIlnOCj-mBFxQ0ZXm4TzjjfFL</span><span class="under720">...</span>/edit?userstoinvite=lyra.horse@gmail.com</span></div></div>
     <div class="filePg defSelect" style="height:512px">
-        <div class="filePgH">
+        <div class="filePgH" aria-hidden=true>
             <div class="filePgName"><span class="folderIcon" style="margin: 0 11px"><div></div><div></div></span>Secret Folder</div>
             <div class="filePgOpenW over640">Open with</div>
             <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto;margin-right:2px">
                 <div class="iconButton over480"><div class="dotsIcon"><div></div><div></div><div></div></div></div>
                 <div class="sldsHbtn sldsHbtnBlueDark over480"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
                 <div class="sldsHbtn sldsHbtnBlueDark under480"><div>Share</div></div>
-                <div class="sldsHpfp"><div>L</div></div>
+                <div class="sldsHpfp" role=img aria-label="profile picture"><div>L</div></div>
             </div>
         </div>
         <div class="filePgO">
@@ -1244,7 +1244,7 @@ I pulled out my DevTools and began digging through the JavaScript of the page to
                     <a href="https://www.youtube.com/watch?v=6XFX8hL6YdI" title="there's no one in moominvalley to help"><div class="over360 iconButton iconButtonLight" style="position:absolute;right:6px;top:10px"><div class="helpIcon">?</div></div></a>
                     <div class="iconButton iconButtonLight" style="position:absolute;left:16px;top:12px"><svg width="24" height="24" viewBox="0 0 24 24" style="margin:auto"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg></div>
                     <div class="shareDlgTitle" style="margin-left: 42px">Share "Secret Folder"</div>
-                    <div style="display:flex;margin-top:20px"><div class="shareDlgBbox" style="padding:10px 18px;flex-grow:1;user-select:none;cursor:default;display:flex;align-items:center;margin-right:10px"><div class="shareDlgBubble"><div style="background:#7B1FA2;height:17px;width:17px;border-radius:17px;transform:translate(-4px,0);color:#FFF;line-height:17px;font-weight:400;font-size:12px" class="over480">L</div>Lyra Rebane<span style="margin-left:10px" class="over360">✖</span></div></div><div class="shareDlgBbox" style="padding:14px 18px;width:fit-content;user-select:none;cursor:default;display:flex;align-items:center">Editor<div class="sldsDrop over360" style="margin-left:12px"></div></div></div>
+                    <div style="display:flex;margin-top:20px"><div class="shareDlgBbox" style="padding:10px 18px;flex-grow:1;user-select:none;cursor:default;display:flex;align-items:center;margin-right:10px"><div class="shareDlgBubble"><div style="background:#7B1FA2;height:17px;width:17px;border-radius:17px;transform:translate(-4px,0);color:#FFF;line-height:17px;font-weight:400;font-size:12px" class="over480" role=img aria-label="profile picture">L</div>Lyra Rebane<span style="margin-left:10px" class="over360">✖</span></div></div><div class="shareDlgBbox" style="padding:14px 18px;width:fit-content;user-select:none;cursor:default;display:flex;align-items:center">Editor<div class="sldsDrop over360" style="margin-left:12px"></div></div></div>
                     <div style="display:flex;align-items:center;margin-top:16px;margin-bottom:14px"><input id="notifyChk2" type="checkbox" style="width:18px;height:18px;filter: brightness(0.8) contrast(1.5);margin:1px;margin-right:16px" checked><label for="notifyChk2">Notify people</label></div>
                         <textarea class="shareDlgTbox shareDlgBbox" style="padding:8px 16px;font-size: 14px;height:96px;font-family:inherit;resize: none" placeholder="Message"></textarea>
                         <div style="display:flex;margin: 28px 0 8px;justify-content: flex-end"><div class="shareDlgBtn shareDlgBtnWhite">Cancel</div><div class="shareDlgBtn shareDlgBtnBlue" style="margin-left:8px">Send</div></div>
@@ -1274,7 +1274,7 @@ I began putting the attack together, combining all the cool tricks we've come up
 
 And there we go! I threw it in my slides and...
 
-<div class="genericContainer" style="background:#F9FBFD">
+<div class="genericContainer" style="background:#F9FBFD" role="figure" aria-label="iframe within a slide">
     <div class="sldsMain" style="margin:20px 10px">
             <div class="sldsSlide" style="aspect-ratio:unset;height:fit-content;">
                 <div style="width:94%;height:90%;margin:12px auto;overflow:hidden;border: 2px inset #EEE;background:#0E0E0E">
@@ -1385,7 +1385,7 @@ Both will end up redirecting to <span class="urlBox">https://docs.google.com/fil
 With that figured out, let's throw the **/a/a/** thing into our "videoid" from earlier:
 <span class="urlBox">../signin?next=https%3A%2F%2Faccounts.youtube.com%2Faccounts%2FSetSID%3Fcontinue%3Dhttps%3A%2F%2Fdocs.google.com%252Ffile%252Fd%252F1sHy3aQXsIlnOCj-mBFxQ0ZXm4TzjjfFL%252Fedit%253Fuserstoinvite%253Dlyra.horse%2540gmail.com</span>
 
-<div class="genericContainer" style="background:#F9FBFD">
+<div class="genericContainer" style="background:#F9FBFD" role="figure" aria-label="iframe within a slide, Google Drive dialog">
     <div class="sldsMain" style="margin:20px 10px">
             <div class="sldsSlide" style="aspect-ratio:unset;height:420px">
                 <div style="width:94%;height:90%;margin:auto;overflow:hidden;border: 2px inset #EEE;background:#0E0E0E"><div style="transform:scale(0.8);width:125%;height:125%;margin:-6.75% 0 0 -12.5%">
@@ -1394,7 +1394,7 @@ With that figured out, let's throw the **/a/a/** thing into our "videoid" from e
             <div class="shareDlg">
                     <div class="iconButton iconButtonLight" style="position:absolute;left:16px;top:12px"><svg width="24" height="24" viewBox="0 0 24 24" style="margin:auto"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"></path></svg></div>
                     <div class="shareDlgTitle" style="margin-left: 42px">Share "Secret Folder"</div>
-                    <div style="display:flex;margin-top:20px"><div class="shareDlgBbox" style="padding:10px 18px;flex-grow:1;user-select:none;cursor:default;display:flex;align-items:center;margin-right:10px"><div class="shareDlgBubble"><div style="background:#7B1FA2;height:17px;width:17px;border-radius:17px;transform:translate(-4px,0);color:#FFF;line-height:17px;font-weight:400;font-size:12px" class="over480">L</div>Lyra Rebane<span style="margin-left:10px" class="over360">✖</span></div></div><div class="shareDlgBbox" style="padding:14px 18px;width:fit-content;user-select:none;cursor:default;display:flex;align-items:center">Editor<div class="sldsDrop over360" style="margin-left:12px"></div></div></div>
+                    <div style="display:flex;margin-top:20px"><div class="shareDlgBbox" style="padding:10px 18px;flex-grow:1;user-select:none;cursor:default;display:flex;align-items:center;margin-right:10px"><div class="shareDlgBubble"><div style="background:#7B1FA2;height:17px;width:17px;border-radius:17px;transform:translate(-4px,0);color:#FFF;line-height:17px;font-weight:400;font-size:12px" class="over480" role=img aria-label="profile picture">L</div>Lyra Rebane<span style="margin-left:10px" class="over360">✖</span></div></div><div class="shareDlgBbox" style="padding:14px 18px;width:fit-content;user-select:none;cursor:default;display:flex;align-items:center">Editor<div class="sldsDrop over360" style="margin-left:12px"></div></div></div>
                     <div style="display:flex;align-items:center;margin-top:16px;margin-bottom:14px"><input id="notifyChk2" type="checkbox" style="width:18px;height:18px;filter: brightness(0.8) contrast(1.5);margin:1px;margin-right:16px" checked><label for="notifyChk2">Notify people</label></div>
                         <textarea class="shareDlgTbox shareDlgBbox over480" style="padding:8px 16px;font-size: 14px;height:96px;font-family:inherit;resize: none" placeholder="Message"></textarea>
                         <div style="display:flex;margin: 28px 0 8px;justify-content: flex-end"><div class="shareDlgBtn shareDlgBtnWhite">Cancel</div><div class="shareDlgBtn shareDlgBtnBlue" style="margin-left:8px">Send</div></div>
@@ -1477,7 +1477,7 @@ Feel free to uncomment to see what it looked like in its WIP state :).
 
 With our share dialog inside a presentation, all we need to do now is cover it up with other stuff to make it look presentable. Since all we need to do here is get someone to click the "Send" button, I decided to make my demo look like Google Forms.
 
-<div class="genericContainer" style="background:#F9FBFD">
+<div class="genericContainer" style="background:#F9FBFD" role="figure" aria-label="iframe within a slide, a send button is hidden behind the google form">
     <div class="sldsMain" style="margin:20px 10px">
             <div class="sldsSlide" style="aspect-ratio:unset;height:420px">
                 <div id="formContainer" style="position:relative;width:94%;height:90%;margin:auto;overflow:hidden;border: 2px inset #EEE;background:#F0EBF8">
