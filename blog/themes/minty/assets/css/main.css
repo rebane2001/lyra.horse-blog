@@ -1,6 +1,13 @@
+/* base css for all pages */
+:root {
+  --font-text: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+  --font-head: Didot, 'Bodoni MT', 'Noto Serif Display', 'URW Palladio L', P052, Sylfaen, serif;
+  --font-code: 'Nimbus Mono PS', 'Courier New', monospace;
+}
+
 body {
   color: #222;
-  font-family: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
+  font-family: var(--font-text);
   line-height: normal;
   margin: 0.5rem auto;
   padding: 0.5rem 1rem 1px;
@@ -57,7 +64,6 @@ a {
 #subMeta {
   width: 100%;
   text-align: center;
-  font-family: serif;
 }
 
 #title {
@@ -74,7 +80,7 @@ h1, h2, h2 > a, h1 > a {
 }
 
 h1, h2, #subMeta {
-  font-family: Didot, 'Bodoni MT', 'Noto Serif Display', 'URW Palladio L', P052, Sylfaen, serif;
+  font-family: var(--font-head);
 }
 
 .tag { }
@@ -84,11 +90,30 @@ h1, h2, #subMeta {
 }
 
 code, pre {
-  font-family: 'Nimbus Mono PS', 'Courier New', monospace;
+  font-family: var(--font-code);
   color: #04593b;
   font-size: 90%;
 }
 
 sup {
   line-height: 0;
+}
+
+art-frame {
+ container-type: inline-size;
+ container-name: art;
+ display: block;
+ width: 100%;
+ border-radius: 4px;
+ overflow: clip;
+ min-height: 16px;
+ background: #FFF;
+ &[flex] {
+   display: flex;
+ }
+ &[center] {
+   display: flex;
+   align-items: center;
+   justify-content: center;
+ }
 }

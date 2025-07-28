@@ -3,5 +3,5 @@
   {{- $ISO8601 := "2006-01-02T15:04:05Z07:00" }}
   <div id="subMeta"><time datetime="{{ .Date | time.Format $ISO8601 }}">{{ .Date | time.Format "2006-01-02" }}</time> {{ partial "tags.html" (dict "taxonomy" "tags" "page" .) }}</div>
 
-  {{ .Content }}
+  {{ .Content | replaceRE "<DIV>(<[a-z-]+-[a-z-]+[>\\s])" "$1" | replaceRE "(</[a-z-]+-[a-z-]+>)</DIV>" "$1" | safeHTML }}
 {{ end }}

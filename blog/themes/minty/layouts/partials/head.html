@@ -1,5 +1,5 @@
 <meta charset="utf-8">
   <meta name="viewport" content="width=device-width">
-  <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ printf "%s Ʊ %s" .Title site.Title }}{{ end }}</title>{{ partialCached "head/css.html" . }}
+  <title>{{ if .IsHome }}{{ site.Title }}{{ else }}{{ printf "%s Ʊ %s" .Title site.Title }}{{ end }}</title>
   {{ hugo.Generator }}
-  {{ partial "head/meta.html" . }}
+  {{ partial "head/meta.html" . }}  {{ partialCached "head/css-inline.html" . }}
