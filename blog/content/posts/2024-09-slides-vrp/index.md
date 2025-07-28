@@ -493,6 +493,91 @@ The first obvious place to look would be the external links around the site - su
 
 The redirect works for now, but you'll notice it has a *redir_token* parameter - this parameter is some sort of a token for redirects that's unique to your session. If someone else opened the same link, they'd see this page instead:
 
+<style>
+    .urlBar {
+        background: #3C3C3C;
+        height: 34px;
+        width: calc(100% - 12px);
+        padding: 6px;
+        /*border-radius: 4px;*/
+        font-family: system-ui, sans-serif;
+        font-size: 14px;
+        transition: background 0.4s;
+    }
+    .urlBarInner *::selection {
+        color: #000;
+        background-color: #A8C7FA;
+    }
+    .urlBarInner {
+        background: #282828;
+        color: #C7C7C7;
+        height: 34px;
+        border-radius: 17px;
+        width: 100%;
+        transition: background 0.2s, border-radius 0.2s, font-size 0.4s;
+        display: flex;
+        align-items: center;
+    }
+    .urlBarInner:hover {
+        background: #4A4A4A;
+    }
+    .urlBarText {
+        text-overflow: ellipsis;
+        overflow:hidden;
+        white-space:nowrap;
+        display:inline-block;
+        margin-left:37px;
+        width: calc(100% - 36px - 16px);
+    }
+    .urlBarIcon {
+        width: 16px;
+        height: 16px;
+        margin: 5px;
+        fill: #E3E3E3;
+        background: #3C3C3C;
+        padding: 4px;
+        position: absolute;
+        display:block;
+        border-radius: 24px;
+    }
+    .urlBarIcon svg {
+        width: 16px;
+        height: 16px;
+    }
+    .urlBarDomain {
+        color: #E3E3E3;
+    }
+    @media (width < 480px) {
+        .urlBar {
+            background: #121316;
+            font-size: 12px;
+        }
+        .urlBarInner {
+            background: #313745;
+            color: #C4C6D0;
+        }
+        .urlBarInner:hover {
+            background: #191C21;
+            border-radius: 8px;
+        }
+        .urlBarInner *::selection {
+            color: #E3E2E6;
+            background-color: #373E4D;
+        }
+        .urlBarText {
+            margin-left:26px;
+            width: calc(100% - 25px - 16px);
+        }
+        .urlBarIcon {
+            fill: #E3E2E6;
+            background: #0000;
+            padding-left: 1px;
+        }
+        .urlBarDomain {
+            color: #E3E2E6;
+        }
+    }
+</style>
 <div class="genericContainer" style="background:#FFF;height:480px" role=figure aria-label="Browser window">
     <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span class="urlBarDomain">youtube.com</span>/redirect?event=video_description&redir_token=QUFFLUhqbjdTaFRBeHRfSW95bkJDVmRGcl96VXV6MkNmd3xBQ3Jtc0tuOVg2b2ZsQVV6V3hpaUJfdXB0UWY2Z1A1bE1sUjlQeHZ4WlVYSzNVUXZBcUF0RFYzNHhLazVUUVFQM1Y5N3VGZEV4bmtCVWhmYXRwY05KWlEyY0w3ZHBBdDY5SEtBa1hpQXBkalpqT3liYzFqYVZxSQ&q=https%3A%2F%2Flyra.horse%2F&v=tbYxAFHnzG0</span></div></div>
     <div style="font-family: 'YouTube Noto', Roboto, 'Noto Sans', arial, sans-serif;font-size: 14px;display:flex;flex-direction:column;align-items:center;text-align:center;max-width:90%;margin:auto" class="defSelect">
@@ -677,91 +762,6 @@ This endpoint does redirects without using a verification token! We can just spe
         position: absolute;
         background: #47260E;
         border-radius: 100%;
-    }
-</style>
-<style>
-    .urlBar {
-        background: #3C3C3C;
-        height: 34px;
-        width: calc(100% - 12px);
-        padding: 6px;
-        /*border-radius: 4px;*/
-        font-family: system-ui, sans-serif;
-        font-size: 14px;
-        transition: background 0.4s;
-    }
-    .urlBarInner *::selection {
-        color: #000;
-        background-color: #A8C7FA;
-    }
-    .urlBarInner {
-        background: #282828;
-        color: #C7C7C7;
-        height: 34px;
-        border-radius: 17px;
-        width: 100%;
-        transition: background 0.2s, border-radius 0.2s, font-size 0.4s;
-        display: flex;
-        align-items: center;
-    }
-    .urlBarInner:hover {
-        background: #4A4A4A;
-    }
-    .urlBarText {
-        text-overflow: ellipsis;
-        overflow:hidden;
-        white-space:nowrap;
-        display:inline-block;
-        margin-left:37px;
-        width: calc(100% - 36px - 16px);
-    }
-    .urlBarIcon {
-        width: 16px;
-        height: 16px;
-        margin: 5px;
-        fill: #E3E3E3;
-        background: #3C3C3C;
-        padding: 4px;
-        position: absolute;
-        display:block;
-        border-radius: 24px;
-    }
-    .urlBarIcon svg {
-        width: 16px;
-        height: 16px;
-    }
-    .urlBarDomain {
-        color: #E3E3E3;
-    }
-    @media (width < 480px) {
-        .urlBar {
-            background: #121316;
-            font-size: 12px;
-        }
-        .urlBarInner {
-            background: #313745;
-            color: #C4C6D0;
-        }
-        .urlBarInner:hover {
-            background: #191C21;
-            border-radius: 8px;
-        }
-        .urlBarInner *::selection {
-            color: #E3E2E6;
-            background-color: #373E4D;
-        }
-        .urlBarText {
-            margin-left:26px;
-            width: calc(100% - 25px - 16px);
-        }
-        .urlBarIcon {
-            fill: #E3E2E6;
-            background: #0000;
-            padding-left: 1px;
-        }
-        .urlBarDomain {
-            color: #E3E2E6;
-        }
     }
 </style>
 

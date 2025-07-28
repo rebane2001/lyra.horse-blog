@@ -515,6 +515,57 @@ All of the domains apart from the web.telegram.org one are sort-of built for the
 
 This is usually performed with a HTTP 301 redirect, but if the `tgWebAuth` parameter is set and the deep link is valid, you'll get to run this fun javascript instead:
 
+<style>
+	.vs-main {
+    	width: 100%;
+    	word-break: normal;
+    	overflow-wrap: anywhere;
+    	white-space: pre-wrap;
+    	color: white;
+    	font-family: monospace;
+    	border-spacing: 0px;
+    	background: #000;
+    	border-top: 1px solid #444746;
+	}
+	.vs-ln::before {
+    	content: attr(value);
+	}
+	.vs-ln {
+		box-sizing: border-box;
+    	width: 31px;
+    	background-color: rgb(60, 60, 60);
+    	user-select: none;
+    	text-align: right;
+    	color: rgb(128, 128, 128);
+    	font-size: 12px;
+    	padding: 0px 4px;
+    	border-right: 1px solid rgb(187, 187, 187);
+    	vertical-align: baseline;
+	}
+	.vs-lc {
+		padding: 0px 5px;
+		vertical-align: baseline;
+	}
+	.vs-tg {
+		color: rgb(93, 176, 215);
+	}
+	.vs-at {
+		color: rgb(155, 187, 220);
+	}
+	.vs-av {
+		color: rgb(242, 151, 102);
+	}
+	.vs-cm {
+		color: rgb(35, 110, 37);
+	}
+	.chromeWindow {
+		background: #3C3C3C;
+		height: fit-content;
+		width: 100%;
+		border-radius: 4px;
+		overflow: clip;
+	}
+</style>
 <div class="chromeWindow" role=figure aria-label="Chrome window"><!-- At this point I got a bit lazy, so instead of recreating it from scratch I just kinda copied chromium's view-source CSS :p -->
 <div class="urlBar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText">view-source:https://<span style="color:#E3E3E3">z.t.me</span>/share?url=lyra.horse&tgWebAuth=1</span></div></div>
 <table class="vs-main"><tbody role=code><tr><td class="vs-ln" value="1"></td><td class="vs-lc"><span class="vs-tg">&lt;html&gt;</span></td></tr><tr><td class="vs-ln" value="2"></td><td class="vs-lc"><span class="vs-tg">&lt;head&gt;</span></td></tr><tr><td class="vs-ln" value="3"></td><td class="vs-lc"><span class="vs-tg">&lt;meta <span class="vs-at">name</span>="<span class="vs-av">robots</span>" <span class="vs-at">content</span>="<span class="vs-av">noindex, nofollow</span>"&gt;</span></td></tr><tr><td class="vs-ln" value="4"></td><td class="vs-lc"><span class="vs-tg">&lt;noscript&gt;</span>&lt;meta http-equiv="refresh" content="0;url='https://web.telegram.org/a/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse'"&gt;<span class="vs-tg">&lt;/noscript&gt;</span></td></tr><tr><td class="vs-ln" value="5"></td><td class="vs-lc"><span class="vs-tg">&lt;script&gt;</span></td></tr><tr><td class="vs-ln" value="6"></td><td class="vs-lc">try {</td></tr><tr><td class="vs-ln" value="7"></td><td class="vs-lc">var url = "https:\/\/web.telegram.org\/a\/#?tgaddr=tg%3A%2F%2Fmsg_url%3Furl%3Dlyra.horse";</td></tr><tr><td class="vs-ln" value="8"></td><td class="vs-lc">var hash = location.hash.toString();</td></tr><tr><td class="vs-ln" value="9"></td><td class="vs-lc">if (hash.substr(0, 1) == '#') {</td></tr><tr><td class="vs-ln" value="10"></td><td class="vs-lc">  hash = hash.substr(1);</td></tr><tr><td class="vs-ln" value="11"></td><td class="vs-lc">}</td></tr><tr><td class="vs-ln" value="12"></td><td class="vs-lc">location.replace(hash ? urlAppendHashParams(url, hash) : url);</td></tr><tr><td class="vs-ln" value="13"></td><td class="vs-lc">} catch (e) { location.href=url; }</td></tr><tr><td class="vs-ln" value="14"></td><td class="vs-lc"><br></td></tr><tr><td class="vs-ln" value="15"></td><td class="vs-lc">function urlAppendHashParams(url, addHash) {</td></tr><tr><td class="vs-ln" value="16"></td><td class="vs-lc">  var ind = url.indexOf('#');</td></tr><tr><td class="vs-ln" value="17"></td><td class="vs-lc">  if (ind &lt; 0) {</td></tr><tr><td class="vs-ln" value="18"></td><td class="vs-lc">    return url + '#' + addHash;</td></tr><tr><td class="vs-ln" value="19"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="20"></td><td class="vs-lc">  var curHash = url.substr(ind + 1);</td></tr><tr><td class="vs-ln" value="21"></td><td class="vs-lc">  if (curHash.indexOf('=') &gt;= 0 || curHash.indexOf('?') &gt;= 0) {</td></tr><tr><td class="vs-ln" value="22"></td><td class="vs-lc">    return url + '&amp;' + addHash;</td></tr><tr><td class="vs-ln" value="23"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="24"></td><td class="vs-lc">  if (curHash.length &gt; 0) {</td></tr><tr><td class="vs-ln" value="25"></td><td class="vs-lc">    return url + '?' + addHash;</td></tr><tr><td class="vs-ln" value="26"></td><td class="vs-lc">  }</td></tr><tr><td class="vs-ln" value="27"></td><td class="vs-lc">  return url + addHash;</td></tr><tr><td class="vs-ln" value="28"></td><td class="vs-lc">}</td></tr><tr><td class="vs-ln" value="29"></td><td class="vs-lc"><span class="vs-tg">&lt;/script&gt;</span></td></tr><tr><td class="vs-ln" value="30"></td><td class="vs-lc"><span class="vs-tg">&lt;/head&gt;</span></td></tr><tr><td class="vs-ln" value="31"></td><td class="vs-lc"><span class="vs-tg">&lt;/html&gt;</span></td></tr><tr><td class="vs-ln" value="32"></td><td class="vs-lc"><span class="vs-cm">&lt;!-- page generated in 4.3ms --&gt;</span></td></tr><tr><td class="vs-ln" value="33"></td><td class="vs-lc"><span></span></td></tr></tbody></table>
@@ -538,52 +589,6 @@ We start off by sending "z.t.me" in their Telegram app and tapping on the link. 
 
 <!-- I did not want to add a YouTube embed here because I want there to be no external resources in this blog unless absolutely necessary.
 Having the thumbnail be just a gradient looks a bit silly but otherwise I think it's a fairly decent replacement for the official embed. -->
-<div class="ytLink" style="position:relative">
-<a href="https://vimeo.com/941755175" target="_blank"><div class="ytLinkOverlay"></div></a>
-<div style="padding:13px;display:flex;align-items:center;position:absolute;z-index:3;max-width: calc(100% - 26px);pointer-events:none">
-<a href="https://www.youtube.com/MLGaeming" target="_blank"><span class="ytChan"><span style="color:#F00">m</span><span style="color:#00F">l</span><span style="color:#0F0">g</span></span></a><span style="text-shadow: 0 0 2px #0008;vertical-align: middle;padding-left:10px;display:inline-block;text-overflow: ellipsis;overflow: clip;white-space: nowrap">Stealing your Telegram account in 10 seconds flat</span></div>
-<svg height="13%" style="margin:auto;display:block;position:absolute;top:0;left:0;bottom:0;right:0" viewBox="0 0 68 48"><path class="ytp-large-play-button-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path><path d="M 45,24 27,14 27,34" fill="#fff"></path></svg>
-<div style="position:absolute;bottom: 8px;background:#171717cc;width:fit-content;height:47px;font-size:16px;font-weight:500;display:flex;align-items: center"><span style="margin: 12px">Watch on YouTube</span></div>
-</div>
-
-*Note: YouTube has removed [my video](https://www.youtube.com/watch?v=5DQrPEr1gGk) for a community guidelines violation. Educational content like this is allowed, but I believe their review team confused my video with a hacking tutorial (probably due to livesplit splits looking too much like a step-by-step instruction). They've also refused my appeal. You can watch a [plain mp4](https://cdn.hobune.stream/tg_video_1080p.mp4), [a Vimeo upload](https://vimeo.com/941755175), or [this twitter post](https://twitter.com/rebane2001/status/1785791628533195209) instead.*
-
-This attack is incredibly easy to pull off even for a low-skill attacker. Assuming some higher forces have already set up a custom domain for you, all you need to know is how to tap on a link and add a letter onto the URL bar. You don't need any specialized tools, you don't need to know anything about the target, you don't even need a phone.
-
-So what should Telegram do about this?
-
-<div class="tgQr" role=figure aria-label="Telegram QR Code login">
-<div style="margin: 0 auto;width:280px;aspect-ratio:1/1;max-width:100%;background:#FFF;border-radius:24px"><a href="https://lyra.horse/antonymph/" target="_blank"><!--
-I recreated the QR code SVG from scratch because the one auto-generated by Telegram is very inefficient as a static asset for the blog :c --><svg fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
-<!-- QR data -->
-<polyline points="92 28 100 28 100 36 108 36"/><polyline points="124 28 124 36 132 36 124 36 124 44 116 44 116 68 100 68 108 68 108 76 108 60 132 60 132 52 132 60 140 60 140 84 156 84 156 76"/><polyline points="148 68 117.2 68 124 68 124 84 116 84 116 92"/><polyline points="132 92 132 100 124 100"/><polyline points="84 116 108 116 108 100 84 100 84 92 76 92 100 92 100 84 100 108 100 116 100 108 116 108"/><polyline points="180 44 180 52 148 52 148 44 164 44 164 28 188 28 172 28 172 36 164 36 164 52 156 52 156 60"/><polyline points="172 76 172 68 188 68 188 76 188 60"/><polyline points="188 116 188 108 180 108 180 100 180 108 164 108 164 92 164 100 156 100"/><line x1="188" x2="196" y1="92" y2="92"/><polyline points="236 116 236 100 244 100 244 108 236 108"/><polyline points="212 100 220 100 220 116"/><polyline points="52 92 36 92 36 100"/><polyline points="252 148.9 252 132 244 132 252 132 252 124"/><polyline points="196 140 188 140 188 148"/><polyline points="68 100 68 108 76 108 68 108 68 116"/><polyline points="92 156 92 164 100 164 100 156 76 156 84 156 84 140 76 140"/><line x1="28" x2="28" y1="108" y2="116"/><polyline points="36 124 36 132 44 132 36 132 36 140"/><polyline points="28 148 28 156 36 156 36 164"/><polyline points="68 148 60 148 60 164 68 164 52 164 52 156 60 156 60 188"/><polyline points="76 172 84 172 84 180 100 180 84 180 84 188 76 188"/><line x1="92" x2="92" y1="196" y2="204"/><polyline points="116 228 116 220 100 220 108 220 108 204 132 204 132 220 132 212 124 212 124 204 148 204 140 204 140 188 124 188 124 180 132 180 132 188"/><polyline points="92 228 92 244 100 244 100 236 92 236"/><polyline points="124 252 132 252 132 244"/><polyline points="172 252 164 252 164 236 156 236 156 228 156 236 140 236 140 228"/><polyline points="148 180 172 180 172 164 172 172 180 172"/><polyline points="172 228 172 220 164 220 164 204 164 212 156 212"/><line x1="188" x2="188" y1="236" y2="252"/><polyline points="212 156 212 140 228 140 228 132 220 132 220 140 236 140 236 164 244 164 244 180 252 180 244 180 244 156 236 156 236 164 220 164 220 172 196 172 196 164 188 164"/><polyline points="228 164 228 196 220 196 220 172 204 172 204 180 204 188 204 180 220 180 220 188 180 188 180 204 188 204 188 188 188 220 204 220 204 236 204 228 196 228 196 220 220 220 220 196 220 228 244 228 244 236 252 236 236 236 236 244 228 244 228 228 236 228 236 236 236 220 244 220 244 228 236 228 236 204 252 204 252 196 252 212 252 204 236 204 236 212 220 212"/><line x1="204" x2="204" y1="204" y2="204"/><line x1="244" x2="244" y1="252" y2="252"/><line x1="148" x2="148" y1="252" y2="252"/><line x1="148" x2="148" y1="220" y2="220"/><line x1="108" x2="108" y1="188" y2="188"/><line x1="108" x2="108" y1="172" y2="172"/><line x1="44" x2="44" y1="188" y2="188"/><line x1="28" x2="28" y1="172" y2="172"/><line x1="44" x2="44" y1="148" y2="148"/><line x1="76" x2="76" y1="124" y2="124"/><line x1="52" x2="52" y1="108" y2="108"/><line x1="92" x2="92" y1="76" y2="76"/><path d="m148 108"/><line x1="180" x2="180" y1="132" y2="132"/><line x1="196" x2="196" y1="124" y2="124"/><line x1="212" x2="212" y1="124" y2="124"/><line x1="204" x2="204" y1="108" y2="108"/><line x1="252" x2="252" y1="92" y2="92"/><line x1="148" x2="148" y1="28" y2="28"/>
-<!-- QR position -->
-<polyline points="52 44 52 60 60 60 60 44 44 44 44 60 52 60"/><path d="m44 28h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/><polyline points="52 220 52 236 60 236 60 220 44 220 44 236 52 236"/><path d="m44 204h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/><polyline points="228 44 228 60 236 60 236 44 220 44 220 60 228 60"/><path d="m220 28h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/>
-<!-- TG logo -->
-<circle fill="#3390EC" stroke="none" cx="140" cy="140" r="32"/><path fill="#FFF" stroke="none" d="m131 143.6c5.7-3.8 11.4-7.5 14.8-9.2 0.7-0.5 1.5 0.5 0.9 1.1-2.6 3.3-6.5 6.6-10.8 10.8-0.8 0.8-0.6 2 0.3 2.6 3.5 2.6 7.7 5.2 12.2 7.8 1.8 1.1 4.2 0.1 4.5-2 1.7-9.1 3-17.7 3.9-25.8 0.3-1.9-1.6-3.5-3.5-2.7-10.4 4-21.8 8.8-34.3 14.1-1 0.5-1.6 1.5-0.1 2.3l4.5 1.6c2.6 0.9 5.3 0.8 7.6-0.6z"/>
-</svg></a></div>
-<p>Log in to Telegram by QR Code</p>
-<ol><li><span>Open Telegram on your phone</span></li><li><span>Go to Settings &gt; Devices &gt; Link Desktop Device</span></li><li><span>Point your phone at this screen to confirm login</span></li></ol>
-</div>
-
-The same thing they did with the QR code logins! If you attempt to log onto a new device by scanning a login QR code, you'll still have to enter your 2FA password - and I think the same mitigation could be implemented for these instant login web client URLs.
-
-**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1785779094656868406), [mastodon](https://infosec.exchange/@rebane2001/112367887114044823), [hackernews](https://news.ycombinator.com/item?id=40229482), [cohost](https://cohost.org/rebane2001/post/5798626-i-just-made-a-new-bl)
-
----
-
-thank you for reading my first blog post!! 
-
-i decided to take on the challenge of using no images on the page, and no javascript either. i don't think this'll be a sustainable way of doing things going forward, but it does mean you get fast load times (everything here is ~20kB gzipped!), pretty vector graphics on hidpi screens (try zooming in!), and responsive "screenshots" for mobile devices (try resizing the window and see how neatly things change to accommodate!). also if you're someone using assistive technologies, please let me know how this post felt to read and if there's anything to be improved or done differently in the future.
-
-note: the graphics in this blog post are not fully compatible with [netscape navigator](https://en.wikipedia.org/wiki/Netscape_Navigator), please switch to a modern alternative such as [ladybird](https://ladybird.dev/)
-
-
-
-[^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
-[^2]: `url_auth_domains` is a list of domains used for logging into the web clients, but there is another list under the `autologin_domains` key, which is used for webapps such as [bugs.telegram.org](https://bugs.telegram.org).
-[^3]: There are also `peer`, `msg_id`, and `button_id` fields, but if we set our `flag` to `f_url` (4) we skip them.
-
 <style>
 	.ytLink svg {
 		filter: saturate(0.5) brightness(1.5);
@@ -679,53 +684,49 @@ note: the graphics in this blog post are not fully compatible with [netscape nav
     	border-radius: 50%;
     	font-size: smaller;
 	}
-	.vs-main {
-    	width: 100%;
-    	word-break: normal;
-    	overflow-wrap: anywhere;
-    	white-space: pre-wrap;
-    	color: white;
-    	font-family: monospace;
-    	border-spacing: 0px;
-    	background: #000;
-    	border-top: 1px solid #444746;
-	}
-	.vs-ln::before {
-    	content: attr(value);
-	}
-	.vs-ln {
-		box-sizing: border-box;
-    	width: 31px;
-    	background-color: rgb(60, 60, 60);
-    	user-select: none;
-    	text-align: right;
-    	color: rgb(128, 128, 128);
-    	font-size: 12px;
-    	padding: 0px 4px;
-    	border-right: 1px solid rgb(187, 187, 187);
-    	vertical-align: baseline;
-	}
-	.vs-lc {
-		padding: 0px 5px;
-		vertical-align: baseline;
-	}
-	.vs-tg {
-		color: rgb(93, 176, 215);
-	}
-	.vs-at {
-		color: rgb(155, 187, 220);
-	}
-	.vs-av {
-		color: rgb(242, 151, 102);
-	}
-	.vs-cm {
-		color: rgb(35, 110, 37);
-	}
-	.chromeWindow {
-		background: #3C3C3C;
-		height: fit-content;
-		width: 100%;
-		border-radius: 4px;
-		overflow: clip;
-	}
 </style>
+<div class="ytLink" style="position:relative">
+<a href="https://vimeo.com/941755175" target="_blank"><div class="ytLinkOverlay"></div></a>
+<div style="padding:13px;display:flex;align-items:center;position:absolute;z-index:3;max-width: calc(100% - 26px);pointer-events:none">
+<a href="https://www.youtube.com/MLGaeming" target="_blank"><span class="ytChan"><span style="color:#F00">m</span><span style="color:#00F">l</span><span style="color:#0F0">g</span></span></a><span style="text-shadow: 0 0 2px #0008;vertical-align: middle;padding-left:10px;display:inline-block;text-overflow: ellipsis;overflow: clip;white-space: nowrap">Stealing your Telegram account in 10 seconds flat</span></div>
+<svg height="13%" style="margin:auto;display:block;position:absolute;top:0;left:0;bottom:0;right:0" viewBox="0 0 68 48"><path class="ytp-large-play-button-bg" d="M66.52,7.74c-0.78-2.93-2.49-5.41-5.42-6.19C55.79,.13,34,0,34,0S12.21,.13,6.9,1.55 C3.97,2.33,2.27,4.81,1.48,7.74C0.06,13.05,0,24,0,24s0.06,10.95,1.48,16.26c0.78,2.93,2.49,5.41,5.42,6.19 C12.21,47.87,34,48,34,48s21.79-0.13,27.1-1.55c2.93-0.78,4.64-3.26,5.42-6.19C67.94,34.95,68,24,68,24S67.94,13.05,66.52,7.74z" fill="#f00"></path><path d="M 45,24 27,14 27,34" fill="#fff"></path></svg>
+<div style="position:absolute;bottom: 8px;background:#171717cc;width:fit-content;height:47px;font-size:16px;font-weight:500;display:flex;align-items: center"><span style="margin: 12px">Watch on YouTube</span></div>
+</div>
+
+*Note: YouTube has removed [my video](https://www.youtube.com/watch?v=5DQrPEr1gGk) for a community guidelines violation. Educational content like this is allowed, but I believe their review team confused my video with a hacking tutorial (probably due to livesplit splits looking too much like a step-by-step instruction). They've also refused my appeal. You can watch a [plain mp4](https://cdn.hobune.stream/tg_video_1080p.mp4), [a Vimeo upload](https://vimeo.com/941755175), or [this twitter post](https://twitter.com/rebane2001/status/1785791628533195209) instead.*
+
+This attack is incredibly easy to pull off even for a low-skill attacker. Assuming some higher forces have already set up a custom domain for you, all you need to know is how to tap on a link and add a letter onto the URL bar. You don't need any specialized tools, you don't need to know anything about the target, you don't even need a phone.
+
+So what should Telegram do about this?
+
+<div class="tgQr" role=figure aria-label="Telegram QR Code login">
+<div style="margin: 0 auto;width:280px;aspect-ratio:1/1;max-width:100%;background:#FFF;border-radius:24px"><a href="https://lyra.horse/antonymph/" target="_blank"><!--
+I recreated the QR code SVG from scratch because the one auto-generated by Telegram is very inefficient as a static asset for the blog :c --><svg fill="none" stroke="#000" stroke-width="8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 280 280" xmlns="http://www.w3.org/2000/svg">
+<!-- QR data -->
+<polyline points="92 28 100 28 100 36 108 36"/><polyline points="124 28 124 36 132 36 124 36 124 44 116 44 116 68 100 68 108 68 108 76 108 60 132 60 132 52 132 60 140 60 140 84 156 84 156 76"/><polyline points="148 68 117.2 68 124 68 124 84 116 84 116 92"/><polyline points="132 92 132 100 124 100"/><polyline points="84 116 108 116 108 100 84 100 84 92 76 92 100 92 100 84 100 108 100 116 100 108 116 108"/><polyline points="180 44 180 52 148 52 148 44 164 44 164 28 188 28 172 28 172 36 164 36 164 52 156 52 156 60"/><polyline points="172 76 172 68 188 68 188 76 188 60"/><polyline points="188 116 188 108 180 108 180 100 180 108 164 108 164 92 164 100 156 100"/><line x1="188" x2="196" y1="92" y2="92"/><polyline points="236 116 236 100 244 100 244 108 236 108"/><polyline points="212 100 220 100 220 116"/><polyline points="52 92 36 92 36 100"/><polyline points="252 148.9 252 132 244 132 252 132 252 124"/><polyline points="196 140 188 140 188 148"/><polyline points="68 100 68 108 76 108 68 108 68 116"/><polyline points="92 156 92 164 100 164 100 156 76 156 84 156 84 140 76 140"/><line x1="28" x2="28" y1="108" y2="116"/><polyline points="36 124 36 132 44 132 36 132 36 140"/><polyline points="28 148 28 156 36 156 36 164"/><polyline points="68 148 60 148 60 164 68 164 52 164 52 156 60 156 60 188"/><polyline points="76 172 84 172 84 180 100 180 84 180 84 188 76 188"/><line x1="92" x2="92" y1="196" y2="204"/><polyline points="116 228 116 220 100 220 108 220 108 204 132 204 132 220 132 212 124 212 124 204 148 204 140 204 140 188 124 188 124 180 132 180 132 188"/><polyline points="92 228 92 244 100 244 100 236 92 236"/><polyline points="124 252 132 252 132 244"/><polyline points="172 252 164 252 164 236 156 236 156 228 156 236 140 236 140 228"/><polyline points="148 180 172 180 172 164 172 172 180 172"/><polyline points="172 228 172 220 164 220 164 204 164 212 156 212"/><line x1="188" x2="188" y1="236" y2="252"/><polyline points="212 156 212 140 228 140 228 132 220 132 220 140 236 140 236 164 244 164 244 180 252 180 244 180 244 156 236 156 236 164 220 164 220 172 196 172 196 164 188 164"/><polyline points="228 164 228 196 220 196 220 172 204 172 204 180 204 188 204 180 220 180 220 188 180 188 180 204 188 204 188 188 188 220 204 220 204 236 204 228 196 228 196 220 220 220 220 196 220 228 244 228 244 236 252 236 236 236 236 244 228 244 228 228 236 228 236 236 236 220 244 220 244 228 236 228 236 204 252 204 252 196 252 212 252 204 236 204 236 212 220 212"/><line x1="204" x2="204" y1="204" y2="204"/><line x1="244" x2="244" y1="252" y2="252"/><line x1="148" x2="148" y1="252" y2="252"/><line x1="148" x2="148" y1="220" y2="220"/><line x1="108" x2="108" y1="188" y2="188"/><line x1="108" x2="108" y1="172" y2="172"/><line x1="44" x2="44" y1="188" y2="188"/><line x1="28" x2="28" y1="172" y2="172"/><line x1="44" x2="44" y1="148" y2="148"/><line x1="76" x2="76" y1="124" y2="124"/><line x1="52" x2="52" y1="108" y2="108"/><line x1="92" x2="92" y1="76" y2="76"/><path d="m148 108"/><line x1="180" x2="180" y1="132" y2="132"/><line x1="196" x2="196" y1="124" y2="124"/><line x1="212" x2="212" y1="124" y2="124"/><line x1="204" x2="204" y1="108" y2="108"/><line x1="252" x2="252" y1="92" y2="92"/><line x1="148" x2="148" y1="28" y2="28"/>
+<!-- QR position -->
+<polyline points="52 44 52 60 60 60 60 44 44 44 44 60 52 60"/><path d="m44 28h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/><polyline points="52 220 52 236 60 236 60 220 44 220 44 236 52 236"/><path d="m44 204h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/><polyline points="228 44 228 60 236 60 236 44 220 44 220 60 228 60"/><path d="m220 28h16c8.8 0 16 7.2 16 16v16c0 8.8-7.2 16-16 16h-16c-8.8 0-16-7.2-16-16v-16c0-8.8 7.2-16 16-16z"/>
+<!-- TG logo -->
+<circle fill="#3390EC" stroke="none" cx="140" cy="140" r="32"/><path fill="#FFF" stroke="none" d="m131 143.6c5.7-3.8 11.4-7.5 14.8-9.2 0.7-0.5 1.5 0.5 0.9 1.1-2.6 3.3-6.5 6.6-10.8 10.8-0.8 0.8-0.6 2 0.3 2.6 3.5 2.6 7.7 5.2 12.2 7.8 1.8 1.1 4.2 0.1 4.5-2 1.7-9.1 3-17.7 3.9-25.8 0.3-1.9-1.6-3.5-3.5-2.7-10.4 4-21.8 8.8-34.3 14.1-1 0.5-1.6 1.5-0.1 2.3l4.5 1.6c2.6 0.9 5.3 0.8 7.6-0.6z"/>
+</svg></a></div>
+<p>Log in to Telegram by QR Code</p>
+<ol><li><span>Open Telegram on your phone</span></li><li><span>Go to Settings &gt; Devices &gt; Link Desktop Device</span></li><li><span>Point your phone at this screen to confirm login</span></li></ol>
+</div>
+
+The same thing they did with the QR code logins! If you attempt to log onto a new device by scanning a login QR code, you'll still have to enter your 2FA password - and I think the same mitigation could be implemented for these instant login web client URLs.
+
+**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1785779094656868406), [mastodon](https://infosec.exchange/@rebane2001/112367887114044823), [hackernews](https://news.ycombinator.com/item?id=40229482), [cohost](https://cohost.org/rebane2001/post/5798626-i-just-made-a-new-bl)
+
+---
+
+thank you for reading my first blog post!! 
+
+i decided to take on the challenge of using no images on the page, and no javascript either. i don't think this'll be a sustainable way of doing things going forward, but it does mean you get fast load times (everything here is ~20kB gzipped!), pretty vector graphics on hidpi screens (try zooming in!), and responsive "screenshots" for mobile devices (try resizing the window and see how neatly things change to accommodate!). also if you're someone using assistive technologies, please let me know how this post felt to read and if there's anything to be improved or done differently in the future.
+
+note: the graphics in this blog post are not fully compatible with [netscape navigator](https://en.wikipedia.org/wiki/Netscape_Navigator), please switch to a modern alternative such as [ladybird](https://ladybird.dev/)
+
+
+
+[^1]: [tdesktop](https://github.com/telegramdesktop/tdesktop) is the official cross-platform desktop client (Telegram Lite on macOS)
+[^2]: `url_auth_domains` is a list of domains used for logging into the web clients, but there is another list under the `autologin_domains` key, which is used for webapps such as [bugs.telegram.org](https://bugs.telegram.org).
+[^3]: There are also `peer`, `msg_id`, and `button_id` fields, but if we set our `flag` to `f_url` (4) we skip them.

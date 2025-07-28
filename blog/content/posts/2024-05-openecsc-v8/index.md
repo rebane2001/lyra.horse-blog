@@ -265,6 +265,156 @@ The challenge consists of the V8 engine with some new functionality added throug
 
 The patch adds a new **Array.xor()** prototype that can be used to xor all values within an array of doubles, let's try it:
 
+<style>
+.jsConsole {
+	background: #282828;
+	border-radius: 4px;
+	width: calc(100% - 2px);
+	color: #E3E3E3;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 12px;
+	border: 1px solid #5E5E5E;
+	cursor: default;
+}
+.jsConsole *::selection {
+	background: #004A77;
+}
+.jsConLine {
+	min-height: 14px;
+	margin: 3px;
+	padding: 1px;
+	width: calc(100% - 8px);
+	border-radius: 4px;
+}
+.jsConTerm {
+	white-space: pre-wrap;
+	background: #000;
+	color: #FFF;
+	margin: 0;
+	padding: 4px;
+}
+.jsConTerm::selection, .jsConTerm *::selection {
+	color: #000;
+	background: #FFF;
+}
+.jsConCode {
+	min-height: 14px;
+	margin: 3px;
+	padding: 7px;
+	width: calc(100% - 20px);
+	border-radius: 4px;
+	white-space: pre-wrap;
+	cursor: initial;
+}
+.jsConLine:has(details) {
+	text-wrap: nowrap;
+}
+.jsConBorder {
+	background: #5E5E5E;
+	width: 100%;
+	height: 1px;
+}
+.jsConLine:hover {
+	background: #3D3D3D;
+}
+.jsConTerm:hover {
+	background: #111;
+}
+.jsConLine:has(.jsConErr):hover {
+	background: #E46962;
+}
+.jsConLine > details {
+	padding-left: 4px;
+	display: inline-block;
+	text-wrap: wrap;
+	max-width: calc(100% - 4px - 18px);
+}
+.jsConLine > details > summary::marker {
+	line-height: 0;
+}
+.jsConVar {
+	color: #C7C7C7;
+}
+.jsConValIn {
+	color: #C4EED0;
+}
+.jsConValOut {
+	color: #9980FF;
+}
+.jsConProp {
+	color: #FACC15;
+}
+.jsConIdx {
+	color: #7CACF8;
+}
+.jsConB {
+	font-weight: bold;
+}
+.jsConNull {
+	color: #6F6F6F;
+}
+.jsConKw {
+	color: #BF67FF;
+}
+.jsConStr {
+	color: #FE8D59;
+}
+.jsConStrOut {
+	color: #5CD5FB;
+}
+.jsConV8 {
+	/* color: #9F0; */
+	color: #FFF;
+}
+.jsConIcon {
+	fill: #C7C7C7;
+	display: inline-block;
+	width: 16px;
+	height: 14px;
+	vertical-align: top;
+	padding-right: 2px;
+}
+.jsConErr {
+	background: #4E3534;
+	color: #F9DEDC;
+	padding: 4px;
+	border-radius: 4px;
+}
+.jsConErr > .jsConIcon {
+	padding-right: 4px;
+}
+
+@media (width >= 430px) {
+	.under430 {
+		display: none;
+	}
+}
+@media (width < 430px) {
+	.over430 {
+		display: none;
+	}
+}
+@media (width < 640px) {
+	.over640 {
+		display: none;
+	}
+}
+@media (width >= 640px) {
+	.termCodeComm {
+		float: right;
+	}
+}
+@media (width < 800px) {
+	.over800 {
+		display: none;
+	}
+}
+@media (height < 960px) {
+	.over960h {
+		display: none;
+	}
+}
+</style>
 <div class="jsConsole">
 	<div class="jsConLine"><svg class="jsConIcon" xmlns="http://www.w3.org/2000/svg"><path d="M 6.4,11 5.55,10.15 8.7,7 5.55,3.85 6.4,3 l 4,4 z"/></svg><span class="jsConVar">arr</span> = [<span class="jsConValIn">0.1</span>, <span class="jsConValIn">0.2</span>, <span class="jsConValIn">0.3</span>]</div>
 	<div class="jsConBorder"></div>
@@ -436,6 +586,285 @@ But first, we should look at how v8 stores stuff in the memory so that we can fi
 
 With the **d8 natives syntax** and a **debugger**! If we launch d8 (the v8 shell) with the `--allow-natives-syntax` flag, we can use various debug functions such as `%DebugPrint(obj)` to examine what's going on with objects, and if we combine that with a debugger ([gdb](https://gnu.org/software/gdb/) in this case) we can even check out the entire memory to understand it better. Let's try it:
 
+<style>
+.termCodePp {
+	color: #444;
+}
+.termCodePr {
+	color: #8e1;
+}
+.termCodePw {
+	color: #EF0;
+}
+.termCodePx {
+	color: #FA0;
+}
+.termCodePrwx {
+	color: #F00;
+}
+.jsMem {
+	color: #DCDFE4;
+	background: #282C34;
+	border-radius: 4px;
+	padding:8px;
+	cursor: default;
+}
+
+.coarseText {
+	display: none;
+}
+.fineText {
+	display: inline;
+}
+
+/*
+ *	Disable text selection on touchscreens because you can't
+ *  hover over the interactive elements and tapping them will
+ *  try to select the text if we don't disable selections.
+ */
+@media (pointer: coarse) {
+	.jsMem {
+		user-select: none;
+	}
+	.coarseText {
+		display: inline;
+	}
+	.fineText {
+		display: none;
+	}
+}
+
+.jsMemTitle {
+	pointer-events: none;
+	user-select: none;
+	color: var(--lyreGold);
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 14px;
+	display: flex;
+	margin: 4px 4px 4px;
+}
+.jsMemSep {
+	margin-left: 5px;
+	margin-top: 1px;
+	flex-grow: 1;
+	align-self: center;
+	display: inline-block;
+	height: 2px;
+	background: var(--lyreGold);
+}
+
+.jsMem *::selection {
+	background: #00F;
+	color: #FFF;
+}
+
+.jsMemDbg, .jsMemHex {
+	font-size: 12px;
+	white-space: pre-wrap;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+}
+
+:root {
+	--lyreGold: #FAD542;
+	--jsMemVarB0:  #0000;
+	--jsMemVarB1:  #0000;
+	--jsMemVarB2:  #0000;
+	--jsMemVarB3:  #0000;
+	--jsMemVarB4:  #0000;
+	--jsMemVarB5:  #0000;
+	--jsMemVarB6:  #0000;
+	--jsMemVarB7:  #0000;
+	--jsMemVarB8:  #0000;
+	--jsMemVarB9:  #0000;
+	--jsMemVarB10:  #0000;
+	--jsMemVarB11:  #0000;
+	--jsMemVarB12:  #0000;
+	--jsMemVarB13:  #0000;
+	--jsMemVarB14:  #0000;
+	--jsMemVarB15:  #0000;
+	--jsMemVarB16:  #0000;
+	--jsMemVarB17:  #0000;
+	--jsMemVarB18:  #0000;
+	--jsMemVarB19:  #0000;
+	--jsMemVarB20:  #0000;
+	--jsMemVarF0:  #ff9999;
+	--jsMemVarF1:  #ffc199;
+	--jsMemVarF2:  #ffea99;
+	--jsMemVarF3:  #eaff99;
+	--jsMemVarF4:  #c1ff99;
+	--jsMemVarF5:  #99ff99;
+	--jsMemVarF6:  #99ffc1;
+	--jsMemVarF7:  #99ffea;
+	--jsMemVarF8:  #99eaff;
+	--jsMemVarF9:  #99c1ff;
+	--jsMemVarF10:  #9999ff;
+	--jsMemVarF11:  #c199ff;
+	--jsMemVarF12:  #ea99ff;
+	--jsMemVarF13:  #ff99ea;
+	--jsMemVarF14:  #ff99c1;
+	--jsMemVarF15:  #ff9999;
+	--jsMemVarF16:  #ffc199;
+	--jsMemVarF17:  #ffea99;
+	--jsMemVarF18:  #eaff99;
+	--jsMemVarF19:  #c1ff99;
+	--jsMemVarF20:  #99ff99;
+	--jsMemVarB: var(--lyreGold);
+	--jsMemVarF: #000;
+}
+
+.jsMemVar0 { color: var(--jsMemVarF0); background: var(--jsMemVarB0) }
+.jsMemVar1 { color: var(--jsMemVarF1); background: var(--jsMemVarB1) }
+.jsMemVar2 { color: var(--jsMemVarF2); background: var(--jsMemVarB2) }
+.jsMemVar3 { color: var(--jsMemVarF3); background: var(--jsMemVarB3) }
+.jsMemVar4 { color: var(--jsMemVarF4); background: var(--jsMemVarB4) }
+.jsMemVar5 { color: var(--jsMemVarF5); background: var(--jsMemVarB5) }
+.jsMemVar6 { color: var(--jsMemVarF6); background: var(--jsMemVarB6) }
+.jsMemVar7 { color: var(--jsMemVarF7); background: var(--jsMemVarB7) }
+.jsMemVar8 { color: var(--jsMemVarF8); background: var(--jsMemVarB8) }
+.jsMemVar9 { color: var(--jsMemVarF9); background: var(--jsMemVarB9) }
+.jsMemVar10 { color: var(--jsMemVarF10); background: var(--jsMemVarB10) }
+.jsMemVar11 { color: var(--jsMemVarF11); background: var(--jsMemVarB11) }
+.jsMemVar12 { color: var(--jsMemVarF12); background: var(--jsMemVarB12) }
+.jsMemVar13 { color: var(--jsMemVarF13); background: var(--jsMemVarB13) }
+.jsMemVar14 { color: var(--jsMemVarF14); background: var(--jsMemVarB14) }
+.jsMemVar15 { color: var(--jsMemVarF15); background: var(--jsMemVarB15) }
+.jsMemVar16 { color: var(--jsMemVarF16); background: var(--jsMemVarB16) }
+.jsMemVar17 { color: var(--jsMemVarF17); background: var(--jsMemVarB17) }
+.jsMemVar18 { color: var(--jsMemVarF18); background: var(--jsMemVarB18) }
+.jsMemVar19 { color: var(--jsMemVarF19); background: var(--jsMemVarB19) }
+.jsMemVar20 { color: var(--jsMemVarF20); background: var(--jsMemVarB20) }
+.jsMem:has(.jsMemVar0:hover) { --jsMemVarB0: var(--jsMemVarB); --jsMemVarF0: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar1:hover) { --jsMemVarB1: var(--jsMemVarB); --jsMemVarF1: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar2:hover) { --jsMemVarB2: var(--jsMemVarB); --jsMemVarF2: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar3:hover) { --jsMemVarB3: var(--jsMemVarB); --jsMemVarF3: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar4:hover) { --jsMemVarB4: var(--jsMemVarB); --jsMemVarF4: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar5:hover) { --jsMemVarB5: var(--jsMemVarB); --jsMemVarF5: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar6:hover) { --jsMemVarB6: var(--jsMemVarB); --jsMemVarF6: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar7:hover) { --jsMemVarB7: var(--jsMemVarB); --jsMemVarF7: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar9:hover) { --jsMemVarB9: var(--jsMemVarB); --jsMemVarF9: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar10:hover) { --jsMemVarB10: var(--jsMemVarB); --jsMemVarF10: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar12:hover) { --jsMemVarB12: var(--jsMemVarB); --jsMemVarF12: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar13:hover) { --jsMemVarB13: var(--jsMemVarB); --jsMemVarF13: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar14:hover) { --jsMemVarB14: var(--jsMemVarB); --jsMemVarF14: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar15:hover) { --jsMemVarB15: var(--jsMemVarB); --jsMemVarF15: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar16:hover) { --jsMemVarB16: var(--jsMemVarB); --jsMemVarF16: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar17:hover) { --jsMemVarB17: var(--jsMemVarB); --jsMemVarF17: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar18:hover) { --jsMemVarB18: var(--jsMemVarB); --jsMemVarF18: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
+.jsMem:has(.jsMemVar20:hover) { --jsMemVarB20: var(--jsMemVarB); --jsMemVarF20: var(--jsMemVarF) }
+
+.jsMemVarExt6 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
+.jsMemVarExt7 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
+.jsMemVarExt8 { text-decoration: #09b underline; text-decoration-skip-ink: none; }
+.jsMemVarExt11 { text-decoration: var(--jsMemVarF11) underline; }
+.jsMemVarExt19 { text-decoration: var(--jsMemVarF19) underline; }
+.jsMemVarExt6:hover { background: var(--jsMemVarB6); color: var(--jsMemVarF6);	border-radius: 1px; }
+.jsMemVarExt7:hover { background: var(--jsMemVarB7); color: var(--jsMemVarF7);	border-radius: 1px; }
+.jsMemVarExt8:hover { background: var(--jsMemVarB8); color: var(--jsMemVarF8);	border-radius: 1px; }
+.jsMemVarExt11:hover { background: var(--jsMemVarB11); color: var(--jsMemVarF11);	border-radius: 1px; }
+.jsMemVarExt19:hover { background: var(--jsMemVarB19); color: var(--jsMemVarF19);	border-radius: 1px; }
+body:has(.jsMemVarExt6:hover) { --jsMemVarB6: var(--jsMemVarB); --jsMemVarF6: var(--jsMemVarF) }
+body:has(.jsMemVarExt7:hover) { --jsMemVarB7: var(--jsMemVarB); --jsMemVarF7: var(--jsMemVarF) }
+body:has(.jsMemVarExt8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
+body:has(.jsMemVarExt11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
+body:has(.jsMemVarExt19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
+
+.termCode {
+	white-space: pre-wrap;
+	background: #000;
+	color: #BBB;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 12px;
+	border-radius: 4px;
+	width: calc(100% - 2px - 16px);
+	border: 1px solid var(--lyreGold);
+	padding: 8px;
+	cursor: default;
+}
+.termCode::selection, .termCode *::selection {
+	color: #000;
+	background: var(--lyreGold);
+}
+.termCodeW {
+	color: #FFF;
+}
+.termCodeComm {
+	color: var(--lyreGold);
+}
+.termCodeFlag {
+	display: inline-block;
+	color: #FFF;
+	transform: scale(1);
+	text-shadow: 0 0 8px #f440;
+	transition: transform 0.6s, text-shadow 0.5s, background 0.5s;
+	background: linear-gradient(90deg, #fa0 0%, #f0d 50%, #80f 100%);
+	font-weight: bold;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent; 
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
+  background-size: 200%;
+  background-position: 100%;
+  cursor: grabbing;
+}
+.termCodeFlag:hover {
+	transform: scale(1.2);
+	text-shadow: 0 0 8px #f44f;
+	background-position: 0%;
+}
+.offsetDemo {
+	font-size: 16px;
+	cursor: default;
+	user-select: none;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	line-height: 1em;
+	width: 64ch;
+	margin: 0 auto;
+	border-radius: 4px;
+	border: 1px solid black;
+	overflow: hidden;
+	position: relative;
+	background: #282C34;
+	color: #FFF;
+}
+.offsetDemoLegend {
+	white-space: pre;
+	color: var(--lyreGold);
+	position: absolute;
+	pointer-events: none;
+}
+.offsetDemoOverlay {
+	color: #0000;
+	position: absolute;
+	height: 1em;
+	pointer-events: none;
+}
+.offsetDemoOverlay > span {
+	background: #282C34;
+}
+.offsetDemoHandle {
+	background: var(--lyreGold);
+	width: 1.5ch;
+	height: 12px;
+	margin: 2px 0.25ch;
+	display: inline-block;
+	vertical-align: middle;
+	border-radius: 4px;
+}
+.offsetDemoNumbers {
+	white-space: pre;
+  overflow: hidden;
+  resize: horizontal;
+  height: 2.1em;
+  width: 64ch;
+  min-width: 48ch;
+  max-width: 64ch;
+  text-wrap: nowrap;
+  text-align: right;
+}
+</style>
 <div class="termCode"><span class="termCodeW">$ gdb --args ./d8 --allow-natives-syntax</span> <span class="termCodeComm">&lt;-- use d8 with the natives syntax in gdb</span>
 GNU gdb (GDB) 14.2
 <span class="termCodeW">(gdb) run</span> <span class="termCodeComm">&lt;-- start d8</span>
@@ -1851,431 +2280,3 @@ feel free to let me know if you have any comments or notice anything wrong ^^
 [^5]: JavaScript floating-point numbers can only accurately represent integers up to 2<sup>53</sup>–1. You *can* have larger numbers, but they won't be accurate. [BigInts](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/BigInt) are a separate data type that doesn't have this issue - they can be infinitely big while still being accurate! Well, perhaps not infinitely big, but [in V8](https://v8.dev/features/bigint) their size can be [over a billion bits](https://stackoverflow.com/a/70537884/2251833), which would be about 128MiB of just a single number.
 
 [^6]: In CTF competitions, a "first blood" is the first (and often fastest) solve of a challenge.
-
-<style>
-.termCodePp {
-	color: #444;
-}
-.termCodePr {
-	color: #8e1;
-}
-.termCodePw {
-	color: #EF0;
-}
-.termCodePx {
-	color: #FA0;
-}
-.termCodePrwx {
-	color: #F00;
-}
-.jsMem {
-	color: #DCDFE4;
-	background: #282C34;
-	border-radius: 4px;
-	padding:8px;
-	cursor: default;
-}
-
-.coarseText {
-	display: none;
-}
-.fineText {
-	display: inline;
-}
-
-/*
- *	Disable text selection on touchscreens because you can't
- *  hover over the interactive elements and tapping them will
- *  try to select the text if we don't disable selections.
- */
-@media (pointer: coarse) {
-	.jsMem {
-		user-select: none;
-	}
-	.coarseText {
-		display: inline;
-	}
-	.fineText {
-		display: none;
-	}
-}
-
-.jsMemTitle {
-	pointer-events: none;
-	user-select: none;
-	color: var(--lyreGold);
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	font-size: 14px;
-	display: flex;
-	margin: 4px 4px 4px;
-}
-.jsMemSep {
-	margin-left: 5px;
-	margin-top: 1px;
-	flex-grow: 1;
-	align-self: center;
-	display: inline-block;
-	height: 2px;
-	background: var(--lyreGold);
-}
-
-.jsMem *::selection {
-	background: #00F;
-	color: #FFF;
-}
-
-.jsMemDbg, .jsMemHex {
-	font-size: 12px;
-	white-space: pre-wrap;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-}
-
-:root {
-	--lyreGold: #FAD542;
-	--jsMemVarB0:  #0000;
-	--jsMemVarB1:  #0000;
-	--jsMemVarB2:  #0000;
-	--jsMemVarB3:  #0000;
-	--jsMemVarB4:  #0000;
-	--jsMemVarB5:  #0000;
-	--jsMemVarB6:  #0000;
-	--jsMemVarB7:  #0000;
-	--jsMemVarB8:  #0000;
-	--jsMemVarB9:  #0000;
-	--jsMemVarB10:  #0000;
-	--jsMemVarB11:  #0000;
-	--jsMemVarB12:  #0000;
-	--jsMemVarB13:  #0000;
-	--jsMemVarB14:  #0000;
-	--jsMemVarB15:  #0000;
-	--jsMemVarB16:  #0000;
-	--jsMemVarB17:  #0000;
-	--jsMemVarB18:  #0000;
-	--jsMemVarB19:  #0000;
-	--jsMemVarB20:  #0000;
-	--jsMemVarF0:  #ff9999;
-	--jsMemVarF1:  #ffc199;
-	--jsMemVarF2:  #ffea99;
-	--jsMemVarF3:  #eaff99;
-	--jsMemVarF4:  #c1ff99;
-	--jsMemVarF5:  #99ff99;
-	--jsMemVarF6:  #99ffc1;
-	--jsMemVarF7:  #99ffea;
-	--jsMemVarF8:  #99eaff;
-	--jsMemVarF9:  #99c1ff;
-	--jsMemVarF10:  #9999ff;
-	--jsMemVarF11:  #c199ff;
-	--jsMemVarF12:  #ea99ff;
-	--jsMemVarF13:  #ff99ea;
-	--jsMemVarF14:  #ff99c1;
-	--jsMemVarF15:  #ff9999;
-	--jsMemVarF16:  #ffc199;
-	--jsMemVarF17:  #ffea99;
-	--jsMemVarF18:  #eaff99;
-	--jsMemVarF19:  #c1ff99;
-	--jsMemVarF20:  #99ff99;
-	--jsMemVarB: var(--lyreGold);
-	--jsMemVarF: #000;
-}
-
-.jsMemVar0 { color: var(--jsMemVarF0); background: var(--jsMemVarB0) }
-.jsMemVar1 { color: var(--jsMemVarF1); background: var(--jsMemVarB1) }
-.jsMemVar2 { color: var(--jsMemVarF2); background: var(--jsMemVarB2) }
-.jsMemVar3 { color: var(--jsMemVarF3); background: var(--jsMemVarB3) }
-.jsMemVar4 { color: var(--jsMemVarF4); background: var(--jsMemVarB4) }
-.jsMemVar5 { color: var(--jsMemVarF5); background: var(--jsMemVarB5) }
-.jsMemVar6 { color: var(--jsMemVarF6); background: var(--jsMemVarB6) }
-.jsMemVar7 { color: var(--jsMemVarF7); background: var(--jsMemVarB7) }
-.jsMemVar8 { color: var(--jsMemVarF8); background: var(--jsMemVarB8) }
-.jsMemVar9 { color: var(--jsMemVarF9); background: var(--jsMemVarB9) }
-.jsMemVar10 { color: var(--jsMemVarF10); background: var(--jsMemVarB10) }
-.jsMemVar11 { color: var(--jsMemVarF11); background: var(--jsMemVarB11) }
-.jsMemVar12 { color: var(--jsMemVarF12); background: var(--jsMemVarB12) }
-.jsMemVar13 { color: var(--jsMemVarF13); background: var(--jsMemVarB13) }
-.jsMemVar14 { color: var(--jsMemVarF14); background: var(--jsMemVarB14) }
-.jsMemVar15 { color: var(--jsMemVarF15); background: var(--jsMemVarB15) }
-.jsMemVar16 { color: var(--jsMemVarF16); background: var(--jsMemVarB16) }
-.jsMemVar17 { color: var(--jsMemVarF17); background: var(--jsMemVarB17) }
-.jsMemVar18 { color: var(--jsMemVarF18); background: var(--jsMemVarB18) }
-.jsMemVar19 { color: var(--jsMemVarF19); background: var(--jsMemVarB19) }
-.jsMemVar20 { color: var(--jsMemVarF20); background: var(--jsMemVarB20) }
-.jsMem:has(.jsMemVar0:hover) { --jsMemVarB0: var(--jsMemVarB); --jsMemVarF0: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar1:hover) { --jsMemVarB1: var(--jsMemVarB); --jsMemVarF1: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar2:hover) { --jsMemVarB2: var(--jsMemVarB); --jsMemVarF2: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar3:hover) { --jsMemVarB3: var(--jsMemVarB); --jsMemVarF3: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar4:hover) { --jsMemVarB4: var(--jsMemVarB); --jsMemVarF4: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar5:hover) { --jsMemVarB5: var(--jsMemVarB); --jsMemVarF5: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar6:hover) { --jsMemVarB6: var(--jsMemVarB); --jsMemVarF6: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar7:hover) { --jsMemVarB7: var(--jsMemVarB); --jsMemVarF7: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar9:hover) { --jsMemVarB9: var(--jsMemVarB); --jsMemVarF9: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar10:hover) { --jsMemVarB10: var(--jsMemVarB); --jsMemVarF10: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar12:hover) { --jsMemVarB12: var(--jsMemVarB); --jsMemVarF12: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar13:hover) { --jsMemVarB13: var(--jsMemVarB); --jsMemVarF13: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar14:hover) { --jsMemVarB14: var(--jsMemVarB); --jsMemVarF14: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar15:hover) { --jsMemVarB15: var(--jsMemVarB); --jsMemVarF15: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar16:hover) { --jsMemVarB16: var(--jsMemVarB); --jsMemVarF16: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar17:hover) { --jsMemVarB17: var(--jsMemVarB); --jsMemVarF17: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar18:hover) { --jsMemVarB18: var(--jsMemVarB); --jsMemVarF18: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
-.jsMem:has(.jsMemVar20:hover) { --jsMemVarB20: var(--jsMemVarB); --jsMemVarF20: var(--jsMemVarF) }
-
-.jsMemVarExt6 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
-.jsMemVarExt7 { text-decoration: #0a8 underline; text-decoration-skip-ink: none; }
-.jsMemVarExt8 { text-decoration: #09b underline; text-decoration-skip-ink: none; }
-.jsMemVarExt11 { text-decoration: var(--jsMemVarF11) underline; }
-.jsMemVarExt19 { text-decoration: var(--jsMemVarF19) underline; }
-.jsMemVarExt6:hover { background: var(--jsMemVarB6); color: var(--jsMemVarF6);	border-radius: 1px; }
-.jsMemVarExt7:hover { background: var(--jsMemVarB7); color: var(--jsMemVarF7);	border-radius: 1px; }
-.jsMemVarExt8:hover { background: var(--jsMemVarB8); color: var(--jsMemVarF8);	border-radius: 1px; }
-.jsMemVarExt11:hover { background: var(--jsMemVarB11); color: var(--jsMemVarF11);	border-radius: 1px; }
-.jsMemVarExt19:hover { background: var(--jsMemVarB19); color: var(--jsMemVarF19);	border-radius: 1px; }
-body:has(.jsMemVarExt6:hover) { --jsMemVarB6: var(--jsMemVarB); --jsMemVarF6: var(--jsMemVarF) }
-body:has(.jsMemVarExt7:hover) { --jsMemVarB7: var(--jsMemVarB); --jsMemVarF7: var(--jsMemVarF) }
-body:has(.jsMemVarExt8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: var(--jsMemVarF) }
-body:has(.jsMemVarExt11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
-body:has(.jsMemVarExt19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
-
-.jsConsole {
-	background: #282828;
-	border-radius: 4px;
-	width: calc(100% - 2px);
-	color: #E3E3E3;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	font-size: 12px;
-	border: 1px solid #5E5E5E;
-	cursor: default;
-}
-.jsConsole *::selection {
-	background: #004A77;
-}
-.jsConLine {
-	min-height: 14px;
-	margin: 3px;
-	padding: 1px;
-	width: calc(100% - 8px);
-	border-radius: 4px;
-}
-.jsConTerm {
-	white-space: pre-wrap;
-	background: #000;
-	color: #FFF;
-	margin: 0;
-	padding: 4px;
-}
-.jsConTerm::selection, .jsConTerm *::selection {
-	color: #000;
-	background: #FFF;
-}
-.jsConCode {
-	min-height: 14px;
-	margin: 3px;
-	padding: 7px;
-	width: calc(100% - 20px);
-	border-radius: 4px;
-	white-space: pre-wrap;
-	cursor: initial;
-}
-.jsConLine:has(details) {
-	text-wrap: nowrap;
-}
-.jsConBorder {
-	background: #5E5E5E;
-	width: 100%;
-	height: 1px;
-}
-.jsConLine:hover {
-	background: #3D3D3D;
-}
-.jsConTerm:hover {
-	background: #111;
-}
-.jsConLine:has(.jsConErr):hover {
-	background: #E46962;
-}
-.jsConLine > details {
-	padding-left: 4px;
-	display: inline-block;
-	text-wrap: wrap;
-	max-width: calc(100% - 4px - 18px);
-}
-.jsConLine > details > summary::marker {
-	line-height: 0;
-}
-.jsConVar {
-	color: #C7C7C7;
-}
-.jsConValIn {
-	color: #C4EED0;
-}
-.jsConValOut {
-	color: #9980FF;
-}
-.jsConProp {
-	color: #FACC15;
-}
-.jsConIdx {
-	color: #7CACF8;
-}
-.jsConB {
-	font-weight: bold;
-}
-.jsConNull {
-	color: #6F6F6F;
-}
-.jsConKw {
-	color: #BF67FF;
-}
-.jsConStr {
-	color: #FE8D59;
-}
-.jsConStrOut {
-	color: #5CD5FB;
-}
-.jsConV8 {
-	/* color: #9F0; */
-	color: #FFF;
-}
-.jsConIcon {
-	fill: #C7C7C7;
-	display: inline-block;
-	width: 16px;
-	height: 14px;
-	vertical-align: top;
-	padding-right: 2px;
-}
-.jsConErr {
-	background: #4E3534;
-	color: #F9DEDC;
-	padding: 4px;
-	border-radius: 4px;
-}
-.jsConErr > .jsConIcon {
-	padding-right: 4px;
-}
-
-@media (width >= 430px) {
-	.under430 {
-		display: none;
-	}
-}
-@media (width < 430px) {
-	.over430 {
-		display: none;
-	}
-}
-@media (width < 640px) {
-	.over640 {
-		display: none;
-	}
-}
-@media (width >= 640px) {
-	.termCodeComm {
-		float: right;
-	}
-}
-@media (width < 800px) {
-	.over800 {
-		display: none;
-	}
-}
-@media (height < 960px) {
-	.over960h {
-		display: none;
-	}
-}
-.termCode {
-	white-space: pre-wrap;
-	background: #000;
-	color: #BBB;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	font-size: 12px;
-	border-radius: 4px;
-	width: calc(100% - 2px - 16px);
-	border: 1px solid var(--lyreGold);
-	padding: 8px;
-	cursor: default;
-}
-.termCode::selection, .termCode *::selection {
-	color: #000;
-	background: var(--lyreGold);
-}
-.termCodeW {
-	color: #FFF;
-}
-.termCodeComm {
-	color: var(--lyreGold);
-}
-.termCodeFlag {
-	display: inline-block;
-	color: #FFF;
-	transform: scale(1);
-	text-shadow: 0 0 8px #f440;
-	transition: transform 0.6s, text-shadow 0.5s, background 0.5s;
-	background: linear-gradient(90deg, #fa0 0%, #f0d 50%, #80f 100%);
-	font-weight: bold;
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent; 
-  -moz-background-clip: text;
-  -moz-text-fill-color: transparent;
-  background-size: 200%;
-  background-position: 100%;
-  cursor: grabbing;
-}
-.termCodeFlag:hover {
-	transform: scale(1.2);
-	text-shadow: 0 0 8px #f44f;
-	background-position: 0%;
-}
-.offsetDemo {
-	font-size: 16px;
-	cursor: default;
-	user-select: none;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	line-height: 1em;
-	width: 64ch;
-	margin: 0 auto;
-	border-radius: 4px;
-	border: 1px solid black;
-	overflow: hidden;
-	position: relative;
-	background: #282C34;
-	color: #FFF;
-}
-.offsetDemoLegend {
-	white-space: pre;
-	color: var(--lyreGold);
-	position: absolute;
-	pointer-events: none;
-}
-.offsetDemoOverlay {
-	color: #0000;
-	position: absolute;
-	height: 1em;
-	pointer-events: none;
-}
-.offsetDemoOverlay > span {
-	background: #282C34;
-}
-.offsetDemoHandle {
-	background: var(--lyreGold);
-	width: 1.5ch;
-	height: 12px;
-	margin: 2px 0.25ch;
-	display: inline-block;
-	vertical-align: middle;
-	border-radius: 4px;
-}
-.offsetDemoNumbers {
-	white-space: pre;
-  overflow: hidden;
-  resize: horizontal;
-  height: 2.1em;
-  width: 64ch;
-  min-width: 48ch;
-  max-width: 64ch;
-  text-wrap: nowrap;
-  text-align: right;
-}
-</style>
