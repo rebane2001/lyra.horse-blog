@@ -11,6 +11,141 @@ Despite having 7 Chrome CVEs, I've never actually fully exploited a memory corru
 
 Most V8 exploits tend to have two stages to them - figuring out a unique way to trigger some sort of a memory corruption of at least one byte, and then following a common pattern of building upon that corruption to read arbitrary addresses (`addrof`), create fake objects (`fakeobj`), and eventually reach arbitrary code execution. This challenge was no different.
 
+<style>
+.challDetails {
+	line-height: 12px;
+	font-size: 16px;
+	background: #212529;
+	border: 1px solid rgba(255, 255, 255, 0.15);
+	color: #dee2e6;
+	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
+	border-radius: 8px;
+	max-width: 500px;
+	margin: 16px auto;
+}
+.challDetails *::selection {
+	background: #073BA6;
+}
+.challFiles *::selection {
+	background: #0F0;
+	color: #000;
+}
+.challTitle {
+	font-size: 24px;
+	font-weight: 500;
+	padding: 16px;
+}
+.challSubtitle {
+	font-size: 20px;
+	font-weight: 500;
+	text-align: center;
+	padding: 12px 0;
+}
+.challHr {
+	border-bottom: 1px solid #495057;
+}
+.challTags {
+	text-align: center;
+	padding: 16px 16px 0 16px;
+	user-select: none;
+}
+.challSection {
+	padding: 0 16px 16px 16px;
+}
+.challSection code {
+	overflow-wrap: break-word;
+}
+.challTag {
+	border-radius: 6px;
+	font-weight: bold;
+	height: 32px;
+	padding: 2px 6px;
+	font-size: 13px;
+}
+.challFiles > ul {
+	border-radius: 6px;
+	background: #111;
+	border: 1px solid #fff;
+	line-height: 20px;
+	padding: 14px;
+	margin-bottom: 0;
+	list-style-type: none;
+	font-size: 12px;
+	font-family: 'Nimbus Mono PS', 'Courier New', monospace;
+}
+.challFiles a {
+	color: #0F0;
+}
+.challFiles a:hover {
+	text-decoration: underline;
+}
+.challFiles > summary {
+	color: #fff;
+	background: #007bff;
+	width: fit-content;
+	padding: 12px;
+	border-radius: 6px;
+	user-select: none;
+	cursor: pointer;
+}
+.challScores {
+	width: 100%;
+	border-collapse: collapse;
+	background: #1c232b;
+}
+.challScores tr > * {
+	border: solid 1px rgb(73, 80, 87);
+	padding: 4px 8px;
+	line-height: 20px;
+	text-align: left;
+}
+.challScores tr > :first-child {
+		text-align:center;
+		width: 0;
+}
+.challScores tbody tr:nth-of-type(odd) {
+		background: #29313b;
+}
+.challScores tbody tr:hover {
+		background: #2b3a4d;
+}
+.cppCode {
+	background: #050c1f;
+	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
+	font-size: 12px;
+	border: 1px solid #002;
+	border-radius: 4px;
+	padding: 8px;
+	width: calc(100% - 18px);
+	white-space: pre-wrap;
+	overflow-wrap: anywhere;
+}
+.cppCode::selection, .cppCode *::selection {
+	background: #00258a;
+}
+/* some vscode color palette i copied */
+.mtk1 { color: #d4d4d4; }
+.mtk2 { color: #1e1e1e; }
+.mtk3 { color: #000080; }
+.mtk4 { color: #6a9955; }
+.mtk5 { color: #569cd6; }
+.mtk6 { color: #b5cea8; }
+.mtk7 { color: #646695; }
+.mtk8 { color: #d7ba7d; }
+.mtk9 { color: #9cdcfe; }
+.mtk10 { color: #f44747; }
+.mtk11 { color: #ce9178; }
+.mtk12 { color: #6796e6; }
+.mtk13 { color: #808080; }
+.mtk14 { color: #d16969; }
+.mtk15 { color: #dcdcaa; }
+.mtk16 { color: #4ec9b0; }
+.mtk17 { color: #c586c0; }
+.mtk18 { color: #4fc1ff; }
+.mtk19 { color: #c8c8c8; }
+.mtk20 { color: #cd9731; }
+.mtk21 { color: #b267e6; }
+</style>
 <div class="challDetails">
 	<div class="challTitle challHr">Baby Array.xor</div>
 	<div class="challTags">
@@ -1902,139 +2037,6 @@ body:has(.jsMemVarExt8:hover) { --jsMemVarB8: var(--jsMemVarB); --jsMemVarF8: va
 body:has(.jsMemVarExt11:hover) { --jsMemVarB11: var(--jsMemVarB); --jsMemVarF11: var(--jsMemVarF) }
 body:has(.jsMemVarExt19:hover) { --jsMemVarB19: var(--jsMemVarB); --jsMemVarF19: var(--jsMemVarF) }
 
-.challDetails {
-	line-height: 12px;
-	font-size: 16px;
-	background: #212529;
-	border: 1px solid rgba(255, 255, 255, 0.15);
-	color: #dee2e6;
-	font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif;
-	border-radius: 8px;
-	max-width: 500px;
-	margin: 16px auto;
-}
-.challDetails *::selection {
-	background: #073BA6;
-}
-.challFiles *::selection {
-	background: #0F0;
-	color: #000;
-}
-.challTitle {
-	font-size: 24px;
-	font-weight: 500;
-	padding: 16px;
-}
-.challSubtitle {
-	font-size: 20px;
-	font-weight: 500;
-	text-align: center;
-	padding: 12px 0;
-}
-.challHr {
-	border-bottom: 1px solid #495057;
-}
-.challTags {
-	text-align: center;
-	padding: 16px 16px 0 16px;
-	user-select: none;
-}
-.challSection {
-	padding: 0 16px 16px 16px;
-}
-.challSection code {
-	overflow-wrap: break-word;
-}
-.challTag {
-	border-radius: 6px;
-	font-weight: bold;
-	height: 32px;
-	padding: 2px 6px;
-	font-size: 13px;
-}
-.challFiles > ul {
-	border-radius: 6px;
-	background: #111;
-	border: 1px solid #fff;
-	line-height: 20px;
-	padding: 14px;
-	margin-bottom: 0;
-	list-style-type: none;
-	font-size: 12px;
-	font-family: 'Nimbus Mono PS', 'Courier New', monospace;
-}
-.challFiles a {
-	color: #0F0;
-}
-.challFiles a:hover {
-	text-decoration: underline;
-}
-.challFiles > summary {
-	color: #fff;
-	background: #007bff;
-	width: fit-content;
-	padding: 12px;
-	border-radius: 6px;
-	user-select: none;
-	cursor: pointer;
-}
-.challScores {
-	width: 100%;
-	border-collapse: collapse;
-	background: #1c232b;
-}
-.challScores tr > * {
-	border: solid 1px rgb(73, 80, 87);
-	padding: 4px 8px;
-	line-height: 20px;
-	text-align: left;
-}
-.challScores tr > :first-child {
-		text-align:center;
-		width: 0;
-}
-.challScores tbody tr:nth-of-type(odd) {
-		background: #29313b;
-}
-.challScores tbody tr:hover {
-		background: #2b3a4d;
-}
-.cppCode {
-	background: #050c1f;
-	font-family: Menlo, Consolas, "Ubuntu Mono", monospace;
-	font-size: 12px;
-	border: 1px solid #002;
-	border-radius: 4px;
-	padding: 8px;
-	width: calc(100% - 18px);
-	white-space: pre-wrap;
-	overflow-wrap: anywhere;
-}
-.cppCode::selection, .cppCode *::selection {
-	background: #00258a;
-}
-/* some vscode color palette i copied */
-.mtk1 { color: #d4d4d4; }
-.mtk2 { color: #1e1e1e; }
-.mtk3 { color: #000080; }
-.mtk4 { color: #6a9955; }
-.mtk5 { color: #569cd6; }
-.mtk6 { color: #b5cea8; }
-.mtk7 { color: #646695; }
-.mtk8 { color: #d7ba7d; }
-.mtk9 { color: #9cdcfe; }
-.mtk10 { color: #f44747; }
-.mtk11 { color: #ce9178; }
-.mtk12 { color: #6796e6; }
-.mtk13 { color: #808080; }
-.mtk14 { color: #d16969; }
-.mtk15 { color: #dcdcaa; }
-.mtk16 { color: #4ec9b0; }
-.mtk17 { color: #c586c0; }
-.mtk18 { color: #4fc1ff; }
-.mtk19 { color: #c8c8c8; }
-.mtk20 { color: #cd9731; }
-.mtk21 { color: #b267e6; }
 .jsConsole {
 	background: #282828;
 	border-radius: 4px;

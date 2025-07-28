@@ -9,42 +9,110 @@ summary = "A writeup of my $4133.70 Google Drive vulnerability chain."
 
 In my security research I often come across weird quirks and behaviours that aren't particularly useful beyond a neat party trick. It's always a good idea to keep track of them though, perhaps one day they'll be just the missing piece you need.
 
-<div class="slds" role=img aria-label="Empty google slides presentation">
-    <div class="sldsH">
-        <div class="sldsHicon"><div><div></div></div></div>
-        <div class="sldsHlt">
-            <span class="sldsHtitle" contenteditable="plaintext-only">Untitled presentation</span><br>
-            <div class="sldsHlnks">
-                <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Slide</span><span>Arrange</span><span>Tools</span><span>Extensions</span><span>Help</span>
-            </div>
-        </div>
-        <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto">
-            <div class="sldsHbtn sldsHbtnWhite over640"><div>Slideshow</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
-            <div class="sldsHbtn sldsHbtnBlue over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
-            <div class="sldsHpfp over360"><div>L</div></div>
-        </div>
-    </div>
-    <div class="sldsBody">
-        <div class="sldsSideLeft over640">
-            <div class="sldsFilmEntry">
-                <div class="sldsFilmText">1</div>
-                <div class="sldsFilmSlide">
-                    <div style="text-align: center; filter: blur(0.4px)">
-                        <div style="padding-top: 25px; font-size: 9px; color: #000D">Click to add title</div>
-                        <div style="font-size: 5.3px;color: #595959">Click to steal your files</div>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="sldsMain">
-            <div class="sldsSlide">
-                <div class="sldsSlideTextbox sldsSlideTextboxBig" contenteditable="plaintext-only">Click to add title</div>
-                <div class="sldsSlideTextbox sldsSlideTextboxSmall" contenteditable="plaintext-only">Click to steal your files<!--Click to add subtitle--></div>
-            </div>
-        </div>
-    </div>
-</div>
-
+<style>
+.urlBox {
+    word-break: break-all;
+    background: #2B2B2B;
+    border-radius:4px;
+    padding: 2px 5px;
+    color: #C7C7C7;
+    font-size: 12px;
+    font-family: system-ui, sans-serif;
+    width: fit-content;
+}
+.urlBox a {
+    color: #C7C7C7;
+}
+.urlBox::selection, .urlBox *::selection {
+    background: #FFF;
+    color: #000;
+}
+.genericContainer {
+    width: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+}
+.coarseText {
+    display: none;
+}
+.fineText {
+    display: inline;
+}
+@media (pointer: coarse) {
+    .coarseText {
+        display: inline;
+    }
+    .fineText {
+        display: none;
+    }
+}
+@media (width >= 720px) {
+    .under720 {
+        display: none;
+    }
+}
+@media (width < 720px) {
+    .over720 {
+        display: none;
+    }
+}
+@media (width >= 640px) {
+    .under640 {
+        display: none;
+    }
+}
+@media (width < 640px) {
+    .over640 {
+        display: none;
+    }
+}
+@media (width >= 560px) {
+    .under560 {
+        display: none;
+    }
+}
+@media (width < 560px) {
+    .over560 {
+        display: none;
+    }
+}
+@media (width >= 480px) {
+    .under480 {
+        display: none;
+    }
+}
+@media (width < 480px) {
+    .over480 {
+        display: none;
+    }
+    .sldsBody {
+        height: fit-content;
+        padding-bottom: 16px;
+    }
+    .sldsSlideTextboxBig {
+        font-size: 30px;
+    }
+    .sldsSlideTextboxSmall {
+        font-size: 16px;
+    }
+}
+@media (width >= 360px) {
+    .under360 {
+        display: none;
+    }
+}
+@media (width < 360px) {
+    .over360 {
+        display: none;
+    }
+    .sldsSlideTextboxBig {
+        font-size: 24px;
+    }
+    .sldsSlideTextboxSmall {
+        font-size: 13px;
+    }
+}
+</style>
 <style>
     /* You may notice me using the peculiar font-weight 501 in my CSS. That's because I intended to use 500, but for some reason Firefox renders fonts with just 400/600 at 500 as 400, not 600, so I'm using 501 so that it rounds to 600 if 500 is not available. */
     .sldsBody {
@@ -118,8 +186,6 @@ In my security research I often come across weird quirks and behaviours that are
         font-size: 19px;
         color: #595959;
     }
-</style>
-<style>
     .slds {
         border-radius: 4px;
         width: 100%;
@@ -299,6 +365,42 @@ In my security research I often come across weird quirks and behaviours that are
         border-top: solid 4px currentcolor;
     }
 </style>
+<div class="slds" role=img aria-label="Empty google slides presentation">
+    <div class="sldsH">
+        <div class="sldsHicon"><div><div></div></div></div>
+        <div class="sldsHlt">
+            <span class="sldsHtitle" contenteditable="plaintext-only">Untitled presentation</span><br>
+            <div class="sldsHlnks">
+                <span>File</span><span>Edit</span><span>View</span><span>Insert</span><span>Format</span><span>Slide</span><span>Arrange</span><span>Tools</span><span>Extensions</span><span>Help</span>
+            </div>
+        </div>
+        <div style="height: 40px; display:flex; padding: 2px; gap: 8px;margin-left:auto">
+            <div class="sldsHbtn sldsHbtnWhite over640"><div>Slideshow</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHbtn sldsHbtnBlue over640"><div>Share</div><div style="display:flex"><div style="margin:auto" class="sldsDrop"></div></div></div>
+            <div class="sldsHpfp over360"><div>L</div></div>
+        </div>
+    </div>
+    <div class="sldsBody">
+        <div class="sldsSideLeft over640">
+            <div class="sldsFilmEntry">
+                <div class="sldsFilmText">1</div>
+                <div class="sldsFilmSlide">
+                    <div style="text-align: center; filter: blur(0.4px)">
+                        <div style="padding-top: 25px; font-size: 9px; color: #000D">Click to add title</div>
+                        <div style="font-size: 5.3px;color: #595959">Click to steal your files</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="sldsMain">
+            <div class="sldsSlide">
+                <div class="sldsSlideTextbox sldsSlideTextboxBig" contenteditable="plaintext-only">Click to add title</div>
+                <div class="sldsSlideTextbox sldsSlideTextboxSmall" contenteditable="plaintext-only">Click to steal your files<!--Click to add subtitle--></div>
+            </div>
+        </div>
+    </div>
+</div>
+
 <br>
 
 ## Part 1: Cat videos
@@ -1587,108 +1689,3 @@ love you all &lt;3!
 [^root]: Every Google Drive file and folder has an ID associated with it, and your entire drive's Root folder is no exception! Want to find yours? Open Drive's page with DevTools open, and then search for `9PVA` in the network requests.
 [^wyo]: I'm using this domain as an example because it's short and came up a lot in my Google searches, but there isn't anything special about it, you can use other gsuite domains too. In case anyone from the [Wyoming goverment](https://ets.wyo.gov/cybersecurity) happens across this post - no, this isn't touching your IT systems in any way, it's only affecting Google's systems and they're already aware of and working on the topics discussed in this blog post.
 [^adva]: advaith [let me know](https://twitter.com/advaithj1/status/1836940041756750021) that /a/domain urls automatically switch your account to the one under the domain, so they're still handy if you use multiple accounts.
-
-<style>
-.urlBox {
-    word-break: break-all;
-    background: #2B2B2B;
-    border-radius:4px;
-    padding: 2px 5px;
-    color: #C7C7C7;
-    font-size: 12px;
-    font-family: system-ui, sans-serif;
-    width: fit-content;
-}
-.urlBox a {
-    color: #C7C7C7;
-}
-.urlBox::selection, .urlBox *::selection {
-    background: #FFF;
-    color: #000;
-}
-.genericContainer {
-    width: 100%;
-    border-radius: 4px;
-    overflow: hidden;
-}
-.coarseText {
-    display: none;
-}
-.fineText {
-    display: inline;
-}
-@media (pointer: coarse) {
-    .coarseText {
-        display: inline;
-    }
-    .fineText {
-        display: none;
-    }
-}
-@media (width >= 720px) {
-    .under720 {
-        display: none;
-    }
-}
-@media (width < 720px) {
-    .over720 {
-        display: none;
-    }
-}
-@media (width >= 640px) {
-    .under640 {
-        display: none;
-    }
-}
-@media (width < 640px) {
-    .over640 {
-        display: none;
-    }
-}
-@media (width >= 560px) {
-    .under560 {
-        display: none;
-    }
-}
-@media (width < 560px) {
-    .over560 {
-        display: none;
-    }
-}
-@media (width >= 480px) {
-    .under480 {
-        display: none;
-    }
-}
-@media (width < 480px) {
-    .over480 {
-        display: none;
-    }
-    .sldsBody {
-        height: fit-content;
-        padding-bottom: 16px;
-    }
-    .sldsSlideTextboxBig {
-        font-size: 30px;
-    }
-    .sldsSlideTextboxSmall {
-        font-size: 16px;
-    }
-}
-@media (width >= 360px) {
-    .under360 {
-        display: none;
-    }
-}
-@media (width < 360px) {
-    .over360 {
-        display: none;
-    }
-    .sldsSlideTextboxBig {
-        font-size: 24px;
-    }
-    .sldsSlideTextboxSmall {
-        font-size: 13px;
-    }
-}
-</style>

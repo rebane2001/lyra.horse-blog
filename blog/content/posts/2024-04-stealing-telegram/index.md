@@ -10,6 +10,61 @@ summary = "Say you handed me your phone, what’s the worst I could do in 10 sec
 Say you handed me your phone, what's the worst I could do in 10 seconds?
 
 <!-- This is all handcrafted HTML & CSS :3 -->
+<style>
+	.tgMsg *::selection {
+		background-color: #2E70A5;
+	}
+	.tgThread {
+		font-family: "Open Sans", system-ui, sans-serif;
+		font-size: 12.75px;
+		background: #0E1621;
+		padding: 8px;
+		border-radius: 4px;
+		width: fit-content;
+	}
+	.tgMsg {
+		background: #182533;
+		color: #F5F5F5;
+		border-radius: 16px;
+		max-width: 410px;
+		padding: 8px 8px 8px 11px;
+		margin: 2px;
+		width: fit-content;
+	}
+	.tgMsgSmTL {
+		border-top-left-radius: 6px;
+	}
+	.tgMsgSmBL {
+		border-bottom-left-radius: 6px;
+	}
+	.tgMsgNoneBL {
+		border-bottom-left-radius: 0;
+	}
+	.tgMsg a {
+		color: #70BAF5;
+		text-decoration: none;
+	}
+	.tgMsgTs {
+		margin-top: 5px;
+		float: right;
+		margin-left: 12px;
+		color: #6D7F8F;
+		user-select: none;
+	}
+	.tgMsgSpeech {
+		background: #182533;
+		width: 8px;
+		height: 8px;
+		position: absolute;
+		transform: translate(-6px, -10px);
+	}
+	.tgMsgSpeech > div {
+		background: #0E1621;
+		width: 8px;
+		height: 8px;
+		border-bottom-right-radius: 8px;
+	}
+</style>
 <div class="tgThread" role="figure" aria-label="Telegram messages">
 	<div class="tgMsg tgMsgSmBL"><a href="https://web.telegram.org/">Web.telegram.org</a><span class="tgMsgTs" aria-hidden="true">edited 23:51</span></div>
 	<div class="tgMsg tgMsgSmTL tgMsgNoneBL"><span>Click that link and your browser will be logged into telegram without passwords</span><span class="tgMsgTs" aria-hidden="true">23:52</span></div><div class="tgMsgSpeech" aria-hidden="true"><div></div></div>
@@ -19,6 +74,54 @@ The other day I received an interesting message with a link to [Telegram's web c
 
 I wanted to look into how this works. The first step was to figure out how the Telegram client was passing the session to the browser. As I clicked on the link, I noticed something flash on the URL bar for just a split second:
 
+<style>
+	.urlBar {
+		background: #3C3C3C;
+		height: 34px;
+		width: calc(100% - 12px);
+		padding: 6px;
+		border-radius: 4px;
+		font-family: system-ui, sans-serif;
+		font-size: 14px;
+	}
+	.urlBarInner *::selection {
+		color: #000;
+		background-color: #A8C7FA;
+	}
+	.urlBarInner {
+		background: #282828;
+		color: #C7C7C7;
+		height: 34px;
+		border-radius: 34px;
+		width: 100%;
+		line-height: 22px;
+	}
+	.urlBarText {
+		text-overflow: ellipsis;
+		overflow:clip;
+		white-space:nowrap;
+		display:inline-block;
+		margin-left:37px;
+		width: calc(100% - 36px - 16px);
+		margin-top: 6px;
+	}
+	.urlBarIcon {
+		width: 16px;
+		height: 16px;
+		margin: 5px;
+		color: #E3E3E3;
+		fill: #E3E3E3;
+		background: #3C3C3C;
+		padding: 4px;
+		position: absolute;
+		display:block;
+		border-radius: 24px;
+	}
+	.urlBarIcon svg {
+		width: 16px;
+		height: 16px;
+	}
+</style>
 <div class="urlBar" role=figure aria-label="url bar"><div class="urlBarInner"><div class="urlBarIcon"><svg xmlns="http://www.w3.org/2000/svg"><path d="M11.55 13.52a2.27 2.27 0 0 1 -1.68 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68a2.27 2.27 0 0 1 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.45c0.25 0 0.47 -0.09 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.27 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.26 0.64c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.4 0.27 0.65 0.27Zm-9.47 -0.1v-1.63H7.98v1.63Zm2.37 -4.75a2.27 2.27 0 0 1 -1.67 -0.69a2.29 2.29 0 0 1 -0.69 -1.68c0 -0.66 0.23 -1.22 0.7 -1.68a2.3 2.3 0 0 1 1.68 -0.69c0.66 0 1.22 0.23 1.68 0.69c0.46 0.46 0.69 1.02 0.69 1.68c0 0.66 -0.23 1.22 -0.69 1.68c-0.46 0.46 -1.02 0.69 -1.68 0.69Zm0 -1.46a0.88 0.88 0 0 0 0.65 -0.27a0.88 0.88 0 0 0 0.27 -0.64a0.89 0.89 0 0 0 -0.26 -0.65a0.88 0.88 0 0 0 -0.65 -0.27a0.88 0.88 0 0 0 -0.65 0.27a0.88 0.88 0 0 0 -0.27 0.65c0 0.25 0.09 0.47 0.27 0.65c0.18 0.18 0.39 0.27 0.65 0.27Zm3.57 -0.1V4.03h5.9v1.63Zm0 0Z"/></svg></div><span class="urlBarText"><span style="color:#E3E3E3">web.telegram.org</span>/#tgWebAuthToken=dGhpcyB0b2<span aria-hidden=true>tlbiBpcyByYW5kb20gYW5kIDEwMjQgYml0cyBsb25nLCBidXQgaW4gdGhlIGJsb2cgcG9zdCBpIHJlcGxhY2VkIGl0IHdpdGggdGhpcyBmdW4gZWFzdGVyIGVnZyBmb3IgdGhvc2Ugd2l0aCBhIGtlZW4gZXllIQ&tgWebAuthUserId=420493337&tgWebAuthDcId=4</span></span></div></div>
 
 It seems like Telegram just opens up a URL with your account's token appended to it. The token gets put in a hash fragment, and quickly disappears once the web client loads up and realizes there's a token there. Although very convenient, this feature is pretty concerning because it can be used to quickly gain access to your account even if you use 2FA and a locked-down device (eg a *non-rooted/jailbroken* phone).
@@ -28,6 +131,192 @@ So where does this URL and its session come from? I searched tdesktop[^1]'s code
 A couple hours of compiling later, I had my very own build of tdesktop up and running. I set up a few breakpoints, clicked on some test links, and stepped through the code looking for the relevant bits. And eventually, I got here:
 
 <!-- This was fun to make! It took me a long time to recreate all the icons in SVG though. -->
+<style>
+	.detailedUrlMapTable {
+		table-layout: fixed;
+		width: 100%;
+		word-break: break-all;
+		font-size: 12px;
+		font-family: monospace;
+		border-collapse: collapse;
+		color: #70BAF5;
+		background: #182533;
+		border-radius: 4px;
+	}
+	.detailedUrlMapTable td {
+		border: 1px solid #0E1621;
+		padding: 4px 4px;
+	}
+	.vsLocals svg {
+		width: 16px;
+		height: 16px;
+		vertical-align: bottom;
+		padding-left: 2px;
+		padding-right: 4px;
+	}
+	.vsLocals th {
+		font-weight: normal;
+		text-align: left;
+  		border: 1px solid #3D3D3D;
+  		border-top: none;
+  		border-left: none;
+  		padding-left: 4px;
+  		user-select: none;
+	}
+	.vsLocals td {
+  		border: 1px solid #000;
+  		border-top: none;
+  		border-left: none;
+  		padding: 0 0 0 3px;
+		text-overflow: ellipsis;
+		overflow: clip;
+		white-space: nowrap;
+		max-width: 0;
+		user-select: all;
+	}
+	.vsLocals > table {
+		border-collapse: collapse;
+		box-model: border-box;
+		line-height: 16px;
+		width: 100%;
+		cursor: default;
+	}
+	.vsLocals > table *::selection {
+		background: #7160E8;
+	}
+	.vsBreakpoint {
+		width: 12px;
+		height: 12px;
+		background: #B7B7B7;
+		border: 0.5px solid #DDD;
+		border-radius: 14px;
+		margin: 3px 0 2px 2px;
+		opacity: 0;
+	}
+	.vsBreakpoint:hover {
+		opacity: 1;
+	}
+	.vsBreakpoint.active {
+		background: #C55159;
+		border-color: #EF5B64;
+		opacity: 1;
+	}
+	.vC1 { color: #4EC9B0 }
+	.vC2 { color: #569CD6 }
+	.vC3 { color: #9A9A9A }
+	.vC4 { color: #9CDCFE }
+	.vC5 { color: #B4B4B4 }
+	.vC6 { color: #B8D7A3 }
+	.vC7 { color: #C8C8C8 }
+	.vC8 { color: #D69D85 }
+	.vC9 { color: #D8A0DF }
+	.vC0 { color: #DCDCAA }
+	.vCA { color: #DCDCDC }
+	.vCB { color: #E8C9BB }
+	.vLn {
+		user-select: none;
+		cursor: default;
+	}
+	.vsCodeArea > span:hover {
+		background: #2e2237;
+	}
+	.vsCodeArea::-webkit-scrollbar {
+	  width: 10px;
+	}
+	.vsCodeArea::-webkit-scrollbar-track {
+	  background: #2E2E2E;
+	}
+	.vsCodeArea::-webkit-scrollbar-thumb {
+	  background: #4D4D4D; 
+	}
+	.vsCodeArea::-webkit-scrollbar-thumb:hover {
+	  background: #999; 
+	}
+	.vsCodeArea::selection, .vsCodeArea *::selection  {
+		background: #264F78;
+	}
+	.vsCodeArea {
+		vertical-align: bottom;
+		font-family: "Cascadia Code", "Cascadia Mono", "Lucida Sans Typewriter", "Courier New", monospace;
+		white-space: pre-wrap;
+		font-size: 13px;
+		line-height: 17px;
+    	display: inline-block;
+    	color: #8A8A8A;
+		text-wrap: nowrap;
+    	overflow: auto;
+    	overflow-y: clip;
+    	cursor: text;
+	}
+	.vsContainer {
+		background: #1F1F1F;
+		color: #FAFAFA;
+		width: calc(100% - 8px);
+		height: fit-content;
+		border-radius: 4px;
+		padding: 4px;
+		font-family: system-ui, sans-serif;
+		font-size: 12px;
+		line-height: 16px;
+	}
+	.vsBox {
+		border: 1px solid #3D3D3D;
+		overflow: clip;
+		white-space:nowrap;
+	}
+	.vsDropdown {
+		background: #383838;
+		height: 18px;
+		padding-top: 1px;
+		border: 1px solid #424242;
+		border-right: 4px solid #424242;
+		width: 352px;
+		display: inline-block;
+		user-select: none;
+	}
+	.vsDropdown > svg {
+		width: 16px;
+		height: 16px;
+		vertical-align: bottom;
+		padding-left: 2px;
+		padding-right: 3px;
+	}
+	.vsDropdown:hover {
+		background: #3D3D3D;
+	}
+	.vsTabs {
+		width: 100%;
+		height: 21px;
+		border-bottom: 2px #7160E8 solid;
+		user-select: none;
+		margin-left: 1px;
+		overflow: clip;
+		white-space:nowrap;
+	}
+	.vsTab:hover {
+		background: #3D3D3D;
+		color: #FAFAFA;
+	}
+	.vsTab {
+		display: inline-block;
+		height: 16px;
+		background: #2E2E2E;
+		color: #B2B2B2;
+		padding: 0 43px 3px 4.5px;
+		margin: 1px 1px 0;
+	}
+	.vsTab.active {
+		border-top: 2px #7160E8 solid;
+		box-sizing: border-box;
+		height: 20px;
+		vertical-align: bottom;
+		color: #FAFAFA;
+		background: #3D3D3D;
+		font-weight: 600;
+		margin: 1px 0px 0;
+		padding: 0 45px 3px 4.5px;
+	}
+</style>
 <div class="vsContainer" draggable="false" role=figure aria-label="Visual Studio window">
 	<div class="vsTabs"><span class="vsTab active">ui_integration.cpp<svg style="position:absolute;width:16px;height:16px;padding-left:27px" xmlns="http://www.w3.org/2000/svg" fill="#D6D6D6" stroke="none"><polygon points="4 8 7 8 7 5 8 5 8 6 12 6 12 11 8 11 8 9 11 9 11 7 8 7 8 12 7 12 7 9 4 9"/></svg></span><span class="vsTab" aria-hidden=true>base_integration.cpp</span><span class="vsTab" aria-hidden=true>url_auth_box.cpp</span><span class="vsTab" aria-hidden=true>scheme.h</span><span class="vsTab" aria-hidden=true>local_url_handlers.cpp</span><span class="vsTab" aria-hidden=true>basic_click_handlers.cpp</span></div>
 	<div class="vsBox" style="border-top: none; height: fit-content">
@@ -249,7 +538,7 @@ We start off by sending "z.t.me" in their Telegram app and tapping on the link. 
 
 <!-- I did not want to add a YouTube embed here because I want there to be no external resources in this blog unless absolutely necessary.
 Having the thumbnail be just a gradient looks a bit silly but otherwise I think it's a fairly decent replacement for the official embed. -->
-<div class="ytLink">
+<div class="ytLink" style="position:relative">
 <a href="https://vimeo.com/941755175" target="_blank"><div class="ytLinkOverlay"></div></a>
 <div style="padding:13px;display:flex;align-items:center;position:absolute;z-index:3;max-width: calc(100% - 26px);pointer-events:none">
 <a href="https://www.youtube.com/MLGaeming" target="_blank"><span class="ytChan"><span style="color:#F00">m</span><span style="color:#00F">l</span><span style="color:#0F0">g</span></span></a><span style="text-shadow: 0 0 2px #0008;vertical-align: middle;padding-left:10px;display:inline-block;text-overflow: ellipsis;overflow: clip;white-space: nowrap">Stealing your Telegram account in 10 seconds flat</span></div>
@@ -330,7 +619,6 @@ note: the graphics in this blog post are not fully compatible with [netscape nav
 	}
 	.ytLink {
 		user-select: none;
-		position: relative;
 		width: 100%;
 		min-height: 240px;
 		aspect-ratio: 16 / 9;
@@ -439,288 +727,5 @@ note: the graphics in this blog post are not fully compatible with [netscape nav
 		width: 100%;
 		border-radius: 4px;
 		overflow: clip;
-	}
-	.detailedUrlMapTable {
-		table-layout: fixed;
-		width: 100%;
-		word-break: break-all;
-		font-size: 12px;
-		font-family: monospace;
-		border-collapse: collapse;
-		color: #70BAF5;
-		background: #182533;
-		border-radius: 4px;
-	}
-	.detailedUrlMapTable td {
-		border: 1px solid #0E1621;
-		padding: 4px 4px;
-	}
-	.vsLocals svg {
-		width: 16px;
-		height: 16px;
-		vertical-align: bottom;
-		padding-left: 2px;
-		padding-right: 4px;
-	}
-	.vsLocals th {
-		font-weight: normal;
-		text-align: left;
-  		border: 1px solid #3D3D3D;
-  		border-top: none;
-  		border-left: none;
-  		padding-left: 4px;
-  		user-select: none;
-	}
-	.vsLocals td {
-  		border: 1px solid #000;
-  		border-top: none;
-  		border-left: none;
-  		padding: 0 0 0 3px;
-		text-overflow: ellipsis;
-		overflow: clip;
-		white-space: nowrap;
-		max-width: 0;
-		user-select: all;
-	}
-	.vsLocals > table {
-		border-collapse: collapse;
-		box-model: border-box;
-		line-height: 16px;
-		width: 100%;
-		cursor: default;
-	}
-	.vsLocals > table *::selection {
-		background: #7160E8;
-	}
-	.vsBreakpoint {
-		width: 12px;
-		height: 12px;
-		background: #B7B7B7;
-		border: 0.5px solid #DDD;
-		border-radius: 14px;
-		margin: 3px 0 2px 2px;
-		opacity: 0;
-	}
-	.vsBreakpoint:hover {
-		opacity: 1;
-	}
-	.vsBreakpoint.active {
-		background: #C55159;
-		border-color: #EF5B64;
-		opacity: 1;
-	}
-	.vC1 { color: #4EC9B0 }
-	.vC2 { color: #569CD6 }
-	.vC3 { color: #9A9A9A }
-	.vC4 { color: #9CDCFE }
-	.vC5 { color: #B4B4B4 }
-	.vC6 { color: #B8D7A3 }
-	.vC7 { color: #C8C8C8 }
-	.vC8 { color: #D69D85 }
-	.vC9 { color: #D8A0DF }
-	.vC0 { color: #DCDCAA }
-	.vCA { color: #DCDCDC }
-	.vCB { color: #E8C9BB }
-	.vLn {
-		user-select: none;
-		cursor: default;
-	}
-	.vsCodeArea > span:hover {
-		background: #2e2237;
-	}
-	.vsCodeArea::-webkit-scrollbar {
-	  width: 10px;
-	}
-	.vsCodeArea::-webkit-scrollbar-track {
-	  background: #2E2E2E;
-	}
-	.vsCodeArea::-webkit-scrollbar-thumb {
-	  background: #4D4D4D; 
-	}
-	.vsCodeArea::-webkit-scrollbar-thumb:hover {
-	  background: #999; 
-	}
-	.vsCodeArea::selection, .vsCodeArea *::selection  {
-		background: #264F78;
-	}
-	.vsCodeArea {
-		vertical-align: bottom;
-		font-family: "Cascadia Code", "Cascadia Mono", "Lucida Sans Typewriter", "Courier New", monospace;
-		white-space: pre-wrap;
-		font-size: 13px;
-		line-height: 17px;
-    	display: inline-block;
-    	color: #8A8A8A;
-		text-wrap: nowrap;
-    	overflow: auto;
-    	overflow-y: clip;
-    	cursor: text;
-	}
-	.vsContainer {
-		background: #1F1F1F;
-		color: #FAFAFA;
-		width: calc(100% - 8px);
-		height: fit-content;
-		border-radius: 4px;
-		padding: 4px;
-		font-family: system-ui, sans-serif;
-		font-size: 12px;
-		line-height: 16px;
-	}
-	.vsBox {
-		border: 1px solid #3D3D3D;
-		overflow: clip;
-		white-space:nowrap;
-	}
-	.vsDropdown {
-		background: #383838;
-		height: 18px;
-		padding-top: 1px;
-		border: 1px solid #424242;
-		border-right: 4px solid #424242;
-		width: 352px;
-		display: inline-block;
-		user-select: none;
-	}
-	.vsDropdown > svg {
-		width: 16px;
-		height: 16px;
-		vertical-align: bottom;
-		padding-left: 2px;
-		padding-right: 3px;
-	}
-	.vsDropdown:hover {
-		background: #3D3D3D;
-	}
-	.vsTabs {
-		width: 100%;
-		height: 21px;
-		border-bottom: 2px #7160E8 solid;
-		user-select: none;
-		margin-left: 1px;
-		overflow: clip;
-		white-space:nowrap;
-	}
-	.vsTab:hover {
-		background: #3D3D3D;
-		color: #FAFAFA;
-	}
-	.vsTab {
-		display: inline-block;
-		height: 16px;
-		background: #2E2E2E;
-		color: #B2B2B2;
-		padding: 0 43px 3px 4.5px;
-		margin: 1px 1px 0;
-	}
-	.vsTab.active {
-		border-top: 2px #7160E8 solid;
-		box-sizing: border-box;
-		height: 20px;
-		vertical-align: bottom;
-		color: #FAFAFA;
-		background: #3D3D3D;
-		font-weight: 600;
-		margin: 1px 0px 0;
-		padding: 0 45px 3px 4.5px;
-	}
-	.urlBar {
-		background: #3C3C3C;
-		height: 34px;
-		width: calc(100% - 12px);
-		padding: 6px;
-		border-radius: 4px;
-		font-family: system-ui, sans-serif;
-		font-size: 14px;
-	}
-	.urlBarInner *::selection {
-		color: #000;
-		background-color: #A8C7FA;
-	}
-	.urlBarInner {
-		background: #282828;
-		color: #C7C7C7;
-		height: 34px;
-		border-radius: 34px;
-		width: 100%;
-		line-height: 22px;
-	}
-	.urlBarText {
-		text-overflow: ellipsis;
-		overflow:clip;
-		white-space:nowrap;
-		display:inline-block;
-		margin-left:37px;
-		width: calc(100% - 36px - 16px);
-		margin-top: 6px;
-	}
-	.urlBarIcon {
-		width: 16px;
-		height: 16px;
-		margin: 5px;
-		color: #E3E3E3;
-		fill: #E3E3E3;
-		background: #3C3C3C;
-		padding: 4px;
-		position: absolute;
-		display:block;
-		border-radius: 24px;
-	}
-	.urlBarIcon svg {
-		width: 16px;
-		height: 16px;
-	}
-	.tgMsg *::selection {
-		background-color: #2E70A5;
-	}
-	.tgThread {
-		font-family: "Open Sans", system-ui, sans-serif;
-		font-size: 12.75px;
-		background: #0E1621;
-		padding: 8px;
-		border-radius: 4px;
-		width: fit-content;
-	}
-	.tgMsg {
-		background: #182533;
-		color: #F5F5F5;
-		border-radius: 16px;
-		max-width: 410px;
-		padding: 8px 8px 8px 11px;
-		margin: 2px;
-		width: fit-content;
-	}
-	.tgMsgSmTL {
-		border-top-left-radius: 6px;
-	}
-	.tgMsgSmBL {
-		border-bottom-left-radius: 6px;
-	}
-	.tgMsgNoneBL {
-		border-bottom-left-radius: 0;
-	}
-	.tgMsg a {
-		color: #70BAF5;
-		text-decoration: none;
-	}
-	.tgMsgTs {
-		margin-top: 5px;
-		float: right;
-		margin-left: 12px;
-		color: #6D7F8F;
-		user-select: none;
-	}
-	.tgMsgSpeech {
-		background: #182533;
-		width: 8px;
-		height: 8px;
-		position: absolute;
-		transform: translate(-6px, -10px);
-	}
-	.tgMsgSpeech > div {
-		background: #0E1621;
-		width: 8px;
-		height: 8px;
-		border-bottom-right-radius: 8px;
 	}
 </style>
