@@ -2,7 +2,8 @@
 :root {
   --font-text: Charter, 'Bitstream Charter', 'Sitka Text', Cambria, serif;
   --font-head: Didot, 'Bodoni MT', 'Noto Serif Display', 'URW Palladio L', P052, Sylfaen, serif;
-  --font-code: 'Nimbus Mono PS', 'Courier New', monospace;
+  --font-mono: 'Nimbus Mono PS', 'Courier New', monospace;
+  --font-code: Menlo, Consolas, "Ubuntu Mono", monospace;
 }
 
 body {
@@ -90,13 +91,41 @@ h1, h2, #subMeta {
 }
 
 code, pre {
-  font-family: var(--font-code);
+  font-family: var(--font-mono);
   color: #04593b;
   font-size: 90%;
 }
 
 sup {
   line-height: 0;
+}
+
+.footnotes :target p, p:has(sup:target .footnote-ref) {
+  animation: 2s footnote 1 linear;
+  border-radius: 4px;
+}
+
+@keyframes footnote {
+  10% {
+    background: #FFF;
+  }
+}
+
+.footnotes li:target {
+  &::marker { font-weight: 600; }
+  p {
+    padding-left: 8px;
+    border-left: 2px solid #04593b;
+  }
+}
+
+/* Really cursed hack to make footnotes scroll better */
+html:has(sup:target .footnote-ref) { animation: 0.1s scroll-padding 1 linear; }
+
+@keyframes scroll-padding {
+  from {
+    scroll-padding-top: 25dvh;
+  }
 }
 
 art-frame {
