@@ -2896,7 +2896,7 @@ thank you so much for reading &lt;3
 <p id="youAre">you're awesome!! (i can tell because you checked <a href="#awesome">that checkbox</a> from earlier)</p>
 <style>body:not(:has(#awesome:checked)) #youAre { display: none; }</style>
 
-**Discuss this post on:** twitter, mastodon, lobsters
+**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1961167342530183535), [mastodon](https://infosec.exchange/@rebane2001/115108329158660789), [lobsters](https://lobste.rs/s/xx7dbi/you_no_longer_need_javascript_overview)
 
 <!--[^interactive]: They actually don't.-->
 [^firefox-flex]: Chrome's DevTools come with the cool flexbox widget. Firefox's however don't seem to for some reason? I find that weird because Firefox does have really good tools for flexbox and grid development, so this seems like an odd omission.
