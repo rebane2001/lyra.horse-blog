@@ -2896,6 +2896,8 @@ thank you so much for reading &lt;3
 <p id="youAre">you're awesome!! (i can tell because you checked <a href="#awesome">that checkbox</a> from earlier)</p>
 <style>body:not(:has(#awesome:checked)) #youAre { display: none; }</style>
 
+*If you'd like to reach out, feel free to message me on my socials or at lyra.horse [at] gmail.com.*
+
 **Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1961167342530183535), [mastodon](https://infosec.exchange/@rebane2001/115108329158660789), [lobsters](https://lobste.rs/s/xx7dbi/you_no_longer_need_javascript_overview)
 
 <!--[^interactive]: They actually don't.-->
