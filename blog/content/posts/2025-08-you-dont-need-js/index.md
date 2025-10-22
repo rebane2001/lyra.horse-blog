@@ -1,6 +1,7 @@
 +++
 title = "You no longer need JavaScript"
 date = 2025-08-28T20:40:00Z
+lastmod = 2025-10-22T18:00:00Z
 draft = false
 tags = ["css"]
 slug = "you-dont-need-js"
@@ -1856,6 +1857,8 @@ body:has(#vici:not(:checked)) #tab-vici {
 }
 </style>
 
+*Correction (Oct 2025): As pointed out by a few people, the word definitions in the demo above are not fully accurate. Use my post to learn CSS, not Latin :).*
+
 We can now use them in the CSS however we want by just seeing if they're *:checked*. Here I made tabs with separate divs for the content by using a *:has* selector on a parent element to find out which radio button is currently selected.
 
 The *:has* selector has to be on a parent element that contains both the radio button and the target element - you can simply use *html* or *body* if you want it to work across the entire page. You should **never** use something like <code style="color:#d30000">:has(...)</code> by itself as it'll run the selector for every element of the page, which can cause performance issues (<code style="color:#0e8d00">body:has(...)</code> is okay).
@@ -1957,10 +1960,10 @@ And lastly, I want to show you the power of input validation in HTML and CSS.
 <sx-t>&lt;small&gt;</sx-t>3-16 letters, only alphanum and _.<sx-t>&lt;/small&gt;</sx-t>
 <sx-t>&lt;style&gt;</sx-t>
  <sx-t>input</sx-t>:<sx-l>valid</sx-l> {
-   <sx-p>border</sx-p>: <sx-n>1px</sx-n> <sx-a>solid</sx-a> <sx-a>green</sx-a>;
+   <sx-p>border</sx-p>: <sx-n>2px</sx-n> <sx-a>solid</sx-a> <sx-a>green</sx-a>;
  }
  <sx-t>input</sx-t>:<sx-l>invalid</sx-l> {
-   <sx-p>border</sx-p>: <sx-n>1px</sx-n> <sx-a>solid</sx-a> <sx-a>red</sx-a>;
+   <sx-p>border</sx-p>: <sx-n>2px</sx-n> <sx-a>solid</sx-a> <sx-a>red</sx-a>;
  }
 <sx-t>&lt;/style&gt;</sx-t></code-frame>
 <fake-frame style="min-height:128px">
@@ -1984,10 +1987,10 @@ And lastly, I want to show you the power of input validation in HTML and CSS.
       outline-offset: 2px;
     }
     input:valid {
-      border: 1px solid green;
+      border: 2px solid green;
     }
     input:invalid {
-      border: 1px solid red;
+      border: 2px solid red;
     }
   }
 }
@@ -2037,6 +2040,8 @@ Now, where CSS comes in is styling the input to show whether its value is valid.
 An easy win here is to instead use *:user-valid* and *:user-invalid* - these pseudo-classes only become active once you've interacted with input field. I also made this example use an outline instead of a border, which I think looks a lot nicer.
 
 It may sometimes even make sense to use a combination of *:valid* and *:user-invalid*.
+
+*Note (Oct 2025): Be careful with only using colors as feedback, as it can be an [accessibility problem](https://infosec.exchange/@rebane2001/115133979492369974).*
 
 And of course, you can use the *:has* selector to style other elements depending on the input too!
 
@@ -2254,6 +2259,7 @@ epic-phone {
       display: block;
       flex: 1;
       overflow-y: auto;
+      overscroll-behavior-y: none;
       scrollbar-width: none;
       ul {
         margin: 0;
@@ -2591,6 +2597,8 @@ Alright, so this is a little different from the rest of the post, but I wanted t
 
 They are just fun ideas, don't take them too seriously.
 
+*Update (Oct 2025): [Bramus](https://front-end.social/@bramus/115111465257753352) made an awesome toot going over my wishlist and letting us know which of the features will be there soon.*
+
 ### Reusable blocks
 
 I wish it was possible to put classes in other classes in CSS, so that you could write something like:
@@ -2867,6 +2875,7 @@ But what's unfortunate is that despite browsers supporting this, and major sites
 
 I think an HTML validator should warn for this, but not error.
 
+*Note (Oct 2025): It's actually possible to use **@scope {...}** to limit the scope of a style tag to its current parent.*
 
 ## The art
 
@@ -2898,10 +2907,11 @@ thank you so much for reading &lt;3
 
 *If you'd like to reach out, feel free to message me on my socials or at lyra.horse [at] gmail.com.*
 
-**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1961167342530183535), [mastodon](https://infosec.exchange/@rebane2001/115108329158660789), [lobsters](https://lobste.rs/s/xx7dbi/you_no_longer_need_javascript_overview)
+**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1961167342530183535), [mastodon](https://infosec.exchange/@rebane2001/115108329158660789), [lobsters](https://lobste.rs/s/xx7dbi/you_no_longer_need_javascript_overview), [hn](https://news.ycombinator.com/item?id=45056878)
 
 <!--[^interactive]: They actually don't.-->
-[^firefox-flex]: Chrome's DevTools come with the cool flexbox widget. Firefox's however don't seem to for some reason? I find that weird because Firefox does have really good tools for flexbox and grid development, so this seems like an odd omission.
+[^firefox-flex]: Chrome's DevTools come with the cool flexbox widget. Firefox's however don't seem to for some reason? I find that weird because Firefox does have really good tools for flexbox and grid development, so this seems like an odd omission.  
+*Update (Oct 2025): [Nicolas](https://mastodon.social/@nicolaschevobbe/115124078265768359) let me know that this [will be added soon](https://phabricator.services.mozilla.com/D260229).*
 [^tailwind]: While I think what I said is true, Tailwind does have more to its existence, the core of which can be found in [this post](https://adamwathan.me/css-utility-classes-and-separation-of-concerns/) by its creator.
 [^compliant]: You are allowed to just make up elements <a target="_blank" href="https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name">as long as their names contain a hyphen</a>. Apart from the 8 existing tags listed at the link, no HTML tags contain a hyphen and none ever will. The spec even has `<math-α>` and `<emotion-😍>` as <a target="_blank" href="https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name:~:text=😍">examples of allowed names</a>. You are allowed to <a target="_blank" href="https://html.spec.whatwg.org/multipage/custom-elements.html#custom-elements-core-concepts:~:text=Any%20namespace%2Dless%20attribute">make up attributes</a> on an <a target="_blank" href="https://html.spec.whatwg.org/multipage/custom-elements.html#autonomous-custom-element">autonomous custom element</a>, but for other elements (built-in or extended) you should only make up `data-*` attributes. I make heavy use of this on my blog to make writing HTML and CSS nicer and avoid meaningless div-soup.<!-- links in this footnote are set to target="_blank" because otherwise the whatwg spec fragment links don't work on page load -->
 [^bem]: Still not nice to read for you? I'm personally not a fan of [BEM](https://getbem.com/), but I'd definitely recommend reading up on it too if you just don't vibe with the way I'm writing my examples. Also, my example intentionally shows off a lot of the syntax at once, but in the real world it might make sense to structure things a little differently.
