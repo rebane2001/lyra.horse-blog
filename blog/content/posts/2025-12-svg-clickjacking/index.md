@@ -2236,6 +2236,7 @@ This post is already getting pretty long, so I'll leave figuring out how this fi
       background-blend-mode: difference;
       filter: saturate(100) hue-rotate(90deg);
       mix-blend-mode: lighten;
+      pointer-events: none;
     }
   }
 </style>
@@ -2246,7 +2247,7 @@ This demo <bad-phone>does not work on mobile devices</bad-phone>. And also, for 
 
 Similarly, in a real attack, the scaling and color profile issues could be worked around using some JavaScript tricks or simply by implementing the filter a bit differently - this here is just a proof of concept that's a bit rough around the edges.
 
-But yeah, that's a QR code generator built inside and SVG filter!
+But yeah, that's a QR code generator built inside an SVG filter!
 
 Took me a while to make, but I didn't want to write about it just being "theoretically possible".
 
