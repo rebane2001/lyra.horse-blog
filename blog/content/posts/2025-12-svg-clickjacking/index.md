@@ -2371,7 +2371,7 @@ see y'all around!!
 
 &lt;3
 
-**Discuss this post on:** TODO
+**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1996581146662998516), [mastodon](https://infosec.exchange/@rebane2001/115661669658436967), [lobsters](https://lobste.rs/s/omnyrf/svg_filters_clickjacking_2_0)
 
 
 [^refract]: This is a fancy way of saying it does a basic displacement of pixels.
