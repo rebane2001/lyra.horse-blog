@@ -432,7 +432,7 @@ Drowning in the flurry of posts, a thought came to mind - how hard would it be t
     <div>
     <album-card><div style="background:linear-gradient(#040758,#052297)"></div><p>EMERGENCY!</p><p>Girls Rituals</p></album-card>
     <album-card><div style="background:linear-gradient(-135deg,#0C9FF0,#0000 25%), linear-gradient(135deg,#0C9FF0,#0000 25%), linear-gradient(in oklch,#FFF,#FFF,#FFF,#BD3242)"></div><p>This Won't Be The Last Time</p><p>acloudyskye</p></album-card>
-    <album-card><div style="background:radial-gradient(in oklch, #F8C6AD,#F9E234,#CDCA01)/*radial-gradient(circle at 50% 95%,#ECAB91, #F3A98C 10%,#0000 16%),radial-gradient(circle at 50% 50%,#ECAB91, #F3A98C 50%,#0000 60%),radial-gradient(circle at 45% 48%,#0000 40%, #666A09,#F4C72E,#E45626,#0000 54%),  radial-gradient(circle at 50% 50%,#F7B85C,#7A582B)*/"></div><p>SOUND BANDIT FUCKING LIVES</p><p>Sound Bandit</p></album-card>
+    <album-card><div style="background:radial-gradient(in oklch, #F8C6AD,#F9E234,#CDCA01)"></div><p>SOUND BANDIT FUCKING LIVES</p><p>Sound Bandit</p></album-card>
     <album-card><div style="background:linear-gradient(0deg,#0003,#0000 20%),linear-gradient(90deg,#0003,#0000 20%),linear-gradient(180deg,#0003,#0000 20%),linear-gradient(270deg,#0003,#0000 20%),linear-gradient(180deg,#FF0213,#D85C13,#C472B2,#AD2DA8,#A51866),linear-gradient(in oklch 180deg,#9E4CA2,#B41C35)"></div><p>Love & Ponystep</p><p>Vylet Pony</p></album-card>
     <album-card><div style="background:linear-gradient(#D5D6D3,#8691AA)"></div><p>I Love My Computer</p><p>Ninajirachi</p></album-card>
     </div>
@@ -1162,9 +1162,9 @@ How can we adapt this technique to work with arbitrary colors and textures?
 
 <pre class="sx-block"><code><sx-c>&lt;!-- crop to first stripe of the flag --&gt;</sx-c>
 <sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;22&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;22&quot;</sx-v>
-    <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-t>/&gt;
+        <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-t>/&gt;
 &lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>&quot;col&quot;</sx-v>
-    <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-t>/&gt;</sx-t>
+        <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-t>/&gt;</sx-t>
 <sx-c>&lt;!-- generate a color to diff against --&gt;</sx-c>
 <sx-t>&lt;feFlood</sx-t> <sx-r>flood-color</sx-r><sx-t>=</sx-t><sx-v>&quot;#5BCFFA&quot;</sx-v>
          <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>&quot;blue&quot;</sx-v> <sx-t>/&gt;
@@ -2361,7 +2361,7 @@ whoa this post took such a long time for me to get done!
 
 i started work on it in july, and was expecting to release it alongside [my CSS talk](https://youtu.be/INgS4IipEhU) in september, but it has taken me so much longer than expected to actually finish this thing. i wanted to make sure it was a good in-depth post, rather than something i just get out as soon as possible.
 
-unlike my previous posts, i did unfortunately have to break my trend of using no images, since i needed a few data URIs within the SVG filters for demos. still, no images anywhere else in the post, no javascript, and just -1kB (gzip) of handcrafted html/css/svg.
+unlike my previous posts, i did unfortunately have to break my trend of using no images, since i needed a few data URIs within the SVG filters for demos. still, no images anywhere else in the post, no javascript, and just 42kB (gzip) of handcrafted html/css/svg.
 
 also, i usually hide a bunch of easter eggs in my post that link to stuff i've enjoyed recently, but i have a couple links i didn't want to include without content warnings. [finding responsibility](https://youtu.be/UBdBoWAtLNI) is a pretty dark talk about the ethics of making sure your work won't end up killing people, and [youre the one ive always wanted](https://youtu.be/rQHYelsNgtU) is slightly nsfw doggyhell vent art.
 
