@@ -1,7 +1,7 @@
 +++
 title = "SVG Filters - Clickjacking 2.0"
 date = 2025-12-05T14:00:00Z
-draft = true
+draft = false
 tags = ["infosec", "css"]
 slug = "svg-clickjacking"
 summary = "A novel and powerful twist on an old classic."
@@ -362,7 +362,7 @@ SVG effects are currently <b><fx-on style="color:green">enabled</fx-on><fx-off s
         font-family: var(--font-code);
         font-size: 0.8125rem;
       }
-      &:not(full) {
+      &:not(.sx-full) {
         width: fit-content;
       }
     }
@@ -608,24 +608,23 @@ What we can do instead is make use of `feDisplacementMap` to make the text seem 
 
 <DIV><art-frame id="fakeCaptcha" flex><fake-frame><p>Here is your secret code:</p><p>6c79 7261 706f 6e79</p><p>Don't share it with anyone!</p></fake-frame><fake-frame style="filter:url(#fakeCaptchaFilter)"><p>Here is your secret code:</p><p>6c79 7261 706f 6e79</p><p>Don't share it with anyone!</p></fake-frame><div><div style="margin-top:20px;background:#EEE;padding:10px 0;text-align:center">Complete a captcha</div><div style="margin-top:70px;background:#EEE;padding:10px 0;text-align:center"><div class="textA">What's written above?</div><div class="textB" contenteditable="plaintext-only" style="color:green">Good girl!!<br><p style="font-size:50%;margin:0;color:#444">(<span class="coarseText">tap</span><span class="fineText">click</span> to edit it you're not a girl)</p></div><input spellcheck=false placeholder="Enter the letters from above" minlength="16" pattern="^6c79 ?7261 ?706f ?6e79$" required></div></div></art-frame></DIV>
 
-```svg
-<iframe src="..." style="filter:url(#captchaFilter)"></iframe>
-<svg width="768" height="768" viewBox="0 0 768 768" xmlns="http://www.w3.org/2000/svg">
-  <filter id="captchaFilter">
-    <feTurbulence
-      type="turbulence"
-      baseFrequency="0.03"
-      numOctaves="4"
-      result="turbulence" />
-    <feDisplacementMap
-      in="SourceGraphic"
-      in2="turbulence"
-      scale="6"
-      xChannelSelector="R"
-      yChannelSelector="G" />
-  </filter>
-</svg>
-```
+<pre class="sx-block sx-full"><code><sx-t>&lt;iframe</sx-t> <sx-r>src</sx-r><sx-t>=</sx-t><sx-v>&quot;...&quot;</sx-v> <sx-r>style</sx-r><sx-t>=</sx-t><sx-v>&quot;filter:url(#captchaFilter)&quot;</sx-v><sx-t>&gt;&lt;/iframe&gt;
+&lt;svg</sx-t> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;768&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;768&quot;</sx-v> <sx-r>viewBox</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 768 768&quot;</sx-v> <sx-r>xmlns</sx-r><sx-t>=</sx-t><sx-v>&quot;http://www.w3.org/2000/svg&quot;</sx-v><sx-t>&gt;
+  &lt;filter</sx-t> <sx-r>id</sx-r><sx-t>=</sx-t><sx-v>&quot;captchaFilter&quot;</sx-v><sx-t>&gt;
+    &lt;feTurbulence</sx-t>
+      <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>&quot;turbulence&quot;</sx-v>
+      <sx-r>baseFrequency</sx-r><sx-t>=</sx-t><sx-v>&quot;0.03&quot;</sx-v>
+      <sx-r>numOctaves</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v>
+      <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>&quot;turbulence&quot;</sx-v> <sx-t>/&gt;
+    &lt;feDisplacementMap</sx-t>
+      <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>&quot;SourceGraphic&quot;</sx-v>
+      <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>&quot;turbulence&quot;</sx-v>
+      <sx-r>scale</sx-r><sx-t>=</sx-t><sx-v>&quot;6&quot;</sx-v>
+      <sx-r>xChannelSelector</sx-r><sx-t>=</sx-t><sx-v>&quot;R&quot;</sx-v>
+      <sx-r>yChannelSelector</sx-r><sx-t>=</sx-t><sx-v>&quot;G&quot;</sx-v> <sx-t>/&gt;
+  &lt;/filter&gt;
+&lt;/svg&gt;</sx-t>
+</code></pre>
 
 <svg
   class="effect"
@@ -776,10 +775,9 @@ Let's start off by using `feComposite` with arithmetics to make the grey text di
 
 <DIV><art-frame class="textExample" flex><fake-frame style="filter:url(#textbox1)"><div style="padding:0 16px"><p>Set a new p&ZeroWidthSpace;assword</p><input pattern=.{8,} spellcheck=false placeholder="your new p&ZeroWidthSpace;assword" value="meow"><span class="overlay">too short</span></div></fake-frame></art-frame></DIV>
 
-```svg
-<feComposite operator=arithmetic
-             k1=0 k2=4 k3=0 k4=0 />
-```
+<pre class="sx-block"><code><sx-t>&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v>
+             <sx-r>k1</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>4</sx-v> <sx-r>k3</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>k4</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 <svg
   class="effect"
@@ -805,9 +803,8 @@ We start off by cropping the result of our black text filter with `feTile`.
 
 <DIV><art-frame class="textExample" flex><fake-frame style="filter:url(#textbox2)"><div style="padding:0 16px"><p>Set a new p&ZeroWidthSpace;assword</p><input pattern=.{8,} spellcheck=false placeholder="your new p&ZeroWidthSpace;assword" value="meow"><span class="overlay">too short</span></div></fake-frame></art-frame></DIV>
 
-```svg
-<feTile x=20 y=56 width=184 height=22 />
-```
+<pre class="sx-block"><code><sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>20</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>56</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>184</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>22</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 <svg
   class="effect"
@@ -830,9 +827,8 @@ Then we use `feMorphology` to increase the thickness of the text.
 
 <DIV><art-frame class="textExample" flex><fake-frame style="filter:url(#textbox3)"><div style="padding:0 16px"><p>Set a new p&ZeroWidthSpace;assword</p><input pattern=.{8,} spellcheck=false placeholder="your new p&ZeroWidthSpace;assword" value="meow"><span class="overlay">too short</span></div></fake-frame></art-frame></DIV>
 
-```svg
-<feMorphology operator=erode radius=3 result=thick />
-```
+<pre class="sx-block"><code><sx-t>&lt;feMorphology</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>erode</sx-v> <sx-r>radius</sx-r><sx-t>=</sx-t><sx-v>3</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>thick</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 <svg
   class="effect"
@@ -854,11 +850,10 @@ Now we have to increase the contrast of the mask. I'm going to do it by first us
 
 <DIV><art-frame class="textExample" flex><fake-frame style="filter:url(#textbox4)"><div style="padding:0 16px"><p>Set a new p&ZeroWidthSpace;assword</p><input pattern=.{8,} spellcheck=false placeholder="your new p&ZeroWidthSpace;assword" value="meow"><span class="overlay">too short</span></div></fake-frame></art-frame></DIV>
 
-```svg
-<feFlood flood-color=#FFF result=white />
-<feBlend mode=difference in=thick in2=white />
-<feComposite operator=arithmetic k2=100 />
-```
+<pre class="sx-block"><code><sx-t>&lt;feFlood</sx-t> <sx-r>flood-color</sx-r><sx-t>=</sx-t><sx-v>#FFF</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>thick</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>100</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 <svg
   class="effect"
@@ -883,15 +878,14 @@ We have a luma matte now! All that's left is to convert it into an alpha matte w
 
 <DIV><art-frame class="textExample" flex><fake-frame style="filter:url(#textbox5)"><div style="padding:0 16px"><p>Set a new p&ZeroWidthSpace;assword</p><input pattern=.{8,} spellcheck=false placeholder="your new p&ZeroWidthSpace;assword" value="meow"><span class="overlay">too short</span></div></fake-frame></art-frame></DIV>
 
-```svg
-<feColorMatrix type=matrix
-        values="0 0 0 0 0
+<pre class="sx-block"><code><sx-t>&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v>
+        <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 0 0 0
                 0 0 0 0 0
                 0 0 0 0 0
-                0 0 1 0 0" />
-<feComposite in=SourceGraphic operator=in />
-<feBlend in2=white />
-```
+                0 0 1 0 0&quot;</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>in</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 <svg
   class="effect"
@@ -935,27 +929,26 @@ There are all sorts of other effects you can add to make the input seem just rig
   }
 </style>
 
-```svg
-<filter>
-  <feComposite operator=arithmetic
-               k1=0 k2=4 k3=0 k4=0 />
-  <feTile x=20 y=56 width=184 height=22 />
-  <feMorphology operator=erode radius=3 result=thick />
-  <feFlood flood-color=#FFF result=white />
-  <feBlend mode=difference in=thick in2=white />
-  <feComposite operator=arithmetic k2=100 />
-  <feColorMatrix type=matrix
-      values="0 0 0 0 0
+<pre class="sx-block"><code><sx-t>&lt;filter&gt;
+  &lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v>
+               <sx-r>k1</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>4</sx-v> <sx-r>k3</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>k4</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-t>/&gt;
+  &lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>20</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>56</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>184</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>22</sx-v> <sx-t>/&gt;
+  &lt;feMorphology</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>erode</sx-v> <sx-r>radius</sx-r><sx-t>=</sx-t><sx-v>3</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>thick</sx-v> <sx-t>/&gt;
+  &lt;feFlood</sx-t> <sx-r>flood-color</sx-r><sx-t>=</sx-t><sx-v>#FFF</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;
+  &lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>thick</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;
+  &lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>100</sx-v> <sx-t>/&gt;
+  &lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v>
+      <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 0 0 0
               0 0 0 0 0
               0 0 0 0 0
-              0 0 1 0 0" />
-  <feComposite in=SourceGraphic operator=in />
-  <feTile x=21 y=57 width=182 height=20 />
-  <feBlend in2=white />
-  <feBlend mode=difference in2=white />
-  <feComposite operator=arithmetic k2=1 k4=0.02 />
-</filter>
-```
+              0 0 1 0 0&quot;</sx-v> <sx-t>/&gt;
+  &lt;feComposite</sx-t> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>in</sx-v> <sx-t>/&gt;
+  &lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>21</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>57</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>182</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>20</sx-v> <sx-t>/&gt;
+  &lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;
+  &lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;
+  &lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>1</sx-v> <sx-r>k4</sx-r><sx-t>=</sx-t><sx-v>0.02</sx-v> <sx-t>/&gt;
+&lt;/filter&gt;</sx-t>
+</code></pre>
 
 <svg
   class="effect"
@@ -1113,12 +1106,11 @@ For this target, we want to detect when the user clicks on the box to change its
   <p>&lt;--- very cool! click to change color</p>
 </fake-frame></DIV>
 
-```svg
-<feTile x="50" y="50"
-        width="4" height="4" />
-<feTile x="0" y="0"
-        width="100%" height="100%" />
-```
+<pre class="sx-block"><code><sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;50&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;50&quot;</sx-v>
+        <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v>
+        <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 Let's start off by using two copies of the `feTile` filter to first crop out the few pixels we're interested in and then tile those pixels across the entire image.
 
@@ -1129,9 +1121,8 @@ The result is that we now have the entire screen filled with the color of the ar
   <p>&lt;--- very cool! click to change color</p>
 </fake-frame></DIV>
 
-```svg
-<feComposite operator=arithmetic k2=100 />
-```
+<pre class="sx-block"><code><sx-t>&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>100</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 We can turn this result into a binary on/off value by using `feComposite`'s arithmetic the same way as in the last section, but with a way larger `k2` value. This makes it so that the output image is either completely black or completely white.
 
@@ -1140,17 +1131,16 @@ We can turn this result into a binary on/off value by using `feComposite`'s arit
   <p>&lt;--- very cool! click to change color</p>
 </fake-frame></DIV>
 
-```svg
-<feColorMatrix type=matrix
-  values="0 0 0 0 0
+<pre class="sx-block"><code><sx-t>&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v>
+  <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 0 0 0
           0 0 0 0 0
           0 0 0 0 0
-          0 0 1 0 0" result=mask />
-<feGaussianBlur in=SourceGraphic
-                stdDeviation=3 />
-<feComposite operator=in in2=mask />
-<feBlend in2=SourceGraphic />
-```
+          0 0 1 0 0&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>mask</sx-v> <sx-t>/&gt;
+&lt;feGaussianBlur</sx-t> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v>
+                <sx-r>stdDeviation</sx-r><sx-t>=</sx-t><sx-v>3</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>in</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>mask</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 And just as before, this can be used as a mask. We once again convert it into an alpha matte, but this time apply it to the blur filter.
 
@@ -1170,23 +1160,22 @@ How can we adapt this technique to work with arbitrary colors and textures?
   <p>&lt;--- very cool! click to change color</p>
 </fake-frame></DIV>
 
-```svg
-<!-- crop to first stripe of the flag -->
-<feTile x="22" y="22"
-    width="4" height="4" />
-<feTile x="0" y="0" result="col"
-    width="100%" height="100%" />
-<!-- generate a color to diff against -->
-<feFlood flood-color="#5BCFFA"
-         result="blue" />
-<feBlend mode="difference"
-         in="col" in2="blue" />
-<!-- k4 is for more lenient threshold -->
-<feComposite operator=arithmetic
-             k2=100 k4=-5 />
-<!-- do the masking and blur stuff... -->
+<pre class="sx-block"><code><sx-c>&lt;!-- crop to first stripe of the flag --&gt;</sx-c>
+<sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;22&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;22&quot;</sx-v>
+    <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>&quot;col&quot;</sx-v>
+    <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- generate a color to diff against --&gt;</sx-c>
+<sx-t>&lt;feFlood</sx-t> <sx-r>flood-color</sx-r><sx-t>=</sx-t><sx-v>&quot;#5BCFFA&quot;</sx-v>
+         <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>&quot;blue&quot;</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>&quot;difference&quot;</sx-v>
+         <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>&quot;col&quot;</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>&quot;blue&quot;</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- k4 is for more lenient threshold --&gt;</sx-c>
+<sx-t>&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v>
+             <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>100</sx-v> <sx-r>k4</sx-r><sx-t>=</sx-t><sx-v>-5</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- do the masking and blur stuff... --&gt;</sx-c>
 ...
-```
+</code></pre>
 
 The solution is pretty simple - we can simply use `feBlend`'s difference combined with a `feColorMatrix` to join the color channels to turn the image into a similar black/white matte as before. For textures we can use `feImage`, and for non-exact colors we can use a bit of `feComposite`'s arithmetic to make the matching threshold more lenient.
 
@@ -1468,41 +1457,40 @@ These logic gates are what modern computers are made of. You could build a compu
 
 This is a [full adder](https://en.wikipedia.org/wiki/Adder_(electronics)#Full_adder) circuit. This filter implements the logic gates <math><mi>S</mi><mo>=</mo><mi>A</mi><mo>⊕</mo><mi>B</mi><mo>⊕</mo><msub><mi>C</mi><mi>in</mi></msub></math> for the output and <math><msub><mi>C</mi><mi>out</mi></msub><mo>=</mo><mrow><mo>(</mo><mi>A</mi><mo>∧</mo><mi>B</mi><mo>)</mo></mrow><mo>∨</mo><mrow><mo>(</mo><msub><mi>C</mi><mi>in</mi></msub><mo>∧</mo><mrow><mo>(</mo><mi>A</mi><mo>⊕</mo><mi>B</mi><mo>)</mo></mrow><mo>)</mo></mrow></math> for the carry bit using the logic gates described above. There are more efficient ways to implement an adder in SVG filters, but this is meant to serve as proof of the ability to implement arbitrary logic circuits.
 
-```svg
-<!-- util -->
-<feOffset in="SourceGraphic" dx="0" dy="0" result=src />
-<feTile x="16px" y="16px" width="4" height="4" in=src />
-<feTile x="0" y="0" width="100%" height="100%" result=a />
-<feTile x="48px" y="16px" width="4" height="4" in=src />
-<feTile x="0" y="0" width="100%" height="100%" result=b />
-<feTile x="72px" y="16px" width="4" height="4" in=src />
-<feTile x="0" y="0" width="100%" height="100%" result=c />
-<feFlood flood-color=#FFF result=white />
-<!-- A ⊕ B -->
-<feBlend mode=difference in=a in2=b result=ab />
-<!-- [A ⊕ B] ⊕ C -->
-<feBlend mode=difference in2=c />
-<!-- Save result to 'out' -->
-<feTile x="96px" y="0px" width="32" height="32" result=out />
-<!-- C ∧ [A ⊕ B] -->
-<feComposite operator=arithmetic k1=1 in=ab in2=c result=abc />
-<!-- (A ∧ B) -->
-<feComposite operator=arithmetic k1=1 in=a in2=b />
-<!-- [A ∧ B] ∨ [C ∧ (A ⊕ B)] -->
-<feComposite operator=arithmetic k2=1 k3=1 in2=abc />
-<!-- Save result to 'carry' -->
-<feTile x="64px" y="32px" width="32" height="32" result=carry />
-<!-- Combine results -->
-<feBlend in2=out />
-<feBlend in2=src result=done />
-<!-- Shift first row to last -->
-<feTile x="0" y="0" width="100%" height="32" />
-<feTile x="0" y="0" width="100%" height="100%" result=lastrow />
-<feOffset dx="0" dy="-32" in=done />
-<feBlend in2=lastrow />
-<!-- Crop to output -->
-<feTile x="0" y="0" width="100%" height="100%" />
-```
+<pre class="sx-block sx-full"><code><sx-c>&lt;!-- util --&gt;</sx-c>
+<sx-t>&lt;feOffset</sx-t> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>&quot;SourceGraphic&quot;</sx-v> <sx-r>dx</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>dy</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>src</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;16px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;16px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>src</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>a</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;48px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;16px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>src</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>b</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;72px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;16px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>src</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>c</sx-v> <sx-t>/&gt;
+&lt;feFlood</sx-t> <sx-r>flood-color</sx-r><sx-t>=</sx-t><sx-v>#FFF</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- A ⊕ B --&gt;</sx-c>
+<sx-t>&lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>a</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>b</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>ab</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- [A ⊕ B] ⊕ C --&gt;</sx-c>
+<sx-t>&lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>c</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- Save result to &#39;out&#39; --&gt;</sx-c>
+<sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;96px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;32&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;32&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>out</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- C ∧ [A ⊕ B] --&gt;</sx-c>
+<sx-t>&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k1</sx-r><sx-t>=</sx-t><sx-v>1</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>ab</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>c</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>abc</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- (A ∧ B) --&gt;</sx-c>
+<sx-t>&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k1</sx-r><sx-t>=</sx-t><sx-v>1</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>a</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>b</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- [A ∧ B] ∨ [C ∧ (A ⊕ B)] --&gt;</sx-c>
+<sx-t>&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>1</sx-v> <sx-r>k3</sx-r><sx-t>=</sx-t><sx-v>1</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>abc</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- Save result to &#39;carry&#39; --&gt;</sx-c>
+<sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;64px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;32px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;32&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;32&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>carry</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- Combine results --&gt;</sx-c>
+<sx-t>&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>out</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>src</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>done</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- Shift first row to last --&gt;</sx-c>
+<sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;32&quot;</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>lastrow</sx-v> <sx-t>/&gt;
+&lt;feOffset</sx-t> <sx-r>dx</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>dy</sx-r><sx-t>=</sx-t><sx-v>&quot;-32&quot;</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>done</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>lastrow</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- Crop to output --&gt;</sx-c>
+<sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
 
 Anyways, for an attacker, what all of this means is that you can make a multi-step clickjacking attack with lots of conditions and interactivity. And you can run logic on data from cross-origin frames.
 
@@ -1745,6 +1733,74 @@ Which can be expressed in logic gates[^logsyms] as:
 
 And this is how we would implement it in SVG:
 
+<pre class="sx-block sx-full"><code><sx-c>&lt;!-- util --&gt;</sx-c>
+<sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;14px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;4px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-t>/&gt;
+&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>debugEnabled</sx-v>
+  <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0&quot;</sx-v> <sx-t>/&gt;
+&lt;feFlood</sx-t> <sx-r>flood-color</sx-r><sx-t>=</sx-t><sx-v>#FFF</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- attack imgs --&gt;</sx-c>
+<sx-t>&lt;feImage</sx-t> <sx-r>xlink:href</sx-r><sx-t>=</sx-t><sx-v>&quot;data:...&quot;</sx-v> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>420</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>220</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>button1.png</sx-v><sx-t>&gt;&lt;/feImage&gt;
+&lt;feImage</sx-t> <sx-r>xlink:href</sx-r><sx-t>=</sx-t><sx-v>&quot;data:...&quot;</sx-v> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>420</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>220</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>loading.png</sx-v><sx-t>&gt;&lt;/feImage&gt;
+&lt;feImage</sx-t> <sx-r>xlink:href</sx-r><sx-t>=</sx-t><sx-v>&quot;data:...&quot;</sx-v> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>420</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>220</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>checkbox.png</sx-v><sx-t>&gt;&lt;/feImage&gt;
+&lt;feImage</sx-t> <sx-r>xlink:href</sx-r><sx-t>=</sx-t><sx-v>&quot;data:...&quot;</sx-v> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>420</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>220</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>button2.png</sx-v><sx-t>&gt;&lt;/feImage&gt;
+&lt;feImage</sx-t> <sx-r>xlink:href</sx-r><sx-t>=</sx-t><sx-v>&quot;data:...&quot;</sx-v> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>0</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>420</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>220</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>end.png</sx-v><sx-t>&gt;&lt;/feImage&gt;</sx-t>
+<sx-c>&lt;!-- D (dialog visible) --&gt;</sx-c>
+<sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;4px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;4px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>100</sx-v> <sx-r>k4</sx-r><sx-t>=</sx-t><sx-v>-1</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>D</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- L (dialog loaded) --&gt;</sx-c>
+<sx-t>&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;313px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;141px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>&quot;dialogBtn&quot;</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>100</sx-v> <sx-r>k4</sx-r><sx-t>=</sx-t><sx-v>-1</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>L</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- C (checkbox checked) --&gt;</sx-c>
+<sx-t>&lt;feFlood</sx-t> <sx-r>flood-color</sx-r><sx-t>=</sx-t><sx-v>#0B57D0</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>dialogBtn</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>4</sx-v> <sx-r>k4</sx-r><sx-t>=</sx-t><sx-v>-1</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>100</sx-v> <sx-r>k4</sx-r><sx-t>=</sx-t><sx-v>-1</sx-v> <sx-t>/&gt;
+&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v>
+               <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;1 1 1 0 0
+                       1 1 1 0 0
+                       1 1 1 0 0
+                       1 1 1 1 0&quot;</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>mode</sx-r><sx-t>=</sx-t><sx-v>difference</sx-v> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>white</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>C</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- R (red text visible) --&gt;</sx-c>
+<sx-t>&lt;feMorphology</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>erode</sx-v> <sx-r>radius</sx-r><sx-t>=</sx-t><sx-v>3</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;17px&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;150px&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;4&quot;</sx-v> <sx-t>/&gt;
+&lt;feTile</sx-t> <sx-r>x</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>y</sx-r><sx-t>=</sx-t><sx-v>&quot;0&quot;</sx-v> <sx-r>width</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>height</sx-r><sx-t>=</sx-t><sx-v>&quot;100%&quot;</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>redtext</sx-v> <sx-t>/&gt;
+&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v>
+               <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 1 0 0
+                       0 0 0 0 0
+                       0 0 0 0 0
+                       0 0 1 0 0&quot;</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>arithmetic</sx-v> <sx-r>k2</sx-r><sx-t>=</sx-t><sx-v>2</sx-v> <sx-r>k3</sx-r><sx-t>=</sx-t><sx-v>-5</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>redtext</sx-v> <sx-t>/&gt;
+&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>R</sx-v>
+               <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;1 0 0 0 0
+                       1 0 0 0 0
+                       1 0 0 0 0
+                       1 0 0 0 1&quot;</sx-v> <sx-t>/&gt;</sx-t>
+<sx-c>&lt;!-- Attack overlays --&gt;</sx-c>
+<sx-t>&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>R</sx-v>
+  <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0&quot;</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>end.png</sx-v> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>in</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>button1.png</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>SourceGraphic</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>out</sx-v> <sx-t>/&gt;
+&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>C</sx-v>
+  <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0&quot;</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>button2.png</sx-v> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>in</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>checkbox.png</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>loadedGraphic</sx-v> <sx-t>/&gt;
+&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>L</sx-v>
+  <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0&quot;</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>loadedGraphic</sx-v> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>in</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>loading.png</sx-v> <sx-r>result</sx-r><sx-t>=</sx-t><sx-v>dialogGraphic</sx-v> <sx-t>/&gt;
+&lt;feColorMatrix</sx-t> <sx-r>type</sx-r><sx-t>=</sx-t><sx-v>matrix</sx-v> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>D</sx-v>
+  <sx-r>values</sx-r><sx-t>=</sx-t><sx-v>&quot;0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0&quot;</sx-v> <sx-t>/&gt;
+&lt;feComposite</sx-t> <sx-r>in</sx-r><sx-t>=</sx-t><sx-v>dialogGraphic</sx-v> <sx-r>operator</sx-r><sx-t>=</sx-t><sx-v>in</sx-v> <sx-t>/&gt;
+&lt;feBlend</sx-t> <sx-r>in2</sx-r><sx-t>=</sx-t><sx-v>out</sx-v> <sx-t>/&gt;</sx-t>
+</code></pre>
+
 <DIV><fake-frame class="logic-gate-attack" style="filter:url(#logic-gate-filter)">
   <p style="font-size:200%">Securify</p>
   <p>Welcome to this secure application!</p>
@@ -1762,75 +1818,6 @@ And this is how we would implement it in SVG:
 </fake-frame></DIV>
 
 <div><label><input type="checkbox" id="lgDebugCheck">Show attack with transparency</label></div>
-
-```svg
-<!-- util -->
-<feTile x="14px" y="4px" width="4" height="4" in=SourceGraphic />
-<feTile x="0" y="0" width="100%" height="100%" />
-<feColorMatrix type=matrix result=debugEnabled
-  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0" />
-<feFlood flood-color=#FFF result=white />
-<!-- attack imgs -->
-<feImage xlink:href="data:..." x=0 y=0 width=420 height=220 result=button1.png></feImage>
-<feImage xlink:href="data:..." x=0 y=0 width=420 height=220 result=loading.png></feImage>
-<feImage xlink:href="data:..." x=0 y=0 width=420 height=220 result=checkbox.png></feImage>
-<feImage xlink:href="data:..." x=0 y=0 width=420 height=220 result=button2.png></feImage>
-<feImage xlink:href="data:..." x=0 y=0 width=420 height=220 result=end.png></feImage>
-<!-- D (dialog visible) -->
-<feTile x="4px" y="4px" width="4" height="4" in=SourceGraphic />
-<feTile x="0" y="0" width="100%" height="100%" />
-<feBlend mode=difference in2=white />
-<feComposite operator=arithmetic k2=100 k4=-1 result=D />
-<!-- L (dialog loaded) -->
-<feTile x="313px" y="141px" width="4" height="4" in=SourceGraphic />
-<feTile x="0" y="0" width="100%" height="100%" result="dialogBtn" />
-<feBlend mode=difference in2=white />
-<feComposite operator=arithmetic k2=100 k4=-1 result=L />
-<!-- C (checkbox checked) -->
-<feFlood flood-color=#0B57D0 />
-<feBlend mode=difference in=dialogBtn />
-<feComposite operator=arithmetic k2=4 k4=-1 />
-<feComposite operator=arithmetic k2=100 k4=-1 />
-<feColorMatrix type=matrix
-               values="1 1 1 0 0
-                       1 1 1 0 0
-                       1 1 1 0 0
-                       1 1 1 1 0" />
-<feBlend mode=difference in2=white result=C />
-<!-- R (red text visible) -->
-<feMorphology operator=erode radius=3 in=SourceGraphic />
-<feTile x="17px" y="150px" width="4" height="4" />
-<feTile x="0" y="0" width="100%" height="100%" result=redtext />
-<feColorMatrix type=matrix
-               values="0 0 1 0 0
-                       0 0 0 0 0
-                       0 0 0 0 0
-                       0 0 1 0 0" />
-<feComposite operator=arithmetic k2=2 k3=-5 in=redtext />
-<feColorMatrix type=matrix result=R
-               values="1 0 0 0 0
-                       1 0 0 0 0
-                       1 0 0 0 0
-                       1 0 0 0 1" />
-<!-- Attack overlays -->
-<feColorMatrix type=matrix in=R
-  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0" />
-<feComposite in=end.png operator=in />
-<feBlend in2=button1.png />
-<feBlend in2=SourceGraphic result=out />
-<feColorMatrix type=matrix in=C
-  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0" />
-<feComposite in=button2.png operator=in />
-<feBlend in2=checkbox.png result=loadedGraphic />
-<feColorMatrix type=matrix in=L
-  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0" />
-<feComposite in=loadedGraphic operator=in />
-<feBlend in2=loading.png result=dialogGraphic />
-<feColorMatrix type=matrix in=D
-  values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0" />
-<feComposite in=dialogGraphic operator=in />
-<feBlend in2=out />
-```
 
 <svg
   class="effect"
