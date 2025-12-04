@@ -137,6 +137,7 @@ art-frame {
  overflow: clip;
  min-height: 16px;
  background: #FFF;
+ content-visibility: auto;
  &[flex] {
    display: flex;
  }
