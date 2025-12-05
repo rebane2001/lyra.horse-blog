@@ -1,6 +1,6 @@
 +++
 title = "SVG Filters - Clickjacking 2.0"
-date = 2025-12-05T14:00:00Z
+date = 2025-12-04T14:00:00Z
 draft = false
 tags = ["infosec", "css"]
 slug = "svg-clickjacking"
