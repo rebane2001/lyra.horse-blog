@@ -2372,6 +2372,8 @@ see y'all around!!
 
 &lt;3
 
+*Note: I you're making content (articles, videos etc) based on this post, feel free to [reach out](https://lyra.horse/#:~:text=socials) to me to ask for questions or feedback.*
+
 **Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/1996581146662998516), [mastodon](https://infosec.exchange/@rebane2001/115661669658436967), [lobsters](https://lobste.rs/s/omnyrf/svg_filters_clickjacking_2_0)
 
 
