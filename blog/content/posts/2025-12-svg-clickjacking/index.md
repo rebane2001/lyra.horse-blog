@@ -1,11 +1,13 @@
 +++
-title = "SVG Filters - Clickjacking 2.0"
+title = "SVG clickjacking"
 date = 2025-12-04T14:00:00Z
 draft = false
 tags = ["infosec", "css"]
 slug = "svg-clickjacking"
 summary = "A novel and powerful twist on an old classic."
 +++
+
+*Previously titled: "SVG Filters - Clickjacking 2.0"*
 
 Clickjacking is a classic attack that consists of covering up an iframe of some other website in an attempt to trick the user into unintentionally interacting with it. It works great if you need to trick someone into pressing a button or two, but for anything more complicated it's kind of unrealistic.
 
