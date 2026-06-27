@@ -1,10 +1,10 @@
 +++
-title = "A peek into Reddit's spam internals"
+title = "A peek into Reddit's anti-spam internals"
 date = 2026-06-27T16:00:00Z
 draft = false
 tags = ["reddit"]
 slug = "reddit-spam-internals"
-summary = "How Reddit accidentally leaked spamurai to me."
+summary = "How Reddit accidentally leaked its spamurai system."
 +++
 
 <style>
@@ -2552,7 +2552,7 @@ notes:
 
 <p-s s="0.9590444"></p-s>*If you’d like to reach out, feel free to message me on my socials or at lyra.horse [at] gmail.com.*
 
-<p-s s="0.61226535"></p-s>**Discuss this post on:** twitter, mastodon, lobsters
+<p-s s="0.61226535"></p-s>**Discuss this post on:** [twitter](https://twitter.com/rebane2001/status/2070887442891026628), [mastodon](https://infosec.exchange/@rebane2001/116822705466646248), [lobsters](https://lobste.rs/s/boap41/peek_into_reddit_s_anti_spam_internals)
 
 <!-- # Todo: -->
 
