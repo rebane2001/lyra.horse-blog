@@ -62,11 +62,15 @@ summary = "How Reddit accidentally leaked its spamurai system."
   }
   /* Safari crashes with the SVG filter for some people, this replaces the cool filter with just blur lol */
   @supports (font: -apple-system-body) and (-webkit-appearance: none) {
-    html:not(:has(#normalmode:checked)) {
+    /*html:not(:has(#normalmode:checked)) {*/
       censor-ed, .censor, [data-censor] {
-        filter: blur(5px);
+        /* okay so i figured out that this is only an issue during page load, so now on safari you will not have the cool filter effect for the first 4 seconds */
+        transition: 2s 2s filter allow-discrete;
+        @starting-style {
+          filter: blur(5px);
+        }
       }
-    }
+    /*}*/
   }
   .coin-shell {
     &:has(input:checked) { display:none }
@@ -264,7 +268,7 @@ https://www.reddit.com/r/<censor-ed>GoodBoysOnly</censor-ed>/comments/<censor-ed
   </relay-thread>
   <div style="position: absolute; inset:0;background: linear-gradient(#0006, #0000 20%, #0000 80%, #0006); pointer-events: none;"></div>
 </art-frame></DIV>
-<div class="safariwarning"><style>
+<!--<div class="safariwarning"><style>
   @scope { & {
     display: none;
     margin: 1em 0;
@@ -318,7 +322,7 @@ https://www.reddit.com/r/<censor-ed>GoodBoysOnly</censor-ed>/comments/<censor-ed
 <p style="font-size:0.75em">If you're a WebKit dev - the bug is the specific SVG filter I'm using, <em>filter: url(#censor)</em> causes the crash.</p>
 <label>Normal mode<input type=checkbox id="normalmode"></label>
 <label>Compatibility mode<input type=checkbox></label>
-</div>
+</div>-->
 
 <div style="height:1em"></div>
 <!-- So, what happened? -->
