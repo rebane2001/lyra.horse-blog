@@ -60,6 +60,14 @@ summary = "How Reddit accidentally leaked its spamurai system."
   censor-ed, .censor, [data-censor] {
       filter: url(#censor);
   }
+  /* Safari crashes with the SVG filter for some people, this replaces the cool filter with just blur lol */
+  @supports (font: -apple-system-body) and (-webkit-appearance: none) {
+    html:not(:has(#normalmode:checked)) {
+      censor-ed, .censor, [data-censor] {
+        filter: blur(5px);
+      }
+    }
+  }
   .coin-shell {
     &:has(input:checked) { display:none }
     input { display: none }
@@ -256,6 +264,61 @@ https://www.reddit.com/r/<censor-ed>GoodBoysOnly</censor-ed>/comments/<censor-ed
   </relay-thread>
   <div style="position: absolute; inset:0;background: linear-gradient(#0006, #0000 20%, #0000 80%, #0006); pointer-events: none;"></div>
 </art-frame></DIV>
+<div class="safariwarning"><style>
+  @scope { & {
+    display: none;
+    margin: 1em 0;
+    background: #300;
+    color: #F88;
+    padding: 16px;
+    border: 2px solid red;
+    border-radius: 8px;
+    label {
+      margin-top: 1em;
+      font-family: system-ui, sans-serif;
+      font-weight: 600;
+      display: block;
+      text-align: center;
+      cursor: pointer;
+      border: 2px solid;
+      border-radius: 6px;
+      &:not(:last-child) {
+        border-color: green;
+        background: green;
+        color: #FFF;
+      }
+      &:last-child {
+        border-color: grey;
+        background: grey;
+        color: #000;
+      }
+      padding: 6px 14px;
+      &:has(:focus-visible) {
+        outline: 2px solid #FFF;
+      }
+      &:hover {
+        box-shadow: 0 0 0 400px inset #FFF2;
+      }
+    }
+    input {
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+  } }
+@supports (font: -apple-system-body) and (-webkit-appearance: none) {
+  @scope { & {
+    &:not(:has(input:checked)) {
+      display: block;
+    }
+  } }
+}
+</style>
+<p>You're reading this post on Safari. Beta versions of Safari have a bug which can cause the page to crash. Please choose the normal mode below, and if that crashes, choose the compatibility mode.</p>
+<p style="font-size:0.75em">If you're a WebKit dev - the bug is the specific SVG filter I'm using, <em>filter: url(#censor)</em> causes the crash.</p>
+<label>Normal mode<input type=checkbox id="normalmode"></label>
+<label>Compatibility mode<input type=checkbox></label>
+</div>
 
 <div style="height:1em"></div>
 <!-- So, what happened? -->
