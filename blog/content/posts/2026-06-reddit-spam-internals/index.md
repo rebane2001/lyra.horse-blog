@@ -2569,7 +2569,7 @@ background: #FFFFFF;
 
 <p-s s="0.14366198"></p-s>This leads me to believe that REV1 is what *we* know as spamurai. The timeline seems to match, and we've seen samurai emit strings such as "<spam-text>nil</spam-text>" that you'd expect from Lua.
 
-<p-s s="0.67007405"></p-s>There have been [fairly recent user reports](https://old.reddit.com/r/ModSupport/comments/1pejhf7/safety_spamurai/) of posts getting removed by the users /u/Safety_Spamurai and /u/bot-bouncer, so the spamurai name is still at least *somewhat* in use, even for REV2 or snooron.
+<p-s s="0.67007405"></p-s>There have been [fairly recent user reports](https://old.reddit.com/r/ModSupport/comments/1pejhf7/safety_spamurai/) of posts getting removed by the users /u/Safety_Spamurai ~~and /u/bot-bouncer~~ *(edit: bot-bouncer is community ran)*, so the spamurai name is still at least *somewhat* in use, even for REV2 or snooron.
 
 <p-s s="0.03224406"></p-s>But we also saw removals such as <spam-text>u'torenteu'</spam-text> and <spam-text>u'UA-49307539-'</spam-text>, which are clearly Python2.7 unicode strings. The former was way before 2016, so that makes sense, but what about the latter removal that we only saw in like 2020?
 
