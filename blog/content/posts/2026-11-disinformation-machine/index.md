@@ -1806,18 +1806,18 @@ i { color: hsl(calc(71deg * mod(sibling-index(), 13)) 80% 20%) }
 <i><br></i><i>b</i><i>t</i><i>w</i><i> </i><i>c</i><i>l</i><i>i</i><i>c</i><i>k</i><i>i</i><i>n</i><i>g</i><i> </i><i>t</i><i>h</i><i>e</i><i>s</i><i>e</i><i> </i><i>b</i><i>u</i><i>t</i><i>t</i><i>o</i><i>n</i><i>s</i><i> </i><i>h</i><i>a</i><i>s</i><i> </i><i>n</i><i>o</i><i> </i><i>e</i><i>f</i><i>f</i><i>e</i><i>c</i><i>t</i><i> </i><i>e</i><i>x</i><i>c</i><i>e</i><i>p</i><i>t</i><i> </i><i>f</i><i>o</i><i>r</i><i> </i><i>m</i><i>a</i><i>k</i><i>i</i><i>n</i><i>g</i><i> </i><i>t</i><i>h</i><i>i</i><i>s</i><i> </i><i>t</i><i>e</i><i>x</i><i>t</i><i> </i><i>h</i><i>e</i><i>r</i><i>e</i><i> </i><i>a</i><i>p</i><i>p</i><i>e</i><i>a</i><i>r</i><i> </i><i>l</i><i>o</i><i>l</i><i>,</i><i> </i><i>b</i><i>u</i><i>t</i><i> </i><i>i</i><i> </i><i>g</i><i>u</i><i>e</i><i>s</i><i>s</i><i> </i><i>t</i><i>h</i><i>i</i><i>s</i><i> </i><i>a</i><i>l</i><i>r</i><i>e</i><i>a</i><i>d</i><i>y</i><i> </i><i>c</i><i>o</i><i>u</i><i>n</i><i>t</i><i>s</i><i> </i><i>a</i><i>s</i><i> </i><i>a</i><i>n</i><i> </i><i>e</i><i>a</i><i>s</i><i>t</i><i>e</i><i>r</i><i> </i><i>e</i><i>g</i><i>g</i><i> </i><i>s</i><i>o</i><i> </i><i>k</i><i>n</i><i>o</i><i>c</i><i>k</i><i> </i><i>y</i><i>o</i><i>u</i><i>r</i><i>s</i><i>e</i><i>l</i><i>f</i><i> </i><i>o</i><i>u</i><i>t</i><i>.</i><i>.</i><i>.</i>
 </details>
 
-but yeah, as always, this post is lovingly handcrafted and doesn't use any external resources (images, videos, javascript etc). this time the size ended up being around 44kB (gzipped[^gzip]). yay!
+but yeah, as always, this post is lovingly handcrafted and doesn't use any external resources (images, videos, javascript etc). this time the size ended up being around 49kB (gzipped[^gzip]). yay!
 
 [^gzip]: i actually realized the other day that my server isn't even doing the best gzip compression: <pre><style>@scope{white-space:pre-wrap;background:#000;padding:16px;margin:0;margin-top:-8px;margin-bottom:4px;box-sizing:border-box;border-radius:8px;::selection{background:#FFF;color:magenta}code{color:cyan}c-v{color:lime}c-c{color:orange}c-s{color:yellow}c-k{color:magenta}c-w{color:gainsboro}}</style><code><c-k>for</c-k> <c-v>i</c-v> <c-k>in</c-k> {1..9}<c-w>;</c-w> <c-k>do</c-k> <c-c>gzip</c-c> --keep -f -<c-v>$i</c-v> <c-s>index.html</c-s><c-w>;</c-w> <c-c>echo</c-c> -n <c-v>$i</c-v><c-s>:\ </c-s><c-w>;</c-w> <c-c>ls</c-c> -sh -1 <c-s>index.html.gz</c-s> <c-w>|</c-w> <c-c>grep</c-c> -o <c-s>'^\S*'</c-s><c-w>;</c-w> <c-k>done</c-k>
-1: 44K
-2: 44K
-3: 40K
-4: 40K
-5: 36K
-6: 36K
-7: 36K
-8: 36K
-9: 36K</code></pre> so in theory i could shave even more bytes off my posts ^^
+1: 52K
+2: 48K
+3: 48K
+4: 44K
+5: 44K
+6: 40K
+7: 40K
+8: 40K
+9: 40K</code></pre> so in theory i could shave even more bytes off my posts ^^
 
 also news time - google ended up paying me a bounty of $18k for [svg clickjacking](https://lyra.horse/blog/2025/12/svg-clickjacking/), i got two (!!) talks accepted at [40c3](https://events.ccc.de/congress/2026/) this year - [Putting the C in CSS](https://lyra.horse/slides/#2026-congress) and [youre telling me a QR coded this?](https://lyra.horse/slides/#2026-congress-qr), and [x3ctf](https://x3c.tf/) is happening dec 4th through dec 6th, please come and play!
 
