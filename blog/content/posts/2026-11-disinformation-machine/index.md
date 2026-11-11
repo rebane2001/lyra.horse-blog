@@ -257,7 +257,7 @@ I am not a millionaire. I have never been one. And yet, if you were to ask Googl
 
 I am a hacker, though. I am a hacker with 14 Chrome CVEs. And I think I am a good hacker. But I don't think I'm the bestest hacker. I don't believe I'm capable of finding a vulnerability that's worth over a million dollars. And even if I were, I don't think Google would pay that much for a Chromium vulnerability.
 
-<span style="font-size:0.8em;font-weight:600;font-style:italic;">Content note: Due to the topics discussed, this post contains some examples of AI-generated text. Those examples are clearly differenciated[^lol]. Everything else in this blog post is fully human-made - I do not use AI.</span>
+<span style="font-size:0.8em;font-weight:600;font-style:italic;">Content note: Due to the topics discussed, this post contains some examples of AI-generated text. Those examples are clearly differentiated[^lol]. Everything else in this blog post is fully human-made - I do not use AI.</span>
 
 [^lol]: The snippets are either marked with "<span class="aio-logo" style="display:inline-flex;margin:-10px 0;translate:0 8px">AI overview</span>" (google), <span style="color:#AC97FF;background:#15202B;padding:2px 1px;margin:-2px -1px;border-radius:4px">"experimental AI contributor"</span> (twitter), or <span style="color:darkred">red text</span> (other).
 
